@@ -16,31 +16,31 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<PromoCode> PromoCodes => Set<PromoCode>();
 
-    protected override void OnModelCreating(ModelBuilder b)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(b);
+        base.OnModelCreating(builder);
 
-        b.Entity<Seat>().HasIndex(s => new { s.VenueId, s.Row, s.Number }).IsUnique();
-        b.Entity<Review>().HasIndex(r => new { r.UserId, r.EventId }).IsUnique();
-        b.Entity<PromoCode>().HasIndex(p => p.Code).IsUnique();
+        builder.Entity<Seat>().HasIndex(s => new { s.VenueId, s.Row, s.Number }).IsUnique();
+        builder.Entity<Review>().HasIndex(r => new { r.UserId, r.EventId }).IsUnique();
+        builder.Entity<PromoCode>().HasIndex(p => p.Code).IsUnique();
 
         // One cart per user.
-        b.Entity<Order>().HasIndex(o => o.UserId).IsUnique().HasFilter("[Status] = 0");
+        builder.Entity<Order>().HasIndex(o => o.UserId).IsUnique().HasFilter("[Status] = 0");
 
         // Double-booking lock: one non-cancelled ticket per (showtime, seat).
-        b.Entity<Ticket>().HasIndex(t => new { t.ShowtimeId, t.SeatId }).IsUnique().HasFilter("[Status] <> 2");
-        b.Entity<Ticket>().HasIndex(t => t.Code).IsUnique().HasFilter("[Code] IS NOT NULL");
+        builder.Entity<Ticket>().HasIndex(t => new { t.ShowtimeId, t.SeatId }).IsUnique().HasFilter("[Status] <> 2");
+        builder.Entity<Ticket>().HasIndex(t => t.Code).IsUnique().HasFilter("[Code] IS NOT NULL");
 
-        b.Entity<Seat>().HasOne(s => s.Venue).WithMany(v => v.Seats).HasForeignKey(s => s.VenueId).OnDelete(DeleteBehavior.Cascade);
-        b.Entity<Showtime>().HasOne(s => s.Event).WithMany(e => e.Showtimes).HasForeignKey(s => s.EventId).OnDelete(DeleteBehavior.Cascade);
-        b.Entity<Review>().HasOne(r => r.Event).WithMany(e => e.Reviews).HasForeignKey(r => r.EventId).OnDelete(DeleteBehavior.Cascade);
-        b.Entity<Review>().HasOne(r => r.User).WithMany(u => u.Reviews).HasForeignKey(r => r.UserId).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Seat>().HasOne(s => s.Venue).WithMany(v => v.Seats).HasForeignKey(s => s.VenueId).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Showtime>().HasOne(s => s.Event).WithMany(e => e.Showtimes).HasForeignKey(s => s.EventId).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Review>().HasOne(r => r.Event).WithMany(e => e.Reviews).HasForeignKey(r => r.EventId).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Review>().HasOne(r => r.User).WithMany(u => u.Reviews).HasForeignKey(r => r.UserId).OnDelete(DeleteBehavior.Cascade);
 
-        b.Entity<Showtime>().HasOne(s => s.Venue).WithMany(v => v.Showtimes).HasForeignKey(s => s.VenueId).OnDelete(DeleteBehavior.Restrict);
-        b.Entity<Order>().HasOne(o => o.User).WithMany(u => u.Orders).HasForeignKey(o => o.UserId).OnDelete(DeleteBehavior.Restrict);
-        b.Entity<Order>().HasOne(o => o.PromoCode).WithMany(p => p.Orders).HasForeignKey(o => o.PromoCodeId).OnDelete(DeleteBehavior.Restrict);
-        b.Entity<Ticket>().HasOne(t => t.Showtime).WithMany(s => s.Tickets).HasForeignKey(t => t.ShowtimeId).OnDelete(DeleteBehavior.Restrict);
-        b.Entity<Ticket>().HasOne(t => t.Seat).WithMany().HasForeignKey(t => t.SeatId).OnDelete(DeleteBehavior.Restrict);
-        b.Entity<Ticket>().HasOne(t => t.Order).WithMany(o => o.Tickets).HasForeignKey(t => t.OrderId).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Showtime>().HasOne(s => s.Venue).WithMany(v => v.Showtimes).HasForeignKey(s => s.VenueId).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Order>().HasOne(o => o.User).WithMany(u => u.Orders).HasForeignKey(o => o.UserId).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Order>().HasOne(o => o.PromoCode).WithMany(p => p.Orders).HasForeignKey(o => o.PromoCodeId).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Ticket>().HasOne(t => t.Showtime).WithMany(s => s.Tickets).HasForeignKey(t => t.ShowtimeId).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Ticket>().HasOne(t => t.Seat).WithMany().HasForeignKey(t => t.SeatId).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Ticket>().HasOne(t => t.Order).WithMany(o => o.Tickets).HasForeignKey(t => t.OrderId).OnDelete(DeleteBehavior.Restrict);
     }
 }

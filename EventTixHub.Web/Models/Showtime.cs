@@ -13,10 +13,10 @@ public class Showtime : BaseEntity, IValidatableObject
 
     public DateTime StartsAt { get; set; }
 
-    [Range(0.01, 1000), Precision(10, 2)]
+    [Range(typeof(decimal), "0.01", "1000"), Precision(10, 2)]
     public decimal StandardPrice { get; set; }
 
-    [Range(0.01, 1000), Precision(10, 2)]
+    [Range(typeof(decimal), "0.01", "1000"), Precision(10, 2)]
     public decimal VipPrice { get; set; }
 
     public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
