@@ -1,5 +1,6 @@
 using EventTixHub.Web.Data;
 using EventTixHub.Web.Models;
+using EventTixHub.Web.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,7 @@ builder.Services.ConfigureApplicationCookie(o =>
 });
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<TicketService>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddControllersWithViews();
 
