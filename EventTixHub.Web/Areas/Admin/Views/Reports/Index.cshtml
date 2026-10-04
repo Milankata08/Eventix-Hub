@@ -44,9 +44,9 @@ else
                     <td>@o.StartsAt.ToString("dd.MM.yyyy HH:mm")</td>
                     <td>
                         <div class="progress" role="progressbar" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100">
-                            <div class="progress-bar @(o.IsCritical ? "bg-danger" : "")" style="width:@percent%">@percent%</div>
+                            <div class="progress-bar @(o.IsCritical ? "bg-danger" : "")" style="width:@percent%"></div>
                         </div>
-                        <div class="small text-muted">@o.Taken от @o.Capacity места</div>
+                        <div class="small text-muted">@percent% · @o.Taken от @o.Capacity места</div>
                     </td>
                     <td>@if (o.IsCritical) { <span class="badge bg-danger">критична</span> }</td>
                 </tr>
@@ -73,8 +73,9 @@ else
                     <td>@h.Showtimes</td>
                     <td>
                         <div class="progress" role="progressbar" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100">
-                            <div class="progress-bar @(percent >= BookingRules.CriticalOccupancyPercent ? "bg-danger" : "")" style="width:@percent%">@percent%</div>
+                            <div class="progress-bar @(percent >= BookingRules.CriticalOccupancyPercent ? "bg-danger" : "")" style="width:@percent%"></div>
                         </div>
+                        <div class="small text-muted">@percent%</div>
                     </td>
                 </tr>
             }
