@@ -1,0 +1,80 @@
+@model ProfileIndexVM
+@{
+    ViewData["Title"] = "Профил";
+    var tabs = new[]
+    {
+        (TicketHistoryFilter.Upcoming, "Предстоящи"),
+        (TicketHistoryFilter.Past, "Минали"),
+        (TicketHistoryFilter.Cancelled, "Отказани")
+    };
+    var pager = new PagerVM(Model.Tickets.Page, Model.Tickets.TotalPages,
+        new Dictionary<string, string?> { ["filter"] = Model.Filter.ToString() });
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <h1 class="h3">@Model.FullName</h1>
+        <div class="text-muted">@Model.Email</div>
+        <div class="text-muted">@(string.IsNullOrEmpty(Model.PhoneNumber) ? "Няма телефон" : Model.PhoneNumber)</div>
+    </div>
+    <a class="btn btn-outline-primary" asp-action="Edit">Редакция</a>
+</div>
+
+<h2 class="h4">Моите билети</h2>
+<ul class="nav nav-tabs mb-3">
+    @foreach (var (value, label) in tabs)
+    {
+        <li class="nav-item">
+            <a class="nav-link @(Model.Filter == value ? "active" : "")" asp-action="Index" asp-route-filter="@value">@label</a>
+        </li>
+    }
+</ul>
+
+@if (Model.Tickets.Items.Count == 0)
+{
+    <p class="text-muted">Няма билети.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Събитие</th>
+                    <th>Зала</th>
+                    <th>Начало</th>
+                    <th>Място</th>
+                    <th>Намаление</th>
+                    <th>Цена</th>
+                    <th>Код</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var t in Model.Tickets.Items)
+                {
+                    <tr>
+                        <td>@t.EventTitle</td>
+                        <td>@t.VenueName</td>
+                        <td>@t.StartsAt.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>Ред @t.Row, място @t.Number (@t.Category.DisplayName())</td>
+                        <td>@t.Concession.DisplayName()</td>
+                        <td>@t.Price.ToString("0.00") €</td>
+                        <td>@t.Code</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" href="/Tickets/Details/@t.TicketId">Детайли</a>
+                            @if (t.CanCancel)
+                            {
+                                <form action="/Tickets/Cancel/@t.TicketId" method="post" asp-antiforgery="true" class="d-inline"
+                                      onsubmit="return confirm('Сигурни ли сте, че искате да откажете билета?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Откажи</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <partial name="_Pager" model="pager" />
+}

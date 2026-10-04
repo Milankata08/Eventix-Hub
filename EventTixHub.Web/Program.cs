@@ -1,7 +1,9 @@
+using System.Globalization;
 using EventTixHub.Web.Data;
 using EventTixHub.Web.Models;
 using EventTixHub.Web.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(o =>
     o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// One culture for model binding and formatting: decimals always bind with '.'.
+CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+
 builder.Services.AddIdentity<User, Role>()
+    .AddErrorDescriber<BulgarianIdentityErrorDescriber>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
@@ -29,7 +36,7 @@ builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ReportService>();
 builder.Services.AddSingleton(TimeProvider.System);
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(o => o.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
 
 var app = builder.Build();
 
@@ -56,6 +63,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStatusCodePagesWithReExecute("/Home/Status/{0}");
 app.UseRouting();
 
 app.UseAuthentication();
