@@ -29,8 +29,11 @@ public class EventFormVM
     [Range(1, 600, ErrorMessage = "Продължителността трябва да е между {1} и {2} минути."), Display(Name = "Продължителност (мин)")]
     public int DurationMinutes { get; set; } = 90;
 
-    [StringLength(500, ErrorMessage = "Адресът може да е до {1} символа."), Url(ErrorMessage = "Невалиден адрес на плакат."), Display(Name = "Плакат (URL)")]
+    /// <summary>Current poster URL, kept in a hidden field; replaced when <see cref="Poster"/> is uploaded.</summary>
     public string? PosterUrl { get; set; }
+
+    [Display(Name = "Плакат (JPG/PNG, до 2 MB)")]
+    public IFormFile? Poster { get; set; }
 
     public static EventFormVM From(Event e) => new()
     {

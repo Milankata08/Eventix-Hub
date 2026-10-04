@@ -37,6 +37,7 @@ builder.Services.AddScoped<VenueService>();
 builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ReportService>();
+builder.Services.AddSingleton<PosterStorage>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddControllersWithViews(o =>
 {
@@ -92,6 +93,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseStaticFiles(); // runtime uploads in wwwroot/uploads (MapStaticAssets only serves build-time files)
 app.MapStaticAssets();
 
 app.MapAreaControllerRoute(
