@@ -33,7 +33,7 @@ public class VenueService(IRepository<Venue> venues, IRepository<Seat> seats, IR
     public async Task<Venue> CreateAsync(Venue venue)
     {
         await venues.AddAsync(venue);
-        foreach (var seat in NewSeats(venue, 1, venue.Rows, 1, venue.SeatsPerRow))
+        foreach (var seat in NewSeats(venue))
             venue.Seats.Add(seat);
         await venues.SaveChangesAsync();
         return venue;
@@ -59,7 +59,7 @@ public class VenueService(IRepository<Venue> venues, IRepository<Seat> seats, IR
                 seats.Remove(seat);
             var kept = existing.Where(s => s.Row <= venue.Rows && s.Number <= venue.SeatsPerRow)
                 .Select(s => (s.Row, s.Number)).ToHashSet();
-            foreach (var seat in NewSeats(current, 1, venue.Rows, 1, venue.SeatsPerRow)
+            foreach (var seat in NewSeats(current, venue.Rows, venue.SeatsPerRow)
                          .Where(s => !kept.Contains((s.Row, s.Number))))
                 await seats.AddAsync(seat);
             current.Rows = venue.Rows;
@@ -91,8 +91,10 @@ public class VenueService(IRepository<Venue> venues, IRepository<Seat> seats, IR
         await seats.SaveChangesAsync();
     }
 
-    private static IEnumerable<Seat> NewSeats(Venue venue, int rowFrom, int rowTo, int numberFrom, int numberTo) =>
-        from row in Enumerable.Range(rowFrom, rowTo - rowFrom + 1)
-        from number in Enumerable.Range(numberFrom, numberTo - numberFrom + 1)
+    private static IEnumerable<Seat> NewSeats(Venue venue) => NewSeats(venue, venue.Rows, venue.SeatsPerRow);
+
+    private static IEnumerable<Seat> NewSeats(Venue venue, int rows, int seatsPerRow) =>
+        from row in Enumerable.Range(1, rows)
+        from number in Enumerable.Range(1, seatsPerRow)
         select new Seat { Venue = venue, Row = row, Number = number, Category = SeatCategory.Standard };
 }

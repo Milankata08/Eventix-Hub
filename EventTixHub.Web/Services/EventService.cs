@@ -159,9 +159,9 @@ public class EventService(
             ?? throw new BookingException("Прожекцията не е намерена.");
         if (showtime.StartsAt != current.StartsAt && showtime.StartsAt <= Now)
             throw new BookingException("Прожекцията трябва да започва в бъдещето.");
-        if (showtime.VenueId != current.VenueId
+        if ((showtime.VenueId != current.VenueId || showtime.EventId != current.EventId)
             && await tickets.Query().AnyAsync(t => t.ShowtimeId == showtime.Id))
-            throw new BookingException("Залата не може да се сменя, след като има билети.");
+            throw new BookingException("Залата и събитието не могат да се сменят, след като има билети.");
         await EnsureNoOverlapAsync(showtime);
 
         current.EventId = showtime.EventId;

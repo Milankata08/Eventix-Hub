@@ -42,6 +42,12 @@ public class ReviewServiceTests
     }
 
     [Fact]
+    public async Task AddReview_RejectsUserWithNoTicketAtAll()
+    {
+        await Assert.ThrowsAsync<BookingException>(() => Service().AddAsync(1, 1, 5, "Супер"));
+    }
+
+    [Fact]
     public async Task AddReview_SavesReviewForAttendee()
     {
         _tickets.Add(Attended());
