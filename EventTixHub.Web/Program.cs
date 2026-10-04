@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.Json.Serialization;
 using EventTixHub.Web.Data;
 using EventTixHub.Web.Models;
 using EventTixHub.Web.Services;
@@ -41,7 +42,7 @@ builder.Services.AddControllersWithViews(o =>
     o.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
     o.ModelBindingMessageProvider.SetValueIsInvalidAccessor(v => $"Стойността „{v}“ е невалидна.");
     o.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "Полето е задължително.");
-});
+}).AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 var app = builder.Build();
 

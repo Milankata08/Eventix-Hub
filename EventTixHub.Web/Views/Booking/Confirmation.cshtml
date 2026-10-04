@@ -1,0 +1,15 @@
+@model ConfirmationVM
+@{
+    ViewData["Title"] = "Потвърждение";
+}
+
+<h1 class="h3">Поръчка №@Model.OrderId е платена</h1>
+<p class="text-muted">Общо: @Model.Total.ToString("0.00") €. Представете QR кода на входа.</p>
+
+@foreach (var card in Model.Tickets)
+{
+    <partial name="_TicketCard" model="card" />
+}
+
+<button type="button" class="btn btn-outline-secondary d-print-none" onclick="window.print()">Печат</button>
+<a class="btn btn-primary d-print-none" asp-controller="Profile" asp-action="Index">Моите билети</a>
