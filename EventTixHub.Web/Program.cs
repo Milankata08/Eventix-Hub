@@ -21,6 +21,8 @@ builder.Services.ConfigureApplicationCookie(o =>
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<TicketService>();
+builder.Services.AddScoped<OrderService>();
+builder.Services.AddScoped<PromoCodeService>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddControllersWithViews();
 

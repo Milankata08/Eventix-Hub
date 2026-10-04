@@ -30,7 +30,11 @@ public class BookingFlowTests : IDisposable
             Event = ev, Venue = venue, StartsAt = _clock.Now.DateTime.AddDays(2),
             StandardPrice = 10m, VipPrice = 20m
         };
-        db.AddRange(u1, u2, showtime);
+        db.AddRange(u1, u2, showtime, new PromoCode
+        {
+            Code = "WELCOME10", DiscountPercent = 10, UsageLimit = 100, IsActive = true,
+            ValidFrom = _clock.Now.DateTime.AddDays(-1), ValidUntil = _clock.Now.DateTime.AddDays(30)
+        });
         db.SaveChanges();
         _user1 = u1.Id;
         _user2 = u2.Id;
@@ -45,6 +49,39 @@ public class BookingFlowTests : IDisposable
         var db = _db.NewContext();
         return new TicketService(new Repository<Showtime>(db), new Repository<Seat>(db),
             new Repository<Ticket>(db), new Repository<Order>(db), _clock, NullLogger<TicketService>.Instance);
+    }
+
+    private OrderService Orders()
+    {
+        var db = _db.NewContext();
+        return new OrderService(new Repository<Order>(db), new Repository<Ticket>(db),
+            new Repository<PromoCode>(db), _clock, NullLogger<OrderService>.Instance);
+    }
+
+    [Fact]
+    public async Task FullFlow_ReserveConcessionPromoCheckout_ProducesPaidTickets()
+    {
+        using (var db = _db.NewContext())
+        {
+            var seatIds = db.Seats.OrderBy(s => s.Number).Select(s => s.Id).ToList();
+            await Service().ReserveSeatsAsync(_user1, _showtimeId, seatIds);
+        }
+        int studentTicketId;
+        using (var db = _db.NewContext())
+            studentTicketId = db.Tickets.Include(t => t.Seat).Single(t => t.Seat.Number == 1).Id;
+
+        await Orders().SetConcessionAsync(_user1, studentTicketId, ConcessionType.Student);
+        await Orders().ApplyPromoAsync(_user1, "welcome10");
+        var order = await Orders().CheckoutAsync(_user1);
+
+        using var check = _db.NewContext();
+        var paid = check.Orders.Include(o => o.Tickets).Single();
+        Assert.Equal((OrderStatus.Paid, 25.20m), (paid.Status, paid.TotalAmount));
+        Assert.All(paid.Tickets, t => Assert.Equal(TicketStatus.Paid, t.Status));
+        Assert.Equal(2, paid.Tickets.Select(t => t.Code).Distinct().Count());
+        Assert.Equal(1, check.PromoCodes.Single().TimesUsed);
+        Assert.Equal(order.Id, paid.Id);
+        Assert.Equal(2, (await Service().GetSeatMapAsync(_showtimeId))!.SoldCount);
     }
 
     [Fact]
