@@ -12,6 +12,7 @@
     <div class="col-md-3">
         <button type="submit" class="btn btn-outline-primary">Покажи</button>
         <a class="btn btn-link" asp-action="Index">Текущ месец</a>
+        <a class="btn btn-outline-success" asp-action="Export" asp-route-from="@Model.From.ToString("yyyy-MM-dd")" asp-route-to="@Model.To.ToString("yyyy-MM-dd")">Експорт CSV</a>
     </div>
 </form>
 
