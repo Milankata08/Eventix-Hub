@@ -93,6 +93,12 @@ public class TicketService(
             throw new BookingException($"Ред {seat.Row}, място {seat.Number} е заето.");
         }
 
+        // The user's own expired holds are dead cart weight: drop them along with the requested seats' ones.
+        if (cart is not null)
+            expired.AddRange((await tickets.Query()
+                .Where(t => t.OrderId == cart.Id && t.Status == TicketStatus.Reserved && t.ReservedUntil <= now)
+                .ToListAsync()).Except(expired));
+
         if (expired.Count > 0)
         {
             foreach (var t in expired)

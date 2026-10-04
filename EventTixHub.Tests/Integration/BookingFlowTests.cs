@@ -93,6 +93,21 @@ public class BookingFlowTests : IDisposable
     }
 
     [Fact]
+    public async Task Reserve_DropsTheUsersOwnExpiredHoldsFromTheCart()
+    {
+        await Service().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
+        _clock.Now = _clock.Now.AddMinutes(11);
+        int otherSeat;
+        using (var db = _db.NewContext())
+            otherSeat = db.Seats.Single(s => s.Number == 2).Id;
+
+        await Service().ReserveSeatsAsync(_user1, _showtimeId, [otherSeat]);
+
+        using var check = _db.NewContext();
+        Assert.Equal(otherSeat, check.Tickets.Single().SeatId);
+    }
+
+    [Fact]
     public async Task DatabaseRefusesSecondNonCancelledTicketForSameSeat()
     {
         await Service().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
