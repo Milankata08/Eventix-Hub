@@ -1,0 +1,32 @@
+@model (string Title, IReadOnlyList<RevenueRowDto> Rows, string NameHeader)
+@{
+    var max = Model.Rows.Count == 0 ? 0 : Model.Rows.Max(r => r.Revenue);
+}
+
+<h2 class="h5 mt-4">@Model.Title</h2>
+@if (Model.Rows.Count == 0)
+{
+    <p class="text-muted">Няма данни.</p>
+}
+else
+{
+    <table class="table align-middle">
+        <thead><tr><th>@Model.NameHeader</th><th>Билети</th><th style="width:40%">Приход</th></tr></thead>
+        <tbody>
+        @foreach (var r in Model.Rows)
+        {
+            var percent = max == 0 ? 0 : (int)Math.Round(100 * r.Revenue / max);
+            <tr>
+                <td>@r.Name</td>
+                <td>@r.TicketsSold</td>
+                <td>
+                    <div class="progress" role="progressbar" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar" style="width:@percent%"></div>
+                    </div>
+                    <div class="small">@r.Revenue.ToString("0.00") €</div>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
