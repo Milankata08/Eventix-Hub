@@ -143,4 +143,39 @@ public class BookingFlowTests : IDisposable
 
         await Service().ReserveSeatsAsync(_user2, _showtimeId, [_seatId]);
     }
+
+    [Fact]
+    public async Task CancelledTicketSeatCanBeBoughtAgain()
+    {
+        await Service().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
+        await Orders().CheckoutAsync(_user1);
+        int ticketId;
+        using (var db = _db.NewContext())
+            ticketId = db.Tickets.Single().Id;
+
+        await Service().CancelTicketAsync(_user1, ticketId);
+        await Service().ReserveSeatsAsync(_user2, _showtimeId, [_seatId]);
+
+        var history = await Service().GetUserTicketsAsync(_user1, TicketHistoryFilter.Cancelled, 1);
+        Assert.Single(history.Items);
+        using var check = _db.NewContext();
+        Assert.Equal(OrderStatus.Cancelled, check.Orders.Single(o => o.UserId == _user1).Status);
+    }
+
+    [Fact]
+    public async Task HistorySplitsUpcomingAndPast_AndDetailsAreOwnerOnly()
+    {
+        await Service().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
+        await Orders().CheckoutAsync(_user1);
+
+        var upcoming = await Service().GetUserTicketsAsync(_user1, TicketHistoryFilter.Upcoming, 1);
+        var ticketId = Assert.Single(upcoming.Items).TicketId;
+        Assert.True(upcoming.Items[0].CanCancel);
+        Assert.NotNull(await Service().GetUserTicketAsync(_user1, ticketId));
+        Assert.Null(await Service().GetUserTicketAsync(_user2, ticketId));
+
+        _clock.Now = _clock.Now.AddDays(3);
+        Assert.Empty((await Service().GetUserTicketsAsync(_user1, TicketHistoryFilter.Upcoming, 1)).Items);
+        Assert.Single((await Service().GetUserTicketsAsync(_user1, TicketHistoryFilter.Past, 1)).Items);
+    }
 }

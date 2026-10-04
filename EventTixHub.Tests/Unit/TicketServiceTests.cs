@@ -19,6 +19,7 @@ public class TicketServiceTests
     private readonly List<Seat> _seats = Enumerable.Range(1, 12)
         .Select(i => new Seat { Id = i, VenueId = 1, Row = 1, Number = i }).ToList();
     private readonly List<Ticket> _tickets = [];
+    private readonly Mock<IRepository<Ticket>> _ticketRepo = new();
 
     private TicketService Service()
     {
@@ -26,11 +27,10 @@ public class TicketServiceTests
         showtimes.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(_showtime);
         var seats = new Mock<IRepository<Seat>>();
         seats.Setup(r => r.Query()).Returns(_seats.BuildMock());
-        var tickets = new Mock<IRepository<Ticket>>();
-        tickets.Setup(r => r.Query()).Returns(_tickets.BuildMock());
+        _ticketRepo.Setup(r => r.Query()).Returns(_tickets.BuildMock());
         var orders = new Mock<IRepository<Order>>();
         orders.Setup(r => r.Query()).Returns(new List<Order>().BuildMock());
-        return new TicketService(showtimes.Object, seats.Object, tickets.Object, orders.Object,
+        return new TicketService(showtimes.Object, seats.Object, _ticketRepo.Object, orders.Object,
             new FakeClock(Now), NullLogger<TicketService>.Instance);
     }
 
@@ -65,5 +65,46 @@ public class TicketServiceTests
         _seats[0].VenueId = 2;
 
         await Assert.ThrowsAsync<BookingException>(() => Service().ReserveSeatsAsync(1, 1, [1]));
+    }
+
+    private Ticket PaidTicket(int ownerId = 1) => new()
+    {
+        Id = 5, OrderId = 9, SeatId = 3, Status = TicketStatus.Paid, Showtime = _showtime,
+        Order = new Order { Id = 9, UserId = ownerId, Status = OrderStatus.Paid }
+    };
+
+    [Fact]
+    public async Task Cancel_RejectsSomeoneElsesTicket()
+    {
+        _tickets.Add(PaidTicket(ownerId: 2));
+
+        await Assert.ThrowsAsync<BookingException>(() => Service().CancelTicketAsync(1, 5));
+        _ticketRepo.Verify(r => r.SaveChangesAsync(), Times.Never);
+    }
+
+    [Fact]
+    public async Task Cancel_BeforeDeadline_MarksTicketCancelledAndSaves()
+    {
+        var ticket = PaidTicket();
+        _tickets.Add(ticket);
+
+        await Service().CancelTicketAsync(1, 5);
+
+        Assert.Equal((TicketStatus.Cancelled, Now.DateTime), (ticket.Status, ticket.CancelledAt));
+        Assert.Equal(OrderStatus.Cancelled, ticket.Order.Status);
+        _ticketRepo.Verify(r => r.SaveChangesAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task Cancel_AfterDeadline_IsRejectedAndNothingSaved()
+    {
+        _showtime.StartsAt = Now.DateTime.AddHours(24).AddMinutes(-1);
+        var ticket = PaidTicket();
+        _tickets.Add(ticket);
+
+        await Assert.ThrowsAsync<BookingException>(() => Service().CancelTicketAsync(1, 5));
+
+        Assert.Equal(TicketStatus.Paid, ticket.Status);
+        _ticketRepo.Verify(r => r.SaveChangesAsync(), Times.Never);
     }
 }

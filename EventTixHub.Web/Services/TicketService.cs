@@ -160,4 +160,67 @@ public class TicketService(
             throw new BookingException("Билетът току-що беше променен. Опреснете количката.");
         }
     }
+
+    // BR-11
+    public async Task CancelTicketAsync(int userId, int ticketId)
+    {
+        var ticket = await tickets.Query()
+            .Include(t => t.Order).Include(t => t.Showtime)
+            .FirstOrDefaultAsync(t => t.Id == ticketId && t.Order.UserId == userId && t.Status == TicketStatus.Paid)
+            ?? throw new BookingException("Билетът не е намерен.");
+
+        var now = Now;
+        if (!BookingRules.CanCancel(ticket.Showtime.StartsAt, now))
+            throw new BookingException(
+                $"Билет може да се откаже най-късно {BookingRules.CancellationDeadlineHours} часа преди началото.");
+
+        ticket.Status = TicketStatus.Cancelled;
+        ticket.CancelledAt = now;
+        var othersActive = await tickets.Query().AnyAsync(t =>
+            t.OrderId == ticket.OrderId && t.Id != ticket.Id && t.Status != TicketStatus.Cancelled);
+        if (!othersActive)
+            ticket.Order.Status = OrderStatus.Cancelled;
+
+        try
+        {
+            await tickets.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            logger.LogWarning(ex, "Ticket {TicketId} changed while being cancelled", ticketId);
+            throw new BookingException("Билетът току-що беше променен. Опреснете страницата.");
+        }
+    }
+
+    public async Task<PagedResult<UserTicketDto>> GetUserTicketsAsync(
+        int userId, TicketHistoryFilter filter, int page, int pageSize = 10)
+    {
+        var now = Now;
+        var query = OwnedHistory(userId);
+        query = filter switch
+        {
+            TicketHistoryFilter.Cancelled => query.Where(t => t.Status == TicketStatus.Cancelled),
+            TicketHistoryFilter.Past => query.Where(t => t.Status == TicketStatus.Paid && t.Showtime.StartsAt < now),
+            _ => query.Where(t => t.Status == TicketStatus.Paid && t.Showtime.StartsAt >= now)
+        };
+        // Upcoming: soonest first; otherwise most recent first.
+        query = filter == TicketHistoryFilter.Upcoming
+            ? query.OrderBy(t => t.Showtime.StartsAt)
+            : query.OrderByDescending(t => t.Showtime.StartsAt);
+        return await ToDto(query, now).ToPagedResultAsync(page, pageSize);
+    }
+
+    public Task<UserTicketDto?> GetUserTicketAsync(int userId, int ticketId) =>
+        ToDto(OwnedHistory(userId).Where(t => t.Id == ticketId), Now).FirstOrDefaultAsync();
+
+    // Paid and cancelled tickets only: reserved ones are cart items, not history.
+    private IQueryable<Ticket> OwnedHistory(int userId) => tickets.Query()
+        .Where(t => t.Order.UserId == userId && t.Status != TicketStatus.Reserved);
+
+    private static IQueryable<UserTicketDto> ToDto(IQueryable<Ticket> query, DateTime now) => query
+        .Select(t => new UserTicketDto(t.Id, t.Showtime.Event.Title, t.Showtime.Venue.Name, t.Showtime.StartsAt,
+            t.Seat.Row, t.Seat.Number, t.Seat.Category, t.Concession, t.Price, t.Code, t.Status,
+            // Mirrors BookingRules.CanCancel, which EF cannot translate.
+            t.Status == TicketStatus.Paid
+            && t.Showtime.StartsAt >= now.AddHours(BookingRules.CancellationDeadlineHours)));
 }
