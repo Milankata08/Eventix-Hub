@@ -8,6 +8,18 @@ public class AfishaVM
     public EventFilter Filter { get; set; } = new();
     public FilterOptions Options { get; set; } = null!;
     public PagedResult<EventCardDto> Events { get; set; } = null!;
+
+    // Filters the pager keeps when changing page.
+    public Dictionary<string, string?> RouteValues() => new()
+    {
+        ["Search"] = Filter.Search,
+        ["Type"] = Filter.Type?.ToString(),
+        ["Genre"] = Filter.Genre,
+        ["City"] = Filter.City,
+        ["VenueId"] = Filter.VenueId?.ToString(),
+        ["Date"] = Filter.Date?.ToString("yyyy-MM-dd"),
+        ["Sort"] = Filter.Sort.ToString()
+    };
 }
 
 public class EventDetailsVM
@@ -21,6 +33,7 @@ public class EventDetailsVM
 
 public class ReviewVM
 {
+    [Range(1, int.MaxValue, ErrorMessage = "Невалидно събитие.")]
     public int EventId { get; set; }
 
     [Range(1, 5, ErrorMessage = "Оценката трябва да е между 1 и 5.")]

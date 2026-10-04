@@ -2,16 +2,7 @@
 @{
     ViewData["Title"] = "Афиш";
     var f = Model.Filter;
-    var pager = new PagerVM(Model.Events.Page, Model.Events.TotalPages, new Dictionary<string, string?>
-    {
-        ["Search"] = f.Search,
-        ["Type"] = f.Type?.ToString(),
-        ["Genre"] = f.Genre,
-        ["City"] = f.City,
-        ["VenueId"] = f.VenueId?.ToString(),
-        ["Date"] = f.Date?.ToString("yyyy-MM-dd"),
-        ["Sort"] = f.Sort.ToString()
-    });
+    var pager = new PagerVM(Model.Events.Page, Model.Events.TotalPages, Model.RouteValues());
 }
 
 <h1 class="h3 mb-3">Афиш</h1>

@@ -36,7 +36,12 @@ builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ReportService>();
 builder.Services.AddSingleton(TimeProvider.System);
-builder.Services.AddControllersWithViews(o => o.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
+builder.Services.AddControllersWithViews(o =>
+{
+    o.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+    o.ModelBindingMessageProvider.SetValueIsInvalidAccessor(v => $"Стойността „{v}“ е невалидна.");
+    o.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "Полето е задължително.");
+});
 
 var app = builder.Build();
 

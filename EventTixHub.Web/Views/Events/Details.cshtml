@@ -103,6 +103,10 @@ else if (Model.CurrentUserId is null)
         <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path">Влезте</a>, за да оцените събитието.
     </p>
 }
+else if (!Model.CanReview)
+{
+    <p class="text-muted">Можете да оцените събитие само веднъж и само ако сте били с платен билет на негова прожекция, която вече е започнала.</p>
+}
 
 @if (Model.Reviews.Items.Count == 0)
 {
