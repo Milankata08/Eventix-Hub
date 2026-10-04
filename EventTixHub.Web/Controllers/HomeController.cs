@@ -1,12 +1,20 @@
 using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 using EventTixHub.Web.Models;
+using EventTixHub.Web.Services;
+using EventTixHub.Web.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EventTixHub.Web.Controllers;
 
-public class HomeController : Controller
+public class HomeController(EventService eventService) : Controller
 {
-    public IActionResult Index() => View();
+    public async Task<IActionResult> Index([FromQuery] EventFilter filter, int page = 1) =>
+        View(new AfishaVM
+        {
+            Filter = filter,
+            Options = await eventService.GetFilterOptionsAsync(),
+            Events = await eventService.SearchAsync(filter, page)
+        });
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error() =>

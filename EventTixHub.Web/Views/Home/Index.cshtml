@@ -1,8 +1,110 @@
+@model AfishaVM
 @{
     ViewData["Title"] = "Афиш";
+    var f = Model.Filter;
+    var pager = new PagerVM(Model.Events.Page, Model.Events.TotalPages, new Dictionary<string, string?>
+    {
+        ["Search"] = f.Search,
+        ["Type"] = f.Type?.ToString(),
+        ["Genre"] = f.Genre,
+        ["City"] = f.City,
+        ["VenueId"] = f.VenueId?.ToString(),
+        ["Date"] = f.Date?.ToString("yyyy-MM-dd"),
+        ["Sort"] = f.Sort.ToString()
+    });
 }
 
-<div class="text-center">
-    <h1 class="display-4">EventTix Hub</h1>
-    <p>Билети за кино, концерти и театър.</p>
-</div>
+<h1 class="h3 mb-3">Афиш</h1>
+
+<form method="get" asp-action="Index" class="row g-2 mb-4">
+    <div class="col-md-4">
+        <input name="Search" value="@f.Search" class="form-control" placeholder="Търсене по заглавие или жанр" />
+    </div>
+    <div class="col-md-2">
+        <select name="Type" class="form-select">
+            <option value="">Всички видове</option>
+            @foreach (var t in Enum.GetValues<EventType>())
+            {
+                <option value="@t" selected="@(f.Type == t)">@t.DisplayName()</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="Genre" class="form-select">
+            <option value="">Всички жанрове</option>
+            @foreach (var g in Model.Options.Genres)
+            {
+                <option value="@g" selected="@(f.Genre == g)">@g</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="City" class="form-select">
+            <option value="">Всички градове</option>
+            @foreach (var c in Model.Options.Cities)
+            {
+                <option value="@c" selected="@(f.City == c)">@c</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="VenueId" class="form-select">
+            <option value="">Всички зали</option>
+            @foreach (var v in Model.Options.Venues)
+            {
+                <option value="@v.Id" selected="@(f.VenueId == v.Id)">@v.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <input type="date" name="Date" value="@f.Date?.ToString("yyyy-MM-dd")" class="form-control" aria-label="Дата" />
+    </div>
+    <div class="col-md-3">
+        <select name="Sort" class="form-select" aria-label="Сортиране">
+            <option value="Date" selected="@(f.Sort == EventSort.Date)">По дата</option>
+            <option value="Title" selected="@(f.Sort == EventSort.Title)">По заглавие</option>
+            <option value="Rating" selected="@(f.Sort == EventSort.Rating)">По оценка</option>
+        </select>
+    </div>
+    <div class="col-md-6 text-md-end">
+        <button type="submit" class="btn btn-primary">Търси</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">Изчисти</a>
+    </div>
+</form>
+
+@if (Model.Events.Items.Count == 0)
+{
+    <p class="text-muted">Няма намерени събития.</p>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-4">
+        @foreach (var e in Model.Events.Items)
+        {
+            <div class="col">
+                <div class="card h-100">
+                    @if (!string.IsNullOrEmpty(e.PosterUrl))
+                    {
+                        <img src="@e.PosterUrl" class="card-img-top" alt="@e.Title" style="height:220px;object-fit:cover" />
+                    }
+                    else
+                    {
+                        <div class="card-img-top bg-secondary-subtle d-flex align-items-center justify-content-center text-muted" style="height:220px">Без плакат</div>
+                    }
+                    <div class="card-body">
+                        <span class="badge text-bg-primary">@e.Type.DisplayName()</span>
+                        <span class="badge text-bg-light">@e.Genre</span>
+                        <h2 class="h5 mt-2"><a asp-controller="Events" asp-action="Details" asp-route-id="@e.Id" class="stretched-link text-decoration-none">@e.Title</a></h2>
+                        <div class="small text-muted">
+                            @(e.AverageRating is { } r ? $"★ {r:0.0}" : "Няма оценки")
+                        </div>
+                        <div class="small">
+                            @(e.NextShowtime is { } n ? $"Следващо: {n:dd.MM.yyyy HH:mm}" : "Няма предстоящи прожекции")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <partial name="_Pager" model="pager" />
+}
