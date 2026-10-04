@@ -25,7 +25,13 @@ builder.Services.AddControllersWithViews();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
-    scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.Migrate();
+{
+    var sp = scope.ServiceProvider;
+    var db = sp.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+    await DbSeeder.SeedAsync(db, sp.GetRequiredService<UserManager<User>>(),
+        sp.GetRequiredService<RoleManager<Role>>(), sp.GetRequiredService<TimeProvider>());
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
