@@ -107,4 +107,28 @@ public class TicketServiceTests
         Assert.Equal(TicketStatus.Paid, ticket.Status);
         _ticketRepo.Verify(r => r.SaveChangesAsync(), Times.Never);
     }
+
+    [Fact]
+    public async Task Cancel_ExactlyAtDeadline_IsAllowed()
+    {
+        _showtime.StartsAt = Now.DateTime.AddHours(24);
+        var ticket = PaidTicket();
+        _tickets.Add(ticket);
+
+        await Service().CancelTicketAsync(1, 5);
+
+        Assert.Equal(TicketStatus.Cancelled, ticket.Status);
+    }
+
+    [Fact]
+    public async Task Cancel_OneOfSeveralTickets_KeepsOrderPaid()
+    {
+        var ticket = PaidTicket();
+        var other = new Ticket { Id = 6, OrderId = 9, SeatId = 4, Status = TicketStatus.Paid, Order = ticket.Order };
+        _tickets.AddRange([ticket, other]);
+
+        await Service().CancelTicketAsync(1, 5);
+
+        Assert.Equal((TicketStatus.Cancelled, OrderStatus.Paid), (ticket.Status, ticket.Order.Status));
+    }
 }
