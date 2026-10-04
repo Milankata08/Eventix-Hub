@@ -32,7 +32,7 @@ public static class DbSeeder
 
     public static async Task SeedAsync(ApplicationDbContext db, UserManager<User> users, RoleManager<Role> roles, TimeProvider clock)
     {
-        if (await db.Events.AnyAsync()) return;
+        if (await db.Events.AnyAsync() || await db.Venues.AnyAsync() || await db.PromoCodes.AnyAsync()) return;
 
         var now = clock.GetLocalNow().DateTime;
 

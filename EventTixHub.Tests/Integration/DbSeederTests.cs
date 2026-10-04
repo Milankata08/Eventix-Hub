@@ -48,6 +48,22 @@ public class DbSeederTests : IDisposable
     }
 
     [Fact]
+    public async Task Seed_WithExistingPromoCodeAndNoEvents_DoesNotSeedOrThrow()
+    {
+        using (var db = _testDb.NewContext())
+        {
+            db.PromoCodes.Add(new PromoCode { Code = "WELCOME10", DiscountPercent = 5, UsageLimit = 1, ValidFrom = DateTime.Today, ValidUntil = DateTime.Today.AddDays(1), IsActive = true });
+            await db.SaveChangesAsync();
+        }
+
+        await SeedAsync();
+
+        using var check = _testDb.NewContext();
+        Assert.Equal(1, await check.PromoCodes.CountAsync());
+        Assert.Equal(0, await check.Events.CountAsync());
+    }
+
+    [Fact]
     public async Task Seed_ShowtimesDoNotOverlapInSameVenue()
     {
         await SeedAsync();
