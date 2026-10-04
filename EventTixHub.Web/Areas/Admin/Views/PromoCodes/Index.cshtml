@@ -46,6 +46,7 @@ else
                 <td>
                     @if (!p.IsActive) { <span class="badge text-bg-secondary">Неактивен</span> }
                     else if (p.ValidUntil < Model.Now) { <span class="badge text-bg-warning">Изтекъл</span> }
+                    else if (p.TimesUsed >= p.UsageLimit) { <span class="badge text-bg-danger">Изчерпан</span> }
                     else { <span class="badge text-bg-success">Активен</span> }
                 </td>
                 <td class="text-end">
