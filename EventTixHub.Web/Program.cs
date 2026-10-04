@@ -29,10 +29,13 @@ using (var scope = app.Services.CreateScope())
     var sp = scope.ServiceProvider;
     var db = sp.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
-    // Demo data includes known credentials: development only.
+    var roleManager = sp.GetRequiredService<RoleManager<Role>>();
+    // Demo data includes known credentials: development only. SeedAsync also seeds roles.
     if (app.Environment.IsDevelopment())
-        await DbSeeder.SeedAsync(db, sp.GetRequiredService<UserManager<User>>(),
-            sp.GetRequiredService<RoleManager<Role>>(), sp.GetRequiredService<TimeProvider>());
+        await DbSeeder.SeedAsync(db, sp.GetRequiredService<UserManager<User>>(), roleManager,
+            sp.GetRequiredService<TimeProvider>());
+    else
+        await DbSeeder.SeedRolesAsync(roleManager);
 }
 
 // Configure the HTTP request pipeline.

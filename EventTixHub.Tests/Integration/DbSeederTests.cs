@@ -14,7 +14,7 @@ public class DbSeederTests : IDisposable
 
     public void Dispose() => _testDb.Dispose();
 
-    private async Task SeedAsync()
+    private async Task SeedAsync(bool rolesOnly = false)
     {
         var services = new ServiceCollection();
         services.AddLogging();
@@ -23,6 +23,11 @@ public class DbSeederTests : IDisposable
         await using var provider = services.BuildServiceProvider();
         using var scope = provider.CreateScope();
         var sp = scope.ServiceProvider;
+        if (rolesOnly)
+        {
+            await DbSeeder.SeedRolesAsync(sp.GetRequiredService<RoleManager<Role>>());
+            return;
+        }
         await DbSeeder.SeedAsync(sp.GetRequiredService<ApplicationDbContext>(), sp.GetRequiredService<UserManager<User>>(),
             sp.GetRequiredService<RoleManager<Role>>(), _clock);
     }
@@ -61,6 +66,18 @@ public class DbSeederTests : IDisposable
         using var check = _testDb.NewContext();
         Assert.Equal(1, await check.PromoCodes.CountAsync());
         Assert.Equal(0, await check.Events.CountAsync());
+    }
+
+    [Fact]
+    public async Task SeedRoles_CreatesBothRolesOnce_AndNoDemoData()
+    {
+        await SeedAsync(rolesOnly: true);
+        await SeedAsync(rolesOnly: true);
+
+        using var db = _testDb.NewContext();
+        Assert.Equal([Roles.Administrator, Roles.Customer], await db.Roles.Select(r => r.Name!).OrderBy(n => n).ToListAsync());
+        Assert.Equal(0, await db.Users.CountAsync());
+        Assert.Equal(0, await db.Events.CountAsync());
     }
 
     [Fact]

@@ -30,14 +30,19 @@ public static class DbSeeder
         ("Морска зала Варна", "Варна", "бул. Приморски 7", 7, 10, 1),
     ];
 
+    // Roles are required in every environment (registration assigns Customer); demo data is not.
+    public static async Task SeedRolesAsync(RoleManager<Role> roles)
+    {
+        foreach (var role in new[] { Roles.Administrator, Roles.Customer })
+            if (!await roles.RoleExistsAsync(role)) await roles.CreateAsync(new Role(role));
+    }
+
     public static async Task SeedAsync(ApplicationDbContext db, UserManager<User> users, RoleManager<Role> roles, TimeProvider clock)
     {
+        await SeedRolesAsync(roles);
         if (await db.Events.AnyAsync() || await db.Venues.AnyAsync() || await db.PromoCodes.AnyAsync()) return;
 
         var now = clock.GetLocalNow().DateTime;
-
-        foreach (var role in new[] { Roles.Administrator, Roles.Customer })
-            if (!await roles.RoleExistsAsync(role)) await roles.CreateAsync(new Role(role));
 
         await EnsureUserAsync(users, "admin@eventtix.bg", "Admin123!", "Админ", "Администратор", Roles.Administrator);
         var demo = await EnsureUserAsync(users, "user@eventtix.bg", "User123!", "Иван", "Петров", Roles.Customer);
