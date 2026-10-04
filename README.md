@@ -35,7 +35,7 @@ dotnet run --project EventTixHub.Web
 dotnet test
 ```
 
-Модулни тестове (xUnit, Moq) и интеграционни тестове (SQLite in-memory) — общо 64.
+Модулни тестове (xUnit, Moq) и интеграционни тестове (SQLite in-memory) — общо 68.
 
 ## Swagger
 
