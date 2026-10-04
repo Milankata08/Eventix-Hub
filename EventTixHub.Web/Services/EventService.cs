@@ -69,6 +69,9 @@ public class EventService(
         return new FilterOptions(genres, cities, venueList);
     }
 
+    public async Task<IReadOnlyList<EventOption>> GetEventOptionsAsync() =>
+        await events.Query().OrderBy(e => e.Title).Select(e => new EventOption(e.Id, e.Title)).ToListAsync();
+
     public async Task<EventDetailsDto?> GetDetailsAsync(int id)
     {
         var ev = await events.GetByIdAsync(id);

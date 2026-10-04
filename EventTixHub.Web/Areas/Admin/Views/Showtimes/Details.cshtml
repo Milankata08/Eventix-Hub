@@ -1,0 +1,32 @@
+@model SeatsVM
+@{
+    var map = Model.Map;
+    ViewData["Title"] = "Заетост на прожекция";
+}
+
+<h1 class="h3">@map.EventTitle</h1>
+<div class="text-muted mb-3">@map.VenueName · @map.StartsAt.ToString("dd.MM.yyyy HH:mm")
+    · Стандартно @map.StandardPrice.ToString("0.00") € · VIP @map.VipPrice.ToString("0.00") €</div>
+
+<div id="seatmap" data-showtime-id="@map.ShowtimeId" data-mode="monitor"
+     data-standard-price="@map.StandardPrice.ToString("0.00")" data-vip-price="@map.VipPrice.ToString("0.00")">
+    <div class="seat-legend mb-3">
+        <span><i class="seat seat-free"></i> свободно</span>
+        <span><i class="seat seat-vip"></i> VIP</span>
+        <span><i class="seat seat-held"></i> резервирано</span>
+        <span><i class="seat seat-sold"></i> продадено</span>
+    </div>
+    <div class="text-center text-muted mb-2">ЕКРАН / СЦЕНА</div>
+    <div class="seat-grid mb-3" data-role="grid" aria-live="polite">Зареждане…</div>
+    <div class="text-muted small mb-3">
+        Свободни: <span data-count="free">@map.FreeCount</span> ·
+        Резервирани: <span data-count="held">@map.HeldCount</span> ·
+        Продадени: <span data-count="sold">@map.SoldCount</span>
+        (обновява се на всеки 5 секунди)
+    </div>
+</div>
+<a class="btn btn-link" asp-action="Index">Към прожекциите</a>
+
+@section Scripts {
+    <script src="~/js/seatmap.js" asp-append-version="true"></script>
+}

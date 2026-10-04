@@ -1,0 +1,60 @@
+@model ShowtimeFormVM
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Нова прожекция" : "Редакция на прожекция";
+}
+
+<div class="row">
+    <div class="col-lg-7">
+        <h1 class="h3 mb-3">@ViewData["Title"]</h1>
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="EventId" class="form-label"></label>
+                    <select asp-for="EventId" class="form-select">
+                        <option value="">Изберете…</option>
+                        @foreach (var e in Model.Events)
+                        {
+                            <option value="@e.Id" selected="@(Model.EventId == e.Id)">@e.Title</option>
+                        }
+                    </select>
+                    <span asp-validation-for="EventId" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="VenueId" class="form-label"></label>
+                    <select asp-for="VenueId" class="form-select">
+                        <option value="">Изберете…</option>
+                        @foreach (var v in Model.Venues)
+                        {
+                            <option value="@v.Id" selected="@(Model.VenueId == v.Id)">@v.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="VenueId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="StartsAt" class="form-label"></label>
+                <input asp-for="StartsAt" type="datetime-local" class="form-control" />
+                <span asp-validation-for="StartsAt" class="text-danger"></span>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="StandardPrice" class="form-label"></label>
+                    <input asp-for="StandardPrice" type="number" step="0.01" class="form-control" />
+                    <span asp-validation-for="StandardPrice" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="VipPrice" class="form-label"></label>
+                    <input asp-for="VipPrice" type="number" step="0.01" class="form-control" />
+                    <span asp-validation-for="VipPrice" class="text-danger"></span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Запази</button>
+            <a class="btn btn-link" asp-action="Index">Отказ</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

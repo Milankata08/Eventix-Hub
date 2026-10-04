@@ -1,0 +1,66 @@
+@model AdminEventsVM
+@{
+    ViewData["Title"] = "Събития";
+    var pager = new PagerVM(Model.Events.Page, Model.Events.TotalPages, new Dictionary<string, string?>
+    {
+        ["search"] = Model.Search, ["type"] = Model.Type?.ToString(), ["genre"] = Model.Genre
+    });
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Събития</h1>
+    <a class="btn btn-primary" asp-action="Create">Ново събитие</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4"><input name="search" value="@Model.Search" class="form-control" placeholder="Търсене по заглавие или жанр" /></div>
+    <div class="col-md-3">
+        <select name="type" class="form-select" aria-label="Вид">
+            <option value="">Всички видове</option>
+            @foreach (var t in Enum.GetValues<EventType>())
+            {
+                <option value="@t" selected="@(Model.Type == t)">@t.DisplayName()</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select name="genre" class="form-select" aria-label="Жанр">
+            <option value="">Всички жанрове</option>
+            @foreach (var g in Model.Options.Genres)
+            {
+                <option value="@g" selected="@(Model.Genre == g)">@g</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-outline-primary">Търси</button>
+        <a class="btn btn-link" asp-action="Index">Изчисти</a>
+    </div>
+</form>
+
+@if (Model.Events.Items.Count == 0)
+{
+    <p class="text-muted">Няма намерени събития.</p>
+}
+else
+{
+    <table class="table align-middle">
+        <thead><tr><th>Заглавие</th><th>Вид</th><th>Жанр</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var e in Model.Events.Items)
+        {
+            <tr>
+                <td>@e.Title</td>
+                <td>@e.Type.DisplayName()</td>
+                <td>@e.Genre</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@e.Id">Детайли</a>
+                    <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@e.Id">Редакция</a>
+                    <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@e.Id">Изтриване</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <partial name="_Pager" model="pager" />
+}

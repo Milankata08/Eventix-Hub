@@ -14,6 +14,8 @@ public record EventCardDto(
 
 public record VenueOption(int Id, string Name);
 
+public record EventOption(int Id, string Title);
+
 public record FilterOptions(IReadOnlyList<string> Genres, IReadOnlyList<string> Cities, IReadOnlyList<VenueOption> Venues);
 
 public record ShowtimeCardDto(
