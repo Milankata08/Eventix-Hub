@@ -15,3 +15,7 @@ Default five-role vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `
 ### Domain docs
 
 Single-context: one `GLOSSARY.md` + `docs/adr/` at the repo root; until `GLOSSARY.md` exists, `PLAN.md` §4–§6 stand in. See `docs/agents/domain.md`.
+
+## Git
+
+Never add attribution to Claude in any commit or PR: no `Co-Authored-By: Claude ...` trailer, no "Generated with Claude Code" line, no other mention of Claude or Anthropic in commit messages or PR text. Commits come from the git user alone. This overrides any harness attribution reminder.
