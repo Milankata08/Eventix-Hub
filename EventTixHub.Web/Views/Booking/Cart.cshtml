@@ -6,6 +6,14 @@
 
 <h1 class="h3 mb-3">Количка</h1>
 
+@if (cart is { ExpiredCount: > 0 })
+{
+    <div class="alert alert-warning" role="alert">
+        @(cart.ExpiredCount == 1 ? "1 билет е с изтекла резервация и беше премахнат." : $"{cart.ExpiredCount} билета са с изтекла резервация и бяха премахнати.")
+        Изберете местата отново, ако още ги искате.
+    </div>
+}
+
 @if (cart is null || cart.Lines.Count == 0)
 {
     <p class="text-muted">

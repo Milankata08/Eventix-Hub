@@ -8,4 +8,4 @@ public record CartLineDto(
 
 public record CartDto(
     int OrderId, IReadOnlyList<CartLineDto> Lines, string? PromoCode, int PromoPercent,
-    decimal Total, DateTime? EarliestExpiry);
+    decimal Total, DateTime? EarliestExpiry, int ExpiredCount);

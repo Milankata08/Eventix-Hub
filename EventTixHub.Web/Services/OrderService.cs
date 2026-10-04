@@ -66,7 +66,8 @@ public class OrderService(
             t.ReservedUntil!.Value)).ToList();
         return new CartDto(cart.Id, lines, percent > 0 ? cart.PromoCode!.Code : null, percent,
             BookingRules.OrderTotal(lines.Select(l => l.Price)),
-            lines.Count == 0 ? null : lines.Min(l => l.ReservedUntil));
+            lines.Count == 0 ? null : lines.Min(l => l.ReservedUntil),
+            cart.Tickets.Count(t => t.Status == TicketStatus.Reserved && t.ReservedUntil <= now));
     }
 
     public async Task SetConcessionAsync(int userId, int ticketId, ConcessionType concession)
