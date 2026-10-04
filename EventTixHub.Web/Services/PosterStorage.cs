@@ -4,7 +4,8 @@ namespace EventTixHub.Web.Services;
 public class PosterStorage(IWebHostEnvironment env)
 {
     public const long MaxBytes = 2 * 1024 * 1024;
-    const string UrlPrefix = "/uploads/";
+    const string UploadsDir = "uploads";
+    const string UrlPrefix = "/" + UploadsDir + "/";
 
     /// <summary>Returns the extension to store (".jpg"/".png"), or throws <see cref="BookingException"/>.</summary>
     public static string Validate(string fileName, long length)
@@ -19,25 +20,49 @@ public class PosterStorage(IWebHostEnvironment env)
         return ext;
     }
 
+    /// <summary>True when the leading bytes match the PNG or JPEG signature for <paramref name="ext"/>.</summary>
+    public static bool HasImageSignature(ReadOnlySpan<byte> header, string ext) => ext == ".png"
+        ? header.StartsWith(new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A })
+        : header.StartsWith(new byte[] { 0xFF, 0xD8, 0xFF });
+
     /// <summary>Stores the file and returns its public URL.</summary>
     public async Task<string> SaveAsync(IFormFile file)
     {
         var ext = Validate(file.FileName, file.Length);
-        var dir = Path.Combine(env.WebRootPath, "uploads");
+        var header = new byte[8];
+        await using (var peek = file.OpenReadStream())
+            header = header[..await peek.ReadAsync(header)];
+        if (!HasImageSignature(header, ext))
+            throw new BookingException("Файлът не е валидно JPG или PNG изображение.");
+
+        var dir = Path.Combine(env.WebRootPath, UploadsDir);
         Directory.CreateDirectory(dir);
         var name = Guid.NewGuid().ToString("N") + ext;
-        await using var stream = File.Create(Path.Combine(dir, name));
-        await file.CopyToAsync(stream);
+        var path = Path.Combine(dir, name);
+        try
+        {
+            await using var stream = File.Create(path);
+            await file.CopyToAsync(stream);
+        }
+        catch
+        {
+            File.Delete(path); // no partial file left behind
+            throw;
+        }
         return UrlPrefix + name;
     }
 
-    /// <summary>Deletes a previously uploaded poster; ignores external URLs and missing files.</summary>
+    /// <summary>Best-effort delete of an uploaded poster; ignores external URLs and I/O failures.</summary>
     public void Delete(string? posterUrl)
     {
         if (posterUrl is null || !posterUrl.StartsWith(UrlPrefix))
             return;
-        var path = Path.Combine(env.WebRootPath, "uploads", Path.GetFileName(posterUrl));
-        if (File.Exists(path))
-            File.Delete(path);
+        try
+        {
+            File.Delete(Path.Combine(env.WebRootPath, UploadsDir, Path.GetFileName(posterUrl)));
+        }
+        catch (IOException)
+        {
+        }
     }
 }

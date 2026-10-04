@@ -37,10 +37,13 @@
             <div class="mb-3">
                 <label asp-for="Poster" class="form-label"></label>
                 <input asp-for="Poster" type="file" accept=".jpg,.jpeg,.png" class="form-control" />
-                <input asp-for="PosterUrl" type="hidden" />
                 @if (!string.IsNullOrEmpty(Model.PosterUrl))
                 {
-                    <img src="@Model.PosterUrl" alt="" class="mt-2 rounded" style="max-height:120px" />
+                    <img src="@Model.PosterUrl" alt="" class="d-block mt-2 rounded" style="max-height:120px" />
+                    <div class="form-check mt-2">
+                        <input asp-for="RemovePoster" class="form-check-input" />
+                        <label asp-for="RemovePoster" class="form-check-label"></label>
+                    </div>
                 }
                 <span asp-validation-for="Poster" class="text-danger"></span>
             </div>

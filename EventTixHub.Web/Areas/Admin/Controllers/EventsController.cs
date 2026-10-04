@@ -7,6 +7,9 @@ namespace EventTixHub.Web.Areas.Admin.Controllers;
 
 public class EventsController(EventService eventService, PosterStorage posters) : AdminController
 {
+    // Poster limit plus headroom for the other form fields.
+    private const int MaxRequestBytes = (int)PosterStorage.MaxBytes + 1024 * 1024;
+
     public async Task<IActionResult> Index(string? search, EventType? type, string? genre, int page = 1)
     {
         var filter = new EventFilter(search, type, genre, Sort: EventSort.Title);
@@ -25,14 +28,23 @@ public class EventsController(EventService eventService, PosterStorage posters) 
     [HttpGet]
     public IActionResult Create() => View("Form", new EventFormVM());
 
-    [HttpPost]
+    [HttpPost, RequestSizeLimit(MaxRequestBytes)]
     public async Task<IActionResult> Create(EventFormVM vm)
     {
-        if (!await TrySavePosterAsync(vm))
+        if (!ModelState.IsValid || !await TryUploadPosterAsync(vm))
             return View("Form", vm);
-        var ev = await eventService.CreateEventAsync(vm.ToEntity());
-        TempData["Success"] = "Събитието е създадено.";
-        return RedirectToAction(nameof(Details), new { id = ev.Id });
+        try
+        {
+            var ev = await eventService.CreateEventAsync(vm.ToEntity());
+            TempData["Success"] = "Събитието е създадено.";
+            return RedirectToAction(nameof(Details), new { id = ev.Id });
+        }
+        catch
+        {
+            if (vm.Poster is not null)
+                posters.Delete(vm.PosterUrl);
+            throw;
+        }
     }
 
     [HttpGet]
@@ -42,35 +54,45 @@ public class EventsController(EventService eventService, PosterStorage posters) 
         return ev is null ? NotFound() : View("Form", EventFormVM.From(ev));
     }
 
-    [HttpPost]
+    [HttpPost, RequestSizeLimit(MaxRequestBytes)]
     public async Task<IActionResult> Edit(int id, EventFormVM vm)
     {
+        var current = await eventService.GetEventAsync(id);
+        if (current is null)
+            return NotFound();
         vm.Id = id;
-        var oldPoster = vm.PosterUrl;
-        if (!await TrySavePosterAsync(vm))
+        vm.PosterUrl = current.PosterUrl; // server-side value, never trusted from the form
+        if (!ModelState.IsValid || !await TryUploadPosterAsync(vm))
             return View("Form", vm);
+        if (vm.Poster is null && vm.RemovePoster)
+            vm.PosterUrl = null;
         try
         {
-            await eventService.UpdateEventAsync(vm.ToEntity());
+            var oldPoster = await eventService.UpdateEventAsync(vm.ToEntity());
+            if (oldPoster != vm.PosterUrl)
+                posters.Delete(oldPoster);
         }
         catch (BookingException ex)
         {
-            if (vm.PosterUrl != oldPoster)
+            if (vm.Poster is not null)
                 posters.Delete(vm.PosterUrl);
+            vm.PosterUrl = current.PosterUrl;
             ModelState.AddModelError("", ex.Message);
             return View("Form", vm);
         }
-        if (vm.PosterUrl != oldPoster)
-            posters.Delete(oldPoster);
+        catch
+        {
+            if (vm.Poster is not null)
+                posters.Delete(vm.PosterUrl);
+            throw;
+        }
         TempData["Success"] = "Събитието е обновено.";
         return RedirectToAction(nameof(Details), new { id });
     }
 
-    // Validates the form, stores an uploaded poster and points vm.PosterUrl at it.
-    private async Task<bool> TrySavePosterAsync(EventFormVM vm)
+    // Stores an uploaded poster and points vm.PosterUrl at it.
+    private async Task<bool> TryUploadPosterAsync(EventFormVM vm)
     {
-        if (!ModelState.IsValid)
-            return false;
         if (vm.Poster is null)
             return true;
         try
@@ -97,9 +119,7 @@ public class EventsController(EventService eventService, PosterStorage posters) 
     {
         try
         {
-            var poster = (await eventService.GetEventAsync(id))?.PosterUrl;
-            await eventService.DeleteEventAsync(id);
-            posters.Delete(poster);
+            posters.Delete(await eventService.DeleteEventAsync(id));
             TempData["Success"] = "Събитието е изтрито.";
         }
         catch (BookingException ex)

@@ -101,7 +101,8 @@ public class EventService(
         return ev;
     }
 
-    public async Task UpdateEventAsync(Event ev)
+    /// <summary>Returns the poster URL the event had before the update (for file cleanup).</summary>
+    public async Task<string?> UpdateEventAsync(Event ev)
     {
         var current = await events.GetByIdAsync(ev.Id)
             ?? throw new BookingException("Събитието не е намерено.");
@@ -110,12 +111,15 @@ public class EventService(
         current.Type = ev.Type;
         current.Genre = ev.Genre;
         current.DurationMinutes = ev.DurationMinutes;
+        var oldPoster = current.PosterUrl;
         current.PosterUrl = ev.PosterUrl;
         await events.SaveChangesAsync();
+        return oldPoster;
     }
 
     // BR-15
-    public async Task DeleteEventAsync(int id)
+    /// <summary>Returns the deleted event's poster URL (for file cleanup).</summary>
+    public async Task<string?> DeleteEventAsync(int id)
     {
         var ev = await events.GetByIdAsync(id)
             ?? throw new BookingException("Събитието не е намерено.");
@@ -123,6 +127,7 @@ public class EventService(
             throw new BookingException("Събитие с продадени или резервирани билети не може да се изтрие.");
         events.Remove(ev);
         await events.SaveChangesAsync();
+        return ev.PosterUrl;
     }
 
     public async Task<PagedResult<ShowtimeRowDto>> SearchShowtimesAsync(ShowtimeFilter filter, int page, int pageSize = 10)

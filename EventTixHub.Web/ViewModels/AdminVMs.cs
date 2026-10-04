@@ -29,8 +29,12 @@ public class EventFormVM
     [Range(1, 600, ErrorMessage = "Продължителността трябва да е между {1} и {2} минути."), Display(Name = "Продължителност (мин)")]
     public int DurationMinutes { get; set; } = 90;
 
-    /// <summary>Current poster URL, kept in a hidden field; replaced when <see cref="Poster"/> is uploaded.</summary>
+    /// <summary>Current poster URL, display only: set by the server, never bound from the form.</summary>
+    [BindNever]
     public string? PosterUrl { get; set; }
+
+    [Display(Name = "Премахни плаката")]
+    public bool RemovePoster { get; set; }
 
     [Display(Name = "Плакат (JPG/PNG, до 2 MB)")]
     public IFormFile? Poster { get; set; }
@@ -44,7 +48,7 @@ public class EventFormVM
     public Event ToEntity() => new()
     {
         Id = Id, Title = Title.Trim(), Description = Description, Type = Type, Genre = Genre.Trim(),
-        DurationMinutes = DurationMinutes, PosterUrl = string.IsNullOrWhiteSpace(PosterUrl) ? null : PosterUrl.Trim()
+        DurationMinutes = DurationMinutes, PosterUrl = PosterUrl
     };
 }
 
