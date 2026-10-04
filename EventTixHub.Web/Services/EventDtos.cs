@@ -32,3 +32,18 @@ public record ShowtimeRowDto(
     int Capacity, int Sold, int Held, int Free);
 
 public record ReviewDto(int Id, int UserId, string Author, int Rating, string? Comment, DateTime CreatedAt);
+
+/// <summary>Full event description with its upcoming showtimes, as returned by the JSON API.</summary>
+/// <param name="Id">Event id.</param>
+/// <param name="Title">Event title.</param>
+/// <param name="Description">Optional long description.</param>
+/// <param name="Type">Movie or Concert.</param>
+/// <param name="Genre">Genre name.</param>
+/// <param name="DurationMinutes">Duration in minutes.</param>
+/// <param name="PosterUrl">Optional poster image URL.</param>
+/// <param name="AverageRating">Mean review rating (1–5), or null when there are no reviews.</param>
+/// <param name="ReviewCount">Number of reviews.</param>
+/// <param name="Showtimes">Upcoming showtimes ordered by start time.</param>
+public record EventApiDto(
+    int Id, string Title, string? Description, EventType Type, string Genre, int DurationMinutes,
+    string? PosterUrl, double? AverageRating, int ReviewCount, IReadOnlyList<ShowtimeCardDto> Showtimes);

@@ -4,6 +4,7 @@ using EventTixHub.Web.Data;
 using EventTixHub.Web.Models;
 using EventTixHub.Web.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,6 +45,16 @@ builder.Services.AddControllersWithViews(o =>
     o.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "Полето е задължително.");
 }).AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(o =>
+{
+    o.SwaggerDoc("v1", new() { Title = "EventTix Hub API", Version = "v1" });
+    o.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml"));
+    // Only attribute-routed [ApiController] actions; MVC view controllers stay out.
+    o.DocInclusionPredicate((_, api) => api.ActionDescriptor is ControllerActionDescriptor cad
+        && cad.ControllerTypeInfo.IsDefined(typeof(ApiControllerAttribute), true));
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -66,6 +77,12 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
