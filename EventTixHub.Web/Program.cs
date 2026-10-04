@@ -26,6 +26,8 @@ builder.Services.AddScoped<PromoCodeService>();
 builder.Services.AddScoped<EventService>();
 builder.Services.AddScoped<VenueService>();
 builder.Services.AddScoped<ReviewService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ReportService>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddControllersWithViews();
 
