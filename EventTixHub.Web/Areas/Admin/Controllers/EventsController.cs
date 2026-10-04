@@ -41,8 +41,7 @@ public class EventsController(EventService eventService, PosterStorage posters) 
         }
         catch
         {
-            if (vm.Poster is not null)
-                posters.Delete(vm.PosterUrl);
+            DiscardUploadedPoster(vm);
             throw;
         }
     }
@@ -66,28 +65,34 @@ public class EventsController(EventService eventService, PosterStorage posters) 
             return View("Form", vm);
         if (vm.Poster is null && vm.RemovePoster)
             vm.PosterUrl = null;
+        string? oldPoster;
         try
         {
-            var oldPoster = await eventService.UpdateEventAsync(vm.ToEntity());
-            if (oldPoster != vm.PosterUrl)
-                posters.Delete(oldPoster);
+            oldPoster = await eventService.UpdateEventAsync(vm.ToEntity());
         }
         catch (BookingException ex)
         {
-            if (vm.Poster is not null)
-                posters.Delete(vm.PosterUrl);
+            DiscardUploadedPoster(vm);
             vm.PosterUrl = current.PosterUrl;
             ModelState.AddModelError("", ex.Message);
             return View("Form", vm);
         }
         catch
         {
-            if (vm.Poster is not null)
-                posters.Delete(vm.PosterUrl);
+            DiscardUploadedPoster(vm);
             throw;
         }
+        if (oldPoster != vm.PosterUrl)
+            posters.Delete(oldPoster);
         TempData["Success"] = "Събитието е обновено.";
         return RedirectToAction(nameof(Details), new { id });
+    }
+
+    // Rolls back a poster uploaded for a save that failed.
+    private void DiscardUploadedPoster(EventFormVM vm)
+    {
+        if (vm.Poster is not null)
+            posters.Delete(vm.PosterUrl);
     }
 
     // Stores an uploaded poster and points vm.PosterUrl at it.

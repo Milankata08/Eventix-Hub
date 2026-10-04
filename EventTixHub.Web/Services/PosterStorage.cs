@@ -30,8 +30,18 @@ public class PosterStorage(IWebHostEnvironment env)
     {
         var ext = Validate(file.FileName, file.Length);
         var header = new byte[8];
+        int read;
         await using (var peek = file.OpenReadStream())
-            header = header[..await peek.ReadAsync(header)];
+        {
+            for (read = 0; read < header.Length;)
+            {
+                var n = await peek.ReadAsync(header.AsMemory(read));
+                if (n == 0)
+                    break;
+                read += n;
+            }
+        }
+        header = header[..read];
         if (!HasImageSignature(header, ext))
             throw new BookingException("Файлът не е валидно JPG или PNG изображение.");
 
@@ -46,7 +56,7 @@ public class PosterStorage(IWebHostEnvironment env)
         }
         catch
         {
-            File.Delete(path); // no partial file left behind
+            Delete(UrlPrefix + name); // no partial file left behind
             throw;
         }
         return UrlPrefix + name;
@@ -61,8 +71,9 @@ public class PosterStorage(IWebHostEnvironment env)
         {
             File.Delete(Path.Combine(env.WebRootPath, UploadsDir, Path.GetFileName(posterUrl)));
         }
-        catch (IOException)
+        catch (Exception)
         {
+            // Best effort: a leftover file must never fail a request whose DB work already succeeded.
         }
     }
 }
