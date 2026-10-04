@@ -69,7 +69,8 @@ public class UserService(UserManager<User> users, IRepository<Order> orders)
         if (current.Count == 1 && current[0] == role)
             return;
         // Add first: a failure never leaves the user without a role.
-        Check(await users.AddToRoleAsync(user, role));
+        if (!current.Contains(role))
+            Check(await users.AddToRoleAsync(user, role));
         Check(await users.RemoveFromRolesAsync(user, current.Where(r => r != role).ToList()));
     }
 
