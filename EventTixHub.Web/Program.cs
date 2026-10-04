@@ -23,6 +23,9 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<TicketService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<PromoCodeService>();
+builder.Services.AddScoped<EventService>();
+builder.Services.AddScoped<VenueService>();
+builder.Services.AddScoped<ReviewService>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddControllersWithViews();
 
