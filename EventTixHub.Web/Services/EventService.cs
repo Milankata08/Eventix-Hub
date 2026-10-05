@@ -168,7 +168,9 @@ public class EventService(
         await showtimes.Query().Where(s => s.EventId == eventId).OrderBy(s => s.StartsAt)
             .ToOccupancyRows(Now).ToListAsync();
 
-    public Task<Showtime?> GetShowtimeAsync(int id) => showtimes.GetByIdAsync(id);
+    public Task<Showtime?> GetShowtimeAsync(int id) => showtimes.Query()
+        .Include(s => s.Event).Include(s => s.Venue)
+        .FirstOrDefaultAsync(s => s.Id == id);
 
     // BR-12
     public async Task<Showtime> CreateShowtimeAsync(Showtime showtime)

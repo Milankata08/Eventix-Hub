@@ -74,9 +74,10 @@ public class ShowtimesController(
     [HttpGet]
     public async Task<IActionResult> Delete(int id)
     {
-        var map = await ticketService.GetSeatMapAsync(id);
-        return map is null ? NotFound()
-            : View("Delete", new DeleteVM(id, "Изтриване на прожекция", $"{map.EventTitle} · {map.VenueName} · {map.StartsAt:dd.MM.yyyy HH:mm}"));
+        var showtime = await eventService.GetShowtimeAsync(id);
+        return showtime is null ? NotFound()
+            : View("Delete", new DeleteVM(id, "Изтриване на прожекция",
+                $"{showtime.Event.Title} · {showtime.Venue.Name} · {showtime.StartsAt:dd.MM.yyyy HH:mm}"));
     }
 
     [HttpPost, ActionName("Delete")]

@@ -142,6 +142,16 @@ public class CatalogServicesTests : IDisposable
     }
 
     [Fact]
+    public async Task GetShowtime_LoadsEventAndVenue()
+    {
+        var showtime = await Events().GetShowtimeAsync(_showtimeId);
+
+        Assert.NotNull(showtime);
+        Assert.Equal(("Филм", "Зала 1"), (showtime.Event.Title, showtime.Venue.Name));
+        Assert.Null(await Events().GetShowtimeAsync(999));
+    }
+
+    [Fact]
     public async Task CreateVenue_GeneratesStandardSeatGrid()
     {
         var venue = await Venues().CreateAsync(
