@@ -7,16 +7,16 @@ public class PosterStorage(IWebHostEnvironment env)
     const string UploadsDir = "uploads";
     const string UrlPrefix = "/" + UploadsDir + "/";
 
-    /// <summary>Returns the extension to store (".jpg"/".png"), or throws <see cref="BookingException"/>.</summary>
+    /// <summary>Returns the extension to store (".jpg"/".png"), or throws <see cref="PosterException"/>.</summary>
     public static string Validate(string fileName, long length)
     {
         var ext = Path.GetExtension(fileName).ToLowerInvariant();
         if (ext == ".jpeg")
             ext = ".jpg";
         if (ext is not (".jpg" or ".png"))
-            throw new BookingException("Плакатът трябва да е JPG или PNG файл.");
+            throw new PosterException("Плакатът трябва да е JPG или PNG файл.");
         if (length is <= 0 or > MaxBytes)
-            throw new BookingException("Плакатът трябва да е до 2 MB.");
+            throw new PosterException("Плакатът трябва да е до 2 MB.");
         return ext;
     }
 
@@ -43,7 +43,7 @@ public class PosterStorage(IWebHostEnvironment env)
         }
         header = header[..read];
         if (!HasImageSignature(header, ext))
-            throw new BookingException("Файлът не е валидно JPG или PNG изображение.");
+            throw new PosterException("Файлът не е валидно JPG или PNG изображение.");
 
         var dir = Path.Combine(env.WebRootPath, UploadsDir);
         Directory.CreateDirectory(dir);

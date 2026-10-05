@@ -18,7 +18,7 @@ public class PosterStorageTests
     [InlineData("a.jpg", 0)]
     [InlineData("a.jpg", PosterStorage.MaxBytes + 1)]
     public void Validate_RejectsBadTypeOrSize(string name, long length) =>
-        Assert.Throws<BookingException>(() => PosterStorage.Validate(name, length));
+        Assert.Throws<PosterException>(() => PosterStorage.Validate(name, length));
 
     [Fact]
     public void Validate_AcceptsExactlyMaxSize() =>

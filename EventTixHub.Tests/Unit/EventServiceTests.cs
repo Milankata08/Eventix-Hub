@@ -3,11 +3,12 @@ using EventTixHub.Web.Data;
 using EventTixHub.Web.Models;
 using EventTixHub.Web.Services;
 using MockQueryable;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 
 namespace EventTixHub.Tests.Unit;
 
-public class EventServiceTests
+public class EventServiceTests : IDisposable
 {
     private static readonly DateTimeOffset Now = new(2026, 10, 10, 12, 0, 0, TimeSpan.Zero);
 
@@ -15,6 +16,8 @@ public class EventServiceTests
     private readonly List<Showtime> _showtimes = [];
     private readonly List<Ticket> _tickets = [];
     private readonly Mock<IRepository<Showtime>> _showtimeRepo = new();
+    private readonly Mock<IRepository<Event>> _eventRepo = new();
+    private readonly TempWebRoot _web = new();
 
     public EventServiceTests()
     {
@@ -24,16 +27,18 @@ public class EventServiceTests
         });
     }
 
+    public void Dispose() => _web.Dispose();
+
     private EventService Service()
     {
-        var events = new Mock<IRepository<Event>>();
+        var events = _eventRepo;
         events.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(_event);
         events.Setup(r => r.Query()).Returns(new List<Event> { _event }.BuildMock());
         _showtimeRepo.Setup(r => r.Query()).Returns(_showtimes.BuildMock());
         var tickets = new Mock<IRepository<Ticket>>();
         tickets.Setup(r => r.Query()).Returns(_tickets.BuildMock());
         return new EventService(events.Object, _showtimeRepo.Object, tickets.Object,
-            new Mock<IRepository<Venue>>().Object, new FakeClock(Now));
+            new Mock<IRepository<Venue>>().Object, _web.Posters, new FakeClock(Now));
     }
 
     private Showtime NewShowtime(DateTime startsAt) =>
@@ -76,5 +81,17 @@ public class EventServiceTests
         await Assert.ThrowsAsync<BookingException>(() => Service().DeleteShowtimeAsync(1));
 
         _showtimeRepo.Verify(r => r.Remove(It.IsAny<Showtime>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task UpdateEvent_SaveFails_RemovesUploadedFile()
+    {
+        var service = Service();
+        _eventRepo.Setup(r => r.SaveChangesAsync()).ThrowsAsync(new DbUpdateException());
+
+        await Assert.ThrowsAsync<DbUpdateException>(() => service.UpdateEventAsync(
+            new Event { Id = 1, Title = "Нов", Genre = "Драма", DurationMinutes = 90 }, TempWebRoot.Png(), false));
+
+        Assert.Empty(_web.Files());
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EventTixHub.Web.Areas.Admin.Controllers;
 
-public class EventsController(EventService eventService, PosterStorage posters) : AdminController
+public class EventsController(EventService eventService) : AdminController
 {
     // Poster limit plus headroom for the other form fields.
     private const int MaxRequestBytes = (int)PosterStorage.MaxBytes + 1024 * 1024;
@@ -31,18 +31,18 @@ public class EventsController(EventService eventService, PosterStorage posters) 
     [HttpPost, RequestSizeLimit(MaxRequestBytes)]
     public async Task<IActionResult> Create(EventFormVM vm)
     {
-        if (!ModelState.IsValid || !await TryUploadPosterAsync(vm))
+        if (!ModelState.IsValid)
             return View("Form", vm);
         try
         {
-            var ev = await eventService.CreateEventAsync(vm.ToEntity());
+            var ev = await eventService.CreateEventAsync(vm.ToEntity(), vm.Poster);
             TempData["Success"] = "Събитието е създадено.";
             return RedirectToAction(nameof(Details), new { id = ev.Id });
         }
-        catch
+        catch (PosterException ex)
         {
-            DiscardUploadedPoster(vm);
-            throw;
+            ModelState.AddModelError(nameof(vm.Poster), ex.Message);
+            return View("Form", vm);
         }
     }
 
@@ -60,56 +60,25 @@ public class EventsController(EventService eventService, PosterStorage posters) 
         if (current is null)
             return NotFound();
         vm.Id = id;
-        vm.PosterUrl = current.PosterUrl; // server-side value, never trusted from the form
-        if (!ModelState.IsValid || !await TryUploadPosterAsync(vm))
+        vm.PosterUrl = current.PosterUrl; // display only: the service ignores it
+        if (!ModelState.IsValid)
             return View("Form", vm);
-        if (vm.Poster is null && vm.RemovePoster)
-            vm.PosterUrl = null;
-        string? oldPoster;
         try
         {
-            oldPoster = await eventService.UpdateEventAsync(vm.ToEntity());
+            await eventService.UpdateEventAsync(vm.ToEntity(), vm.Poster, vm.RemovePoster);
+        }
+        catch (PosterException ex)
+        {
+            ModelState.AddModelError(nameof(vm.Poster), ex.Message);
+            return View("Form", vm);
         }
         catch (BookingException ex)
         {
-            DiscardUploadedPoster(vm);
-            vm.PosterUrl = current.PosterUrl;
             ModelState.AddModelError("", ex.Message);
             return View("Form", vm);
         }
-        catch
-        {
-            DiscardUploadedPoster(vm);
-            throw;
-        }
-        if (oldPoster != vm.PosterUrl)
-            posters.Delete(oldPoster);
         TempData["Success"] = "Събитието е обновено.";
         return RedirectToAction(nameof(Details), new { id });
-    }
-
-    // Rolls back a poster uploaded for a save that failed.
-    private void DiscardUploadedPoster(EventFormVM vm)
-    {
-        if (vm.Poster is not null)
-            posters.Delete(vm.PosterUrl);
-    }
-
-    // Stores an uploaded poster and points vm.PosterUrl at it.
-    private async Task<bool> TryUploadPosterAsync(EventFormVM vm)
-    {
-        if (vm.Poster is null)
-            return true;
-        try
-        {
-            vm.PosterUrl = await posters.SaveAsync(vm.Poster);
-            return true;
-        }
-        catch (BookingException ex)
-        {
-            ModelState.AddModelError(nameof(vm.Poster), ex.Message);
-            return false;
-        }
     }
 
     [HttpGet]
@@ -124,7 +93,7 @@ public class EventsController(EventService eventService, PosterStorage posters) 
     {
         try
         {
-            posters.Delete(await eventService.DeleteEventAsync(id));
+            await eventService.DeleteEventAsync(id);
             TempData["Success"] = "Събитието е изтрито.";
         }
         catch (BookingException ex)

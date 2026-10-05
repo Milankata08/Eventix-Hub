@@ -8,6 +8,7 @@ namespace EventTixHub.Tests.Integration;
 public class CatalogServicesTests : IDisposable
 {
     private readonly TestDb _db = new();
+    private readonly TempWebRoot _web = new();
     private readonly FakeClock _clock = new(new DateTimeOffset(2026, 10, 10, 12, 0, 0, TimeSpan.Zero));
     private int _movieId, _concertId, _venueId, _showtimeId, _userId;
 
@@ -38,13 +39,17 @@ public class CatalogServicesTests : IDisposable
         (_movieId, _concertId, _venueId, _showtimeId, _userId) = (movie.Id, concert.Id, venue.Id, showtime.Id, user.Id);
     }
 
-    public void Dispose() => _db.Dispose();
+    public void Dispose()
+    {
+        _db.Dispose();
+        _web.Dispose();
+    }
 
     private EventService Events()
     {
         var db = _db.NewContext();
         return new EventService(new Repository<Event>(db), new Repository<Showtime>(db),
-            new Repository<Ticket>(db), new Repository<Venue>(db), _clock);
+            new Repository<Ticket>(db), new Repository<Venue>(db), _web.Posters, _clock);
     }
 
     private VenueService Venues()
@@ -94,6 +99,46 @@ public class CatalogServicesTests : IDisposable
         await Events().DeleteEventAsync(_concertId);
 
         Assert.Null(await Events().GetEventAsync(_concertId));
+    }
+
+    private static Event NewEvent() =>
+        new() { Title = "Нов", Genre = "Джаз", DurationMinutes = 60, Type = EventType.Concert };
+
+    [Fact]
+    public async Task UpdateEvent_ReplacingPoster_DeletesOldFile()
+    {
+        var ev = await Events().CreateEventAsync(NewEvent(), TempWebRoot.Png());
+        var oldUrl = ev.PosterUrl;
+
+        await Events().UpdateEventAsync(
+            new Event { Id = ev.Id, Title = "Нов", Genre = "Джаз", DurationMinutes = 60 }, TempWebRoot.Png(), false);
+
+        var stored = (await Events().GetEventAsync(ev.Id))!.PosterUrl;
+        Assert.NotEqual(oldUrl, stored);
+        Assert.Equal([Path.GetFileName(stored)], _web.Files().Select(Path.GetFileName));
+    }
+
+    [Fact]
+    public async Task UpdateEvent_RemovePoster_ClearsUrlAndDeletesFile()
+    {
+        var ev = await Events().CreateEventAsync(NewEvent(), TempWebRoot.Png());
+
+        await Events().UpdateEventAsync(
+            new Event { Id = ev.Id, Title = "Нов", Genre = "Джаз", DurationMinutes = 60 }, null, true);
+
+        Assert.Null((await Events().GetEventAsync(ev.Id))!.PosterUrl);
+        Assert.Empty(_web.Files());
+    }
+
+    [Fact]
+    public async Task DeleteEvent_DeletesPosterFile()
+    {
+        var ev = await Events().CreateEventAsync(NewEvent(), TempWebRoot.Png());
+        Assert.Single(_web.Files());
+
+        await Events().DeleteEventAsync(ev.Id);
+
+        Assert.Empty(_web.Files());
     }
 
     [Fact]

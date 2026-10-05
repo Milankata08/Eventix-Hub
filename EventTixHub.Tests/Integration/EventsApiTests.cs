@@ -10,6 +10,7 @@ namespace EventTixHub.Tests.Integration;
 public class EventsApiTests : IDisposable
 {
     private readonly TestDb _db = new();
+    private readonly TempWebRoot _web = new();
     private readonly FakeClock _clock = new(new DateTimeOffset(2026, 10, 10, 12, 0, 0, TimeSpan.Zero));
     private int _eventId;
 
@@ -27,13 +28,17 @@ public class EventsApiTests : IDisposable
         _eventId = ev.Id;
     }
 
-    public void Dispose() => _db.Dispose();
+    public void Dispose()
+    {
+        _db.Dispose();
+        _web.Dispose();
+    }
 
     private EventsApiController Api()
     {
         var db = _db.NewContext();
         return new EventsApiController(new EventService(new Repository<Event>(db), new Repository<Showtime>(db),
-            new Repository<Ticket>(db), new Repository<Venue>(db), _clock));
+            new Repository<Ticket>(db), new Repository<Venue>(db), _web.Posters, _clock));
     }
 
     [Fact]

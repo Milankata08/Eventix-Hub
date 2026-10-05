@@ -9,6 +9,7 @@ public class EventService(
     IRepository<Showtime> showtimes,
     IRepository<Ticket> tickets,
     IRepository<Venue> venues,
+    PosterStorage posters,
     TimeProvider clock)
 {
     private DateTime Now => clock.GetLocalNow().DateTime;
@@ -94,32 +95,50 @@ public class EventService(
 
     public Task<Event?> GetEventAsync(int id) => events.GetByIdAsync(id);
 
-    public async Task<Event> CreateEventAsync(Event ev)
+    public async Task<Event> CreateEventAsync(Event ev, IFormFile? poster)
     {
-        await events.AddAsync(ev);
-        await events.SaveChangesAsync();
+        ev.PosterUrl = poster is null ? null : await posters.SaveAsync(poster);
+        try
+        {
+            await events.AddAsync(ev);
+            await events.SaveChangesAsync();
+        }
+        catch
+        {
+            posters.Delete(ev.PosterUrl); // no orphan file for an event that was not saved
+            throw;
+        }
         return ev;
     }
 
-    /// <summary>Returns the poster URL the event had before the update (for file cleanup).</summary>
-    public async Task<string?> UpdateEventAsync(Event ev)
+    // The stored poster URL comes from the server only: ev.PosterUrl from the caller is ignored.
+    public async Task UpdateEventAsync(Event ev, IFormFile? poster, bool removePoster)
     {
         var current = await events.GetByIdAsync(ev.Id)
             ?? throw new BookingException("Събитието не е намерено.");
+        var newUrl = poster is null ? null : await posters.SaveAsync(poster);
+        var oldUrl = current.PosterUrl;
         current.Title = ev.Title;
         current.Description = ev.Description;
         current.Type = ev.Type;
         current.Genre = ev.Genre;
         current.DurationMinutes = ev.DurationMinutes;
-        var oldPoster = current.PosterUrl;
-        current.PosterUrl = ev.PosterUrl;
-        await events.SaveChangesAsync();
-        return oldPoster;
+        current.PosterUrl = newUrl ?? (removePoster ? null : oldUrl);
+        try
+        {
+            await events.SaveChangesAsync();
+        }
+        catch
+        {
+            posters.Delete(newUrl);
+            throw;
+        }
+        if (current.PosterUrl != oldUrl)
+            posters.Delete(oldUrl);
     }
 
     // BR-15
-    /// <summary>Returns the deleted event's poster URL (for file cleanup).</summary>
-    public async Task<string?> DeleteEventAsync(int id)
+    public async Task DeleteEventAsync(int id)
     {
         var ev = await events.GetByIdAsync(id)
             ?? throw new BookingException("Събитието не е намерено.");
@@ -127,7 +146,7 @@ public class EventService(
             throw new BookingException("Събитие с продадени или резервирани билети не може да се изтрие.");
         events.Remove(ev);
         await events.SaveChangesAsync();
-        return ev.PosterUrl;
+        posters.Delete(ev.PosterUrl);
     }
 
     public async Task<PagedResult<ShowtimeRowDto>> SearchShowtimesAsync(ShowtimeFilter filter, int page, int pageSize = 10)
