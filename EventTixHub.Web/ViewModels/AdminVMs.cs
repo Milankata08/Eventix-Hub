@@ -196,4 +196,4 @@ public class PromoCodeFormVM : IValidatableObject
 public record ReportsVM(
     DateTime From, DateTime To,
     IReadOnlyList<RevenueRowDto> ByEvent, IReadOnlyList<RevenueRowDto> ByVenue,
-    IReadOnlyList<OccupancyRowDto> Occupancy, IReadOnlyList<HourOccupancyDto> ByHour);
+    IReadOnlyList<ShowtimeRowDto> Occupancy, IReadOnlyList<HourOccupancyDto> ByHour);

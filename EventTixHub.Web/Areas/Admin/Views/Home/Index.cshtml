@@ -28,14 +28,14 @@ else
         <tbody>
         @foreach (var s in Model.Upcoming)
         {
-            var percent = s.Capacity == 0 ? 0 : (int)Math.Round(100.0 * (s.Sold + s.Held) / s.Capacity);
+            var percent = (int)Math.Round(s.Percent);
             <tr>
                 <td><a asp-controller="Showtimes" asp-action="Details" asp-route-id="@s.Id">@s.EventTitle</a></td>
                 <td>@s.VenueName</td>
                 <td>@s.StartsAt.ToString("dd.MM.yyyy HH:mm")</td>
                 <td>
                     <div class="progress" role="progressbar" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100">
-                        <div class="progress-bar @(percent >= BookingRules.CriticalOccupancyPercent ? "bg-danger" : "")" style="width:@percent%">@percent%</div>
+                        <div class="progress-bar @(s.IsCritical ? "bg-danger" : "")" style="width:@percent%">@percent%</div>
                     </div>
                     <div class="small text-muted">Продадени @s.Sold · резервирани @s.Held · свободни @s.Free</div>
                 </td>

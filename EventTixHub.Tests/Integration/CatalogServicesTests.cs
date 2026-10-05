@@ -83,6 +83,7 @@ public class CatalogServicesTests : IDisposable
         var row = Assert.Single(await Events().GetEventOccupancyAsync(_movieId));
 
         Assert.Equal((4, 1, 0, 3), (row.Capacity, row.Sold, row.Held, row.Free));
+        Assert.Equal((1, 25.0, false), (row.Taken, row.Percent, row.IsCritical));
     }
 
     [Fact]

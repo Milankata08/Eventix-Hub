@@ -39,7 +39,7 @@ else
             {
                 var percent = (int)Math.Round(o.Percent);
                 <tr>
-                    <td><a asp-controller="Showtimes" asp-action="Details" asp-route-id="@o.ShowtimeId">@o.EventTitle</a></td>
+                    <td><a asp-controller="Showtimes" asp-action="Details" asp-route-id="@o.Id">@o.EventTitle</a></td>
                     <td>@o.VenueName</td>
                     <td>@o.StartsAt.ToString("dd.MM.yyyy HH:mm")</td>
                     <td>
@@ -73,7 +73,7 @@ else
                     <td>@h.Showtimes</td>
                     <td>
                         <div class="progress" role="progressbar" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100">
-                            <div class="progress-bar @(percent >= BookingRules.CriticalOccupancyPercent ? "bg-danger" : "")" style="width:@percent%"></div>
+                            <div class="progress-bar @(h.IsCritical ? "bg-danger" : "")" style="width:@percent%"></div>
                         </div>
                         <div class="small text-muted">@percent%</div>
                     </td>

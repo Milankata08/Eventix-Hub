@@ -37,25 +37,12 @@ public class ReportService(IRepository<Ticket> tickets, IRepository<Showtime> sh
         .OrderByDescending(r => r.Revenue).ThenBy(r => r.Name).ToList();
 
     // Showtimes starting in the range; taken = sold + live holds.
-    public async Task<IReadOnlyList<OccupancyRowDto>> GetOccupancyAsync(DateTime? from, DateTime? to)
+    public async Task<IReadOnlyList<ShowtimeRowDto>> GetOccupancyAsync(DateTime? from, DateTime? to)
     {
-        var taken = BookingRules.Taken(Now);
         var query = showtimes.Query();
         if (from is { } f) query = query.Where(s => s.StartsAt >= f.Date);
         if (to is { } t) query = query.Where(s => s.StartsAt < t.Date.AddDays(1));
-        var rows = await query.OrderBy(s => s.StartsAt)
-            .Select(s => new
-            {
-                s.Id, s.Event.Title, VenueName = s.Venue.Name, s.StartsAt,
-                Capacity = s.Venue.Rows * s.Venue.SeatsPerRow,
-                Taken = s.Tickets.AsQueryable().Count(taken)
-            }).ToListAsync();
-        return rows.Select(r =>
-        {
-            var percent = r.Capacity == 0 ? 0 : 100.0 * r.Taken / r.Capacity;
-            return new OccupancyRowDto(r.Id, r.Title, r.VenueName, r.StartsAt, r.Capacity, r.Taken, percent,
-                percent >= BookingRules.CriticalOccupancyPercent);
-        }).ToList();
+        return await query.OrderBy(s => s.StartsAt).ToOccupancyRows(Now).ToListAsync();
     }
 
     public async Task<IReadOnlyList<HourOccupancyDto>> GetAverageOccupancyByHourAsync(DateTime? from, DateTime? to) =>

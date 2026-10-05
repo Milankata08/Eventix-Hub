@@ -141,12 +141,13 @@ public class EventService(
             query = query.Where(s => s.StartsAt >= from.Date);
         if (filter.To is { } to)
             query = query.Where(s => s.StartsAt < to.Date.AddDays(1));
-        return await Occupancy(query.OrderBy(s => s.StartsAt)).ToPagedResultAsync(page, pageSize);
+        return await query.OrderBy(s => s.StartsAt).ToOccupancyRows(Now).ToPagedResultAsync(page, pageSize);
     }
 
     // Sold / held / free per showtime of one event.
     public async Task<IReadOnlyList<ShowtimeRowDto>> GetEventOccupancyAsync(int eventId) =>
-        await Occupancy(showtimes.Query().Where(s => s.EventId == eventId).OrderBy(s => s.StartsAt)).ToListAsync();
+        await showtimes.Query().Where(s => s.EventId == eventId).OrderBy(s => s.StartsAt)
+            .ToOccupancyRows(Now).ToListAsync();
 
     public Task<Showtime?> GetShowtimeAsync(int id) => showtimes.GetByIdAsync(id);
 
@@ -189,18 +190,6 @@ public class EventService(
             throw new BookingException("Прожекция с продадени или резервирани билети не може да се изтрие.");
         showtimes.Remove(showtime);
         await showtimes.SaveChangesAsync();
-    }
-
-    private IQueryable<ShowtimeRowDto> Occupancy(IQueryable<Showtime> query)
-    {
-        var now = Now;
-        var held = BookingRules.LiveHold(now);
-        var taken = BookingRules.Taken(now);
-        return query.Select(s => new ShowtimeRowDto(s.Id, s.EventId, s.Event.Title, s.Venue.Name, s.StartsAt,
-            s.Venue.Rows * s.Venue.SeatsPerRow,
-            s.Tickets.Count(t => t.Status == TicketStatus.Paid),
-            s.Tickets.AsQueryable().Count(held),
-            s.Venue.Rows * s.Venue.SeatsPerRow - s.Tickets.AsQueryable().Count(taken)));
     }
 
     private async Task EnsureNoOverlapAsync(Showtime showtime)

@@ -27,10 +27,6 @@ public record EventDetailsDto(
 
 public record ShowtimeFilter(int? EventId = null, int? VenueId = null, DateTime? From = null, DateTime? To = null);
 
-public record ShowtimeRowDto(
-    int Id, int EventId, string EventTitle, string VenueName, DateTime StartsAt,
-    int Capacity, int Sold, int Held, int Free);
-
 public record ReviewDto(int Id, int UserId, string Author, int Rating, string? Comment, DateTime CreatedAt);
 
 /// <summary>Full event description with its upcoming showtimes, as returned by the JSON API.</summary>
