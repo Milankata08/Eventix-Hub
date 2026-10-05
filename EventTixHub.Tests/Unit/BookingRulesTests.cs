@@ -59,6 +59,16 @@ public class BookingRulesTests
         Assert.Equal(status == TicketStatus.Reserved && seat == SeatStatus.Free, BookingRules.ExpiredHold(Now).Compile()(t));
     }
 
+    [Theory]
+    [InlineData(899, false)]
+    [InlineData(900, true)]
+    public void IsCritical_StartsAtNinetyPercent(int sold, bool expected)
+    {
+        var row = new ShowtimeRowDto(1, 1, "Шоу", "Зала 1", Now, 1000, sold, 0);
+        Assert.Equal(expected, row.IsCritical);
+        Assert.Equal(expected, new HourOccupancyDto(19, 1, row.Percent).IsCritical);
+    }
+
     [Fact]
     public void CanCancel_ExactlyDeadlineIsAllowed() =>
         Assert.True(BookingRules.CanCancel(Now.AddHours(24), Now));
