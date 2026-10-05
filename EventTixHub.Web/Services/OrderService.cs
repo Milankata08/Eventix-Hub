@@ -237,9 +237,6 @@ public class OrderService(
         return cart;
     }
 
-    public Task<Order?> GetUserOrderAsync(int userId, int orderId) => orders.Query()
-        .Include(o => o.Tickets).ThenInclude(t => t.Seat)
-        .Include(o => o.Tickets).ThenInclude(t => t.Showtime).ThenInclude(s => s.Event)
-        .Include(o => o.Tickets).ThenInclude(t => t.Showtime).ThenInclude(s => s.Venue)
-        .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId);
+    public Task<Order?> GetUserOrderAsync(int userId, int orderId) =>
+        orders.Query().FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId);
 }

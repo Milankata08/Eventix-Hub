@@ -255,6 +255,7 @@ classDiagram
         +CancelTicketAsync(userId, ticketId)
         +GetUserTicketsAsync(...)
         +GetUserTicketAsync(userId, ticketId)
+        +GetOrderTicketsAsync(userId, orderId)
     }
     class OrderService {
         +ReserveSeatsAsync(userId, showtimeId, seatIds)

@@ -100,19 +100,15 @@ public class BookingController(TicketService ticketService, OrderService orderSe
 
     public async Task<IActionResult> Confirmation(int id)
     {
-        var order = await orderService.GetUserOrderAsync(User.GetUserId(), id);
+        var userId = User.GetUserId();
+        var order = await orderService.GetUserOrderAsync(userId, id);
         if (order is null)
             return NotFound();
         if (order.Status == OrderStatus.Pending)
             return RedirectToAction(nameof(Cart));
 
-        var cards = order.Tickets
-            .Where(t => t.Status == TicketStatus.Paid)
-            .OrderBy(t => t.Id)
-            .Select(t => new TicketCardVM(
-                new UserTicketDto(t.Id, t.Showtime.Event.Title, t.Showtime.Venue.Name, t.Showtime.StartsAt,
-                    t.Seat.Row, t.Seat.Number, t.Seat.Category, t.Concession, t.Price, t.Code, t.Status),
-                Qr.DataUri(t.Code)))
+        var cards = (await ticketService.GetOrderTicketsAsync(userId, id))
+            .Select(t => new TicketCardVM(t, Qr.DataUri(t.Code)))
             .ToList();
         return View(new ConfirmationVM(order.Id, order.TotalAmount, cards));
     }

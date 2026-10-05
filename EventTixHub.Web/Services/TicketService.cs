@@ -108,6 +108,15 @@ public class TicketService(
         return ticket is null ? null : WithCanCancel(ticket, Now);
     }
 
+    public async Task<IReadOnlyList<UserTicketDto>> GetOrderTicketsAsync(int userId, int orderId)
+    {
+        var now = Now;
+        var list = await ToDto(OwnedHistory(userId)
+            .Where(t => t.OrderId == orderId && t.Status == TicketStatus.Paid)
+            .OrderBy(t => t.Id)).ToListAsync();
+        return list.Select(t => WithCanCancel(t, now)).ToList();
+    }
+
     private static UserTicketDto WithCanCancel(UserTicketDto t, DateTime now) =>
         t with { CanCancel = t.Status == TicketStatus.Paid && BookingRules.CanCancel(t.StartsAt, now) };
 

@@ -216,4 +216,20 @@ public class BookingFlowTests : IDisposable
         Assert.Empty((await Service().GetUserTicketsAsync(_user1, TicketHistoryFilter.Upcoming, 1)).Items);
         Assert.Single((await Service().GetUserTicketsAsync(_user1, TicketHistoryFilter.Past, 1)).Items);
     }
+
+    [Fact]
+    public async Task OrderTickets_AreOwnerOnly_WithCodes()
+    {
+        List<int> seatIds;
+        using (var db = _db.NewContext())
+            seatIds = db.Seats.Select(s => s.Id).ToList();
+        await Orders().ReserveSeatsAsync(_user1, _showtimeId, seatIds);
+        var order = await Orders().CheckoutAsync(_user1);
+
+        var mine = await Service().GetOrderTicketsAsync(_user1, order.Id);
+        Assert.Equal(2, mine.Count);
+        Assert.All(mine, t => { Assert.NotNull(t.Code); Assert.True(t.CanCancel); });
+        Assert.Equal(2, mine.Select(t => t.Code).Distinct().Count());
+        Assert.Empty(await Service().GetOrderTicketsAsync(_user2, order.Id));
+    }
 }
