@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using EventTixHub.Web.Data;
 using EventTixHub.Web.Models;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,7 @@ public class PromoCodeService(IRepository<PromoCode> promos, TimeProvider clock)
 {
     private DateTime Now => clock.GetLocalNow().DateTime;
 
-    // active: true = active and not expired, false = deactivated or expired, null = all.
+    // active: true = usable now (BookingRules.UsablePromo), false = any other state, null = all.
     public Task<PagedResult<PromoCode>> SearchAsync(string? search, bool? active, int page, int pageSize = 10)
     {
         var now = Now;
@@ -18,10 +19,13 @@ public class PromoCodeService(IRepository<PromoCode> promos, TimeProvider clock)
             var s = search.Trim().ToUpperInvariant();
             query = query.Where(p => p.Code.Contains(s));
         }
-        if (active == true)
-            query = query.Where(p => p.IsActive && p.ValidUntil >= now);
-        else if (active == false)
-            query = query.Where(p => !p.IsActive || p.ValidUntil < now);
+        var usable = BookingRules.UsablePromo(now);
+        query = active switch
+        {
+            true => query.Where(usable),
+            false => query.Where(Expression.Lambda<Func<PromoCode, bool>>(Expression.Not(usable.Body), usable.Parameters)),
+            null => query
+        };
         return query.OrderBy(p => p.Code).ToPagedResultAsync(page, pageSize);
     }
 

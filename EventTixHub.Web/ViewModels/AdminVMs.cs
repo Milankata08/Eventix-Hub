@@ -94,7 +94,10 @@ public record AdminVenuesVM(PagedResult<Venue> Venues, IReadOnlyList<string> Cit
 
 public record VenueDetailsVM(Venue Venue, IReadOnlyList<Seat> Seats);
 
-public record AdminPromoCodesVM(PagedResult<PromoCode> Promos, string? Search, bool? Active, DateTime Now);
+public record AdminPromoCodesVM(PagedResult<PromoCode> Promos, string? Search, bool? Active, DateTime Now)
+{
+    public PromoState StateOf(PromoCode p) => BookingRules.StateOf(p, Now);
+}
 
 public record AdminUsersVM(PagedResult<UserRowDto> Users, string? Search, string? Role, int CurrentUserId);
 

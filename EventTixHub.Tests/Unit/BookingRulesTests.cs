@@ -97,6 +97,46 @@ public class BookingRulesTests
     }
 
     [Theory]
+    [InlineData(false, -10, -1, 0, 0, PromoState.Inactive)] // inactive + expired
+    [InlineData(true, -10, -1, 5, 5, PromoState.Expired)]   // expired + exhausted
+    [InlineData(true, 1, 10, 0, 0, PromoState.NotStarted)]
+    [InlineData(true, -1, 10, 5, 5, PromoState.Exhausted)]
+    [InlineData(true, -1, 10, 5, 4, PromoState.Usable)]
+    public void StateOf_FollowsPrecedence(bool active, int fromDays, int untilDays, int limit, int used, PromoState expected)
+    {
+        var promo = new PromoCode
+        {
+            IsActive = active,
+            ValidFrom = Now.AddDays(fromDays),
+            ValidUntil = Now.AddDays(untilDays),
+            UsageLimit = limit,
+            TimesUsed = used
+        };
+        Assert.Equal(expected, BookingRules.StateOf(promo, Now));
+    }
+
+    [Theory]
+    [InlineData(false, 0, 10, 0, 0)] // inactive
+    [InlineData(true, 1, 10, 0, 0)]  // not started
+    [InlineData(true, -10, -1, 0, 0)] // expired
+    [InlineData(true, -1, 10, 5, 5)] // limit reached
+    [InlineData(true, -1, 10, 5, 4)] // valid
+    [InlineData(true, 0, 10, 5, 4)]  // starts now
+    [InlineData(true, -1, 0, 5, 4)]  // ends now
+    public void UsablePromo_AgreesWithIsPromoUsable(bool active, int fromDays, int untilDays, int limit, int used)
+    {
+        var promo = new PromoCode
+        {
+            IsActive = active,
+            ValidFrom = Now.AddDays(fromDays),
+            ValidUntil = Now.AddDays(untilDays),
+            UsageLimit = limit,
+            TimesUsed = used
+        };
+        Assert.Equal(BookingRules.IsPromoUsable(promo, Now), BookingRules.UsablePromo(Now).Compile()(promo));
+    }
+
+    [Theory]
     [InlineData(120, 120, false)] // back-to-back
     [InlineData(60, 120, true)]   // start inside other
     public void Overlaps_DetectsIntersection(int offsetMinutes, int durationMinutes, bool expected) =>

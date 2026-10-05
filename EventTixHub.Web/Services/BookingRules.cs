@@ -1,9 +1,20 @@
+using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using EventTixHub.Web.Models;
 
 namespace EventTixHub.Web.Services;
 
 public enum SeatStatus { Free, Held, Sold }
+
+// Computed, never persisted.
+public enum PromoState
+{
+    [Display(Name = "Неактивен")] Inactive,
+    [Display(Name = "Изтекъл")] Expired,
+    [Display(Name = "Предстоящ")] NotStarted,
+    [Display(Name = "Изчерпан")] Exhausted,
+    [Display(Name = "Активен")] Usable
+}
 
 public static class BookingRules
 {
@@ -52,8 +63,19 @@ public static class BookingRules
     public static bool CanCancel(DateTime startsAt, DateTime now) =>
         startsAt - now >= TimeSpan.FromHours(CancellationDeadlineHours);
 
-    public static bool IsPromoUsable(PromoCode promo, DateTime now) =>
-        promo.IsActive && promo.ValidFrom <= now && now <= promo.ValidUntil && promo.TimesUsed < promo.UsageLimit;
+    // First matching state wins: an inactive expired code is Inactive, an expired exhausted one is Expired.
+    public static PromoState StateOf(PromoCode p, DateTime now) =>
+        !p.IsActive ? PromoState.Inactive
+        : now > p.ValidUntil ? PromoState.Expired
+        : now < p.ValidFrom ? PromoState.NotStarted
+        : p.TimesUsed >= p.UsageLimit ? PromoState.Exhausted
+        : PromoState.Usable;
+
+    public static bool IsPromoUsable(PromoCode promo, DateTime now) => StateOf(promo, now) == PromoState.Usable;
+
+    // EF-translatable form of IsPromoUsable; BookingRulesTests proves they agree.
+    public static Expression<Func<PromoCode, bool>> UsablePromo(DateTime now) =>
+        p => p.IsActive && p.ValidFrom <= now && now <= p.ValidUntil && p.TimesUsed < p.UsageLimit;
 
     // Half-open intervals: back-to-back showtimes do not overlap.
     public static bool Overlaps(DateTime startA, int durationMinutesA, DateTime startB, int durationMinutesB) =>

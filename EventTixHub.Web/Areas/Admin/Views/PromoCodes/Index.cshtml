@@ -18,7 +18,7 @@
         <select name="active" class="form-select" aria-label="Състояние">
             <option value="">Всички</option>
             <option value="true" selected="@(Model.Active == true)">Активни</option>
-            <option value="false" selected="@(Model.Active == false)">Неактивни или изтекли</option>
+            <option value="false" selected="@(Model.Active == false)">Неизползваеми</option>
         </select>
     </div>
     <div class="col-md-3">
@@ -43,12 +43,18 @@ else
                 <td>@p.DiscountPercent %</td>
                 <td>@p.TimesUsed / @p.UsageLimit</td>
                 <td>@p.ValidFrom.ToString("dd.MM.yyyy") – @p.ValidUntil.ToString("dd.MM.yyyy")</td>
-                <td>
-                    @if (!p.IsActive) { <span class="badge text-bg-secondary">Неактивен</span> }
-                    else if (p.ValidUntil < Model.Now) { <span class="badge text-bg-warning">Изтекъл</span> }
-                    else if (p.TimesUsed >= p.UsageLimit) { <span class="badge text-bg-danger">Изчерпан</span> }
-                    else { <span class="badge text-bg-success">Активен</span> }
-                </td>
+                @{
+                    var state = Model.StateOf(p);
+                    var badge = state switch
+                    {
+                        PromoState.Usable => "text-bg-success",
+                        PromoState.Exhausted => "text-bg-danger",
+                        PromoState.Expired => "text-bg-warning",
+                        PromoState.NotStarted => "text-bg-info",
+                        _ => "text-bg-secondary"
+                    };
+                }
+                <td><span class="badge @badge">@state.DisplayName()</span></td>
                 <td class="text-end">
                     <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@p.Id">Редакция</a>
                     <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@p.Id">Изтриване</a>
