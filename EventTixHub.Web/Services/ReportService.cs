@@ -39,7 +39,7 @@ public class ReportService(IRepository<Ticket> tickets, IRepository<Showtime> sh
     // Showtimes starting in the range; taken = sold + live holds.
     public async Task<IReadOnlyList<OccupancyRowDto>> GetOccupancyAsync(DateTime? from, DateTime? to)
     {
-        var now = Now;
+        var taken = BookingRules.Taken(Now);
         var query = showtimes.Query();
         if (from is { } f) query = query.Where(s => s.StartsAt >= f.Date);
         if (to is { } t) query = query.Where(s => s.StartsAt < t.Date.AddDays(1));
@@ -48,8 +48,7 @@ public class ReportService(IRepository<Ticket> tickets, IRepository<Showtime> sh
             {
                 s.Id, s.Event.Title, VenueName = s.Venue.Name, s.StartsAt,
                 Capacity = s.Venue.Rows * s.Venue.SeatsPerRow,
-                Taken = s.Tickets.Count(x => x.Status == TicketStatus.Paid
-                    || (x.Status == TicketStatus.Reserved && x.ReservedUntil > now))
+                Taken = s.Tickets.AsQueryable().Count(taken)
             }).ToListAsync();
         return rows.Select(r =>
         {

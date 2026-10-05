@@ -23,7 +23,7 @@ public class OrderService(
         .FirstOrDefaultAsync(o => o.UserId == userId && o.Status == OrderStatus.Pending);
 
     private static List<Ticket> ActiveTickets(Order cart, DateTime now) => cart.Tickets
-        .Where(t => t.Status == TicketStatus.Reserved && t.ReservedUntil > now)
+        .AsQueryable().Where(BookingRules.LiveHold(now))
         .OrderBy(t => t.Id).ToList();
 
     private static int PromoPercent(Order cart, DateTime now) =>
@@ -67,7 +67,7 @@ public class OrderService(
         return new CartDto(cart.Id, lines, percent > 0 ? cart.PromoCode!.Code : null, percent,
             BookingRules.OrderTotal(lines.Select(l => l.Price)),
             lines.Count == 0 ? null : lines.Min(l => l.ReservedUntil),
-            cart.Tickets.Count(t => t.Status == TicketStatus.Reserved && t.ReservedUntil <= now));
+            cart.Tickets.AsQueryable().Count(BookingRules.ExpiredHold(now)));
     }
 
     public async Task SetConcessionAsync(int userId, int ticketId, ConcessionType concession)
@@ -117,7 +117,7 @@ public class OrderService(
         var cart = await LoadCartAsync(userId)
             ?? throw new BookingException("Количката е празна.");
 
-        var expired = cart.Tickets.Where(t => t.Status == TicketStatus.Reserved && t.ReservedUntil <= now).ToList();
+        var expired = cart.Tickets.AsQueryable().Where(BookingRules.ExpiredHold(now)).ToList();
         if (expired.Count > 0)
         {
             foreach (var t in expired)

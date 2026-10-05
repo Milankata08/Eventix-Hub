@@ -79,6 +79,7 @@ public class EventService(
             return null;
 
         var now = Now;
+        var taken = BookingRules.Taken(now);
         var ratings = await events.Query().Where(e => e.Id == id)
             .SelectMany(e => e.Reviews).Select(r => r.Rating).ToListAsync();
         var upcoming = await showtimes.Query()
@@ -86,8 +87,7 @@ public class EventService(
             .OrderBy(s => s.StartsAt)
             .Select(s => new ShowtimeCardDto(s.Id, s.StartsAt, s.VenueId, s.Venue.Name, s.Venue.City,
                 s.StandardPrice, s.VipPrice,
-                s.Venue.Rows * s.Venue.SeatsPerRow - s.Tickets.Count(t => t.Status == TicketStatus.Paid
-                    || (t.Status == TicketStatus.Reserved && t.ReservedUntil > now))))
+                s.Venue.Rows * s.Venue.SeatsPerRow - s.Tickets.AsQueryable().Count(taken)))
             .ToListAsync();
         return new EventDetailsDto(ev, ratings.Count == 0 ? null : ratings.Average(), ratings.Count, upcoming);
     }
@@ -194,13 +194,13 @@ public class EventService(
     private IQueryable<ShowtimeRowDto> Occupancy(IQueryable<Showtime> query)
     {
         var now = Now;
+        var held = BookingRules.LiveHold(now);
+        var taken = BookingRules.Taken(now);
         return query.Select(s => new ShowtimeRowDto(s.Id, s.EventId, s.Event.Title, s.Venue.Name, s.StartsAt,
             s.Venue.Rows * s.Venue.SeatsPerRow,
             s.Tickets.Count(t => t.Status == TicketStatus.Paid),
-            s.Tickets.Count(t => t.Status == TicketStatus.Reserved && t.ReservedUntil > now),
-            s.Venue.Rows * s.Venue.SeatsPerRow
-                - s.Tickets.Count(t => t.Status == TicketStatus.Paid
-                    || (t.Status == TicketStatus.Reserved && t.ReservedUntil > now))));
+            s.Tickets.AsQueryable().Count(held),
+            s.Venue.Rows * s.Venue.SeatsPerRow - s.Tickets.AsQueryable().Count(taken)));
     }
 
     private async Task EnsureNoOverlapAsync(Showtime showtime)

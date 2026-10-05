@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using EventTixHub.Web.Models;
 
 namespace EventTixHub.Web.Services;
@@ -36,6 +37,17 @@ public static class BookingRules
         TicketStatus.Reserved when reservedUntil > now => SeatStatus.Held,
         _ => SeatStatus.Free
     };
+
+    // EF-translatable forms of BR-01/BR-03. StatusOf stays the in-memory form; BookingRulesTests proves they agree.
+    public static Expression<Func<Ticket, bool>> LiveHold(DateTime now) =>
+        t => t.Status == TicketStatus.Reserved && t.ReservedUntil > now;
+
+    public static Expression<Func<Ticket, bool>> ExpiredHold(DateTime now) =>
+        t => t.Status == TicketStatus.Reserved && t.ReservedUntil <= now;
+
+    // Paid or live hold: the seat is not free.
+    public static Expression<Func<Ticket, bool>> Taken(DateTime now) =>
+        t => t.Status == TicketStatus.Paid || (t.Status == TicketStatus.Reserved && t.ReservedUntil > now);
 
     public static bool CanCancel(DateTime startsAt, DateTime now) =>
         startsAt - now >= TimeSpan.FromHours(CancellationDeadlineHours);

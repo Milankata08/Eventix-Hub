@@ -45,6 +45,20 @@ public class BookingRulesTests
         Assert.Equal(expected, BookingRules.StatusOf(status, until, Now));
     }
 
+    [Theory]
+    [InlineData(TicketStatus.Reserved, 1)]
+    [InlineData(TicketStatus.Reserved, -1)]
+    [InlineData(TicketStatus.Paid, null)]
+    [InlineData(TicketStatus.Cancelled, null)]
+    public void HoldExpressions_AgreeWithStatusOf(TicketStatus status, int? reservedUntilMinutes)
+    {
+        var t = new Ticket { Status = status, ReservedUntil = reservedUntilMinutes is { } m ? Now.AddMinutes(m) : null };
+        var seat = BookingRules.StatusOf(t.Status, t.ReservedUntil, Now);
+        Assert.Equal(seat == SeatStatus.Held, BookingRules.LiveHold(Now).Compile()(t));
+        Assert.Equal(seat != SeatStatus.Free, BookingRules.Taken(Now).Compile()(t));
+        Assert.Equal(status == TicketStatus.Reserved && seat == SeatStatus.Free, BookingRules.ExpiredHold(Now).Compile()(t));
+    }
+
     [Fact]
     public void CanCancel_ExactlyDeadlineIsAllowed() =>
         Assert.True(BookingRules.CanCancel(Now.AddHours(24), Now));

@@ -72,8 +72,8 @@ public class TicketService(
 
         var cart = await orders.Query()
             .FirstOrDefaultAsync(o => o.UserId == userId && o.Status == OrderStatus.Pending);
-        var inCart = cart is null ? 0 : await tickets.Query().CountAsync(t =>
-            t.OrderId == cart.Id && t.Status == TicketStatus.Reserved && t.ReservedUntil > now);
+        var inCart = cart is null ? 0 : await tickets.Query()
+            .Where(BookingRules.LiveHold(now)).CountAsync(t => t.OrderId == cart.Id);
         if (inCart + ids.Count > BookingRules.MaxTicketsPerOrder)
             throw new BookingException($"В количката може да има най-много {BookingRules.MaxTicketsPerOrder} билета.");
 
@@ -96,7 +96,7 @@ public class TicketService(
         // The user's own expired holds are dead cart weight: drop them along with the requested seats' ones.
         if (cart is not null)
             expired.AddRange((await tickets.Query()
-                .Where(t => t.OrderId == cart.Id && t.Status == TicketStatus.Reserved && t.ReservedUntil <= now)
+                .Where(t => t.OrderId == cart.Id).Where(BookingRules.ExpiredHold(now))
                 .ToListAsync()).Except(expired));
 
         if (expired.Count > 0)
@@ -213,20 +213,24 @@ public class TicketService(
         query = filter == TicketHistoryFilter.Upcoming
             ? query.OrderBy(t => t.Showtime.StartsAt)
             : query.OrderByDescending(t => t.Showtime.StartsAt);
-        return await ToDto(query, now).ToPagedResultAsync(page, pageSize);
+        var result = await ToDto(query).ToPagedResultAsync(page, pageSize);
+        return result with { Items = result.Items.Select(t => WithCanCancel(t, now)).ToList() };
     }
 
-    public Task<UserTicketDto?> GetUserTicketAsync(int userId, int ticketId) =>
-        ToDto(OwnedHistory(userId).Where(t => t.Id == ticketId), Now).FirstOrDefaultAsync();
+    public async Task<UserTicketDto?> GetUserTicketAsync(int userId, int ticketId)
+    {
+        var ticket = await ToDto(OwnedHistory(userId).Where(t => t.Id == ticketId)).FirstOrDefaultAsync();
+        return ticket is null ? null : WithCanCancel(ticket, Now);
+    }
+
+    private static UserTicketDto WithCanCancel(UserTicketDto t, DateTime now) =>
+        t with { CanCancel = t.Status == TicketStatus.Paid && BookingRules.CanCancel(t.StartsAt, now) };
 
     // Paid and cancelled tickets only: reserved ones are cart items, not history.
     private IQueryable<Ticket> OwnedHistory(int userId) => tickets.Query()
         .Where(t => t.Order.UserId == userId && t.Status != TicketStatus.Reserved);
 
-    private static IQueryable<UserTicketDto> ToDto(IQueryable<Ticket> query, DateTime now) => query
+    private static IQueryable<UserTicketDto> ToDto(IQueryable<Ticket> query) => query
         .Select(t => new UserTicketDto(t.Id, t.Showtime.Event.Title, t.Showtime.Venue.Name, t.Showtime.StartsAt,
-            t.Seat.Row, t.Seat.Number, t.Seat.Category, t.Concession, t.Price, t.Code, t.Status,
-            // Mirrors BookingRules.CanCancel, which EF cannot translate.
-            t.Status == TicketStatus.Paid
-            && t.Showtime.StartsAt >= now.AddHours(BookingRules.CancellationDeadlineHours)));
+            t.Seat.Row, t.Seat.Number, t.Seat.Category, t.Concession, t.Price, t.Code, t.Status));
 }

@@ -111,7 +111,7 @@ public class BookingController(TicketService ticketService, OrderService orderSe
             .OrderBy(t => t.Id)
             .Select(t => new TicketCardVM(
                 new UserTicketDto(t.Id, t.Showtime.Event.Title, t.Showtime.Venue.Name, t.Showtime.StartsAt,
-                    t.Seat.Row, t.Seat.Number, t.Seat.Category, t.Concession, t.Price, t.Code, t.Status, false),
+                    t.Seat.Row, t.Seat.Number, t.Seat.Category, t.Concession, t.Price, t.Code, t.Status),
                 Qr.DataUri(t.Code)))
             .ToList();
         return View(new ConfirmationVM(order.Id, order.TotalAmount, cards));
