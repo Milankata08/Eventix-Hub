@@ -128,8 +128,6 @@ public class TicketService(
                 SeatId = seat.Id,
                 Status = TicketStatus.Reserved,
                 Concession = ConcessionType.Regular,
-                Price = BookingRules.TicketPrice(showtime.StandardPrice, showtime.VipPrice, seat.Category,
-                    ConcessionType.Regular, 0),
                 ReservedUntil = now.AddMinutes(BookingRules.HoldMinutes)
             };
             await tickets.AddAsync(ticket);

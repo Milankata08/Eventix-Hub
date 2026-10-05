@@ -39,6 +39,7 @@ public class Ticket : BaseEntity
 
     public ConcessionType Concession { get; set; }
 
+    // Final price, stored at checkout (BR-10). 0 while the ticket is a hold.
     [Precision(10, 2)]
     public decimal Price { get; set; }
 

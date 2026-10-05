@@ -29,13 +29,9 @@ public class OrderService(
     private static int PromoPercent(Order cart, DateTime now) =>
         cart.PromoCode is { } p && BookingRules.IsPromoUsable(p, now) ? p.DiscountPercent : 0;
 
-    private static void Reprice(Order cart, DateTime now)
-    {
-        var percent = PromoPercent(cart, now);
-        foreach (var t in ActiveTickets(cart, now))
-            t.Price = BookingRules.TicketPrice(t.Showtime.StandardPrice, t.Showtime.VipPrice, t.Seat.Category,
-                t.Concession, percent);
-    }
+    private static decimal PriceOf(Ticket t, int promoPercent) =>
+        BookingRules.TicketPrice(t.Showtime.StandardPrice, t.Showtime.VipPrice, t.Seat.Category, t.Concession,
+            promoPercent);
 
     private async Task SaveAsync(string conflictMessage)
     {
@@ -60,9 +56,7 @@ public class OrderService(
         var active = ActiveTickets(cart, now);
         var percent = PromoPercent(cart, now);
         var lines = active.Select(t => new CartLineDto(t.Id, t.Showtime.Event.Title, t.Showtime.Venue.Name,
-            t.Showtime.StartsAt, t.Seat.Row, t.Seat.Number, t.Seat.Category, t.Concession,
-            BookingRules.TicketPrice(t.Showtime.StandardPrice, t.Showtime.VipPrice, t.Seat.Category, t.Concession,
-                percent),
+            t.Showtime.StartsAt, t.Seat.Row, t.Seat.Number, t.Seat.Category, t.Concession, PriceOf(t, percent),
             t.ReservedUntil!.Value)).ToList();
         return new CartDto(cart.Id, lines, percent > 0 ? cart.PromoCode!.Code : null, percent,
             BookingRules.OrderTotal(lines.Select(l => l.Price)),
@@ -79,7 +73,6 @@ public class OrderService(
             throw new BookingException("Билетът не е намерен в количката.");
 
         ticket.Concession = concession;
-        Reprice(cart, now);
         await SaveAsync("Количката току-що беше променена. Опреснете страницата.");
     }
 
@@ -96,7 +89,6 @@ public class OrderService(
 
         cart.PromoCodeId = promo.Id;
         cart.PromoCode = promo;
-        Reprice(cart, now);
         await SaveAsync("Количката току-що беше променена. Опреснете страницата.");
     }
 
@@ -106,7 +98,6 @@ public class OrderService(
             ?? throw new BookingException("Количката е празна.");
         cart.PromoCodeId = null;
         cart.PromoCode = null;
-        Reprice(cart, Now);
         await SaveAsync("Количката току-що беше променена. Опреснете страницата.");
     }
 
@@ -136,9 +127,10 @@ public class OrderService(
         if (promo is not null && !BookingRules.IsPromoUsable(promo, now))
             throw new BookingException("Промо кодът е невалиден или изчерпан.");
 
-        Reprice(cart, now);
+        var percent = PromoPercent(cart, now);
         foreach (var t in active)
         {
+            t.Price = PriceOf(t, percent);
             t.Status = TicketStatus.Paid;
             t.ReservedUntil = null;
             t.Code = "ETH-" + Convert.ToHexString(RandomNumberGenerator.GetBytes(5));

@@ -85,6 +85,28 @@ public class BookingFlowTests : IDisposable
     }
 
     [Fact]
+    public async Task PromoAppliedBeforeAddingSeats_AppliesToEverySeat_InPreviewAndCheckout()
+    {
+        int vipSeat;
+        using (var db = _db.NewContext())
+            vipSeat = db.Seats.Single(s => s.Category == SeatCategory.Vip).Id;
+
+        await Service().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
+        await Orders().ApplyPromoAsync(_user1, "WELCOME10");
+        await Service().ReserveSeatsAsync(_user1, _showtimeId, [vipSeat]);
+
+        var cart = await Orders().GetCartAsync(_user1);
+        Assert.Equal([9.00m, 18.00m], cart!.Lines.Select(l => l.Price));
+        Assert.Equal(27.00m, cart.Total);
+
+        await Orders().CheckoutAsync(_user1);
+
+        using var check = _db.NewContext();
+        Assert.Equal(27.00m, check.Orders.Single().TotalAmount);
+        Assert.Equal([9.00m, 18.00m], check.Tickets.OrderBy(t => t.Id).Select(t => t.Price).ToList());
+    }
+
+    [Fact]
     public async Task SecondUserCannotReserveSeatHeldByFirst()
     {
         await Service().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);

@@ -336,7 +336,7 @@ sequenceDiagram
 
     U->>B: POST /Booking/Cart (намаление, промо код)
     B->>O: SetConcessionAsync / ApplyPromoAsync
-    O->>R: TicketPrice, IsPromoUsable
+    O->>R: IsPromoUsable
 
     U->>B: POST /Booking/Checkout (карта)
     B->>O: CheckoutAsync(userId)
