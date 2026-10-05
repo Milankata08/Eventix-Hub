@@ -198,8 +198,8 @@ Services (concrete classes, scoped):
 |---|---|---|
 | EventService | Afisha search (text, type, genre, city, venue, date; sort by date/title/rating; paged), filter option lists, event details with upcoming showtimes + free-seat counts + average rating, admin CRUD for events and showtimes, per-event occupancy summary | BR-12, BR-15 |
 | VenueService | Venue CRUD, seat generation, VIP row toggle | BR-14, BR-15 |
-| TicketService | Seat map with statuses and counts, reserve seats, remove from cart, cancel, user ticket history (upcoming / past / cancelled, paged), ticket details | BR-01–05, BR-11 |
-| OrderService | Cart with live price preview, set concession, apply / remove promo, checkout, order confirmation | BR-06–10 |
+| TicketService | Seat map with statuses and counts, cancel, user ticket history (upcoming / past / cancelled, paged), ticket details | BR-01, BR-11 |
+| OrderService | Reserve seats, remove from cart, cart with live price preview, set concession, apply / remove promo, checkout, order confirmation | BR-02–10 |
 | PromoCodeService | CRUD, search, active filter | BR-08, BR-15 |
 | ReviewService | Reviews per event (paged), CanReview, add, delete | BR-13 |
 | UserService | Register (Customer role), profile read/update, admin list (search, role filter, paged), set role, delete | BR-15, BR-16 |

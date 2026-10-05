@@ -252,13 +252,13 @@ classDiagram
 
     class TicketService {
         +GetSeatMapAsync(showtimeId)
-        +ReserveSeatsAsync(userId, showtimeId, seatIds)
-        +RemoveFromCartAsync(userId, ticketId)
         +CancelTicketAsync(userId, ticketId)
         +GetUserTicketsAsync(...)
         +GetUserTicketAsync(userId, ticketId)
     }
     class OrderService {
+        +ReserveSeatsAsync(userId, showtimeId, seatIds)
+        +RemoveFromCartAsync(userId, ticketId)
         +GetCartAsync(userId)
         +SetConcessionAsync(userId, ticketId, concession)
         +ApplyPromoAsync(userId, code)
@@ -313,23 +313,22 @@ classDiagram
 sequenceDiagram
     actor U as Клиент
     participant B as BookingController
-    participant T as TicketService
     participant O as OrderService
     participant R as BookingRules
     participant DB as SQL Server
 
     U->>B: POST /Booking/Reserve (showtimeId, seatIds)
-    B->>T: ReserveSeatsAsync(userId, showtimeId, seatIds)
-    T->>DB: чете билети за местата, трие изтекли резервации
-    T->>R: StatusOf(...) за всяко място
+    B->>O: ReserveSeatsAsync(userId, showtimeId, seatIds)
+    O->>DB: чете билети за местата, трие изтекли резервации
+    O->>R: StatusOf(...) за всяко място
     alt място заето / прожекцията е започнала / над 10 билета
-        T-->>B: BookingException (напр. „Ред 3, място 7 е заето“)
+        O-->>B: BookingException (напр. „Ред 3, място 7 е заето“)
         B-->>U: съобщение + схема
     else всички свободни
-        T->>DB: INSERT Tickets (Reserved, ReservedUntil = now + 10 мин)
+        O->>DB: INSERT Tickets (Reserved, ReservedUntil = now + 10 мин)
         alt два едновременни INSERT за едно място
-            DB-->>T: DbUpdateException (филтриран уникален индекс)
-            T-->>B: BookingException
+            DB-->>O: DbUpdateException (филтриран уникален индекс)
+            O-->>B: BookingException
         end
         B-->>U: пренасочване към количката
     end

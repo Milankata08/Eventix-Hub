@@ -22,7 +22,7 @@ public class BookingController(TicketService ticketService, OrderService orderSe
     {
         try
         {
-            await ticketService.ReserveSeatsAsync(User.GetUserId(), showtimeId, seatIds ?? []);
+            await orderService.ReserveSeatsAsync(User.GetUserId(), showtimeId, seatIds ?? []);
             return RedirectToAction(nameof(Cart));
         }
         catch (BookingException ex)
@@ -60,7 +60,7 @@ public class BookingController(TicketService ticketService, OrderService orderSe
 
     [HttpPost]
     public Task<IActionResult> RemoveTicket(int ticketId) =>
-        CartAction(() => ticketService.RemoveFromCartAsync(User.GetUserId(), ticketId));
+        CartAction(() => orderService.RemoveFromCartAsync(User.GetUserId(), ticketId));
 
     [HttpGet]
     public async Task<IActionResult> Checkout()

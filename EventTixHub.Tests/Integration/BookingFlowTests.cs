@@ -48,14 +48,15 @@ public class BookingFlowTests : IDisposable
     {
         var db = _db.NewContext();
         return new TicketService(new Repository<Showtime>(db), new Repository<Seat>(db),
-            new Repository<Ticket>(db), new Repository<Order>(db), _clock, NullLogger<TicketService>.Instance);
+            new Repository<Ticket>(db), _clock, NullLogger<TicketService>.Instance);
     }
 
     private OrderService Orders()
     {
         var db = _db.NewContext();
         return new OrderService(new Repository<Order>(db), new Repository<Ticket>(db),
-            new Repository<PromoCode>(db), _clock, NullLogger<OrderService>.Instance);
+            new Repository<PromoCode>(db), new Repository<Showtime>(db), new Repository<Seat>(db), _clock,
+            NullLogger<OrderService>.Instance);
     }
 
     [Fact]
@@ -64,7 +65,7 @@ public class BookingFlowTests : IDisposable
         using (var db = _db.NewContext())
         {
             var seatIds = db.Seats.OrderBy(s => s.Number).Select(s => s.Id).ToList();
-            await Service().ReserveSeatsAsync(_user1, _showtimeId, seatIds);
+            await Orders().ReserveSeatsAsync(_user1, _showtimeId, seatIds);
         }
         int studentTicketId;
         using (var db = _db.NewContext())
@@ -91,9 +92,9 @@ public class BookingFlowTests : IDisposable
         using (var db = _db.NewContext())
             vipSeat = db.Seats.Single(s => s.Category == SeatCategory.Vip).Id;
 
-        await Service().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
+        await Orders().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
         await Orders().ApplyPromoAsync(_user1, "WELCOME10");
-        await Service().ReserveSeatsAsync(_user1, _showtimeId, [vipSeat]);
+        await Orders().ReserveSeatsAsync(_user1, _showtimeId, [vipSeat]);
 
         var cart = await Orders().GetCartAsync(_user1);
         Assert.Equal([9.00m, 18.00m], cart!.Lines.Select(l => l.Price));
@@ -109,21 +110,21 @@ public class BookingFlowTests : IDisposable
     [Fact]
     public async Task SecondUserCannotReserveSeatHeldByFirst()
     {
-        await Service().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
+        await Orders().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
 
-        await Assert.ThrowsAsync<BookingException>(() => Service().ReserveSeatsAsync(_user2, _showtimeId, [_seatId]));
+        await Assert.ThrowsAsync<BookingException>(() => Orders().ReserveSeatsAsync(_user2, _showtimeId, [_seatId]));
     }
 
     [Fact]
     public async Task Reserve_DropsTheUsersOwnExpiredHoldsFromTheCart()
     {
-        await Service().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
+        await Orders().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
         _clock.Now = _clock.Now.AddMinutes(11);
         int otherSeat;
         using (var db = _db.NewContext())
             otherSeat = db.Seats.Single(s => s.Number == 2).Id;
 
-        await Service().ReserveSeatsAsync(_user1, _showtimeId, [otherSeat]);
+        await Orders().ReserveSeatsAsync(_user1, _showtimeId, [otherSeat]);
 
         using var check = _db.NewContext();
         Assert.Equal(otherSeat, check.Tickets.Single().SeatId);
@@ -132,7 +133,7 @@ public class BookingFlowTests : IDisposable
     [Fact]
     public async Task DatabaseRefusesSecondNonCancelledTicketForSameSeat()
     {
-        await Service().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
+        await Orders().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
 
         using var db = _db.NewContext();
         var order = new Order { UserId = _user2, CreatedAt = _clock.Now.DateTime, Status = OrderStatus.Pending };
@@ -148,10 +149,10 @@ public class BookingFlowTests : IDisposable
     [Fact]
     public async Task AfterHoldExpiresAnotherUserCanReserveSeat()
     {
-        await Service().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
+        await Orders().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
         _clock.Now = _clock.Now.AddMinutes(11);
 
-        await Service().ReserveSeatsAsync(_user2, _showtimeId, [_seatId]);
+        await Orders().ReserveSeatsAsync(_user2, _showtimeId, [_seatId]);
 
         using var db = _db.NewContext();
         var ticket = Assert.Single(db.Tickets.Include(t => t.Order).Where(t => t.SeatId == _seatId));
@@ -161,7 +162,7 @@ public class BookingFlowTests : IDisposable
     [Fact]
     public async Task SeatMapCountsFreeHeldAndSold()
     {
-        await Service().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
+        await Orders().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
 
         var map = await Service().GetSeatMapAsync(_showtimeId);
 
@@ -171,27 +172,27 @@ public class BookingFlowTests : IDisposable
     [Fact]
     public async Task RemoveFromCartFreesTheSeat()
     {
-        await Service().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
+        await Orders().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
         int ticketId;
         using (var db = _db.NewContext())
             ticketId = db.Tickets.Single().Id;
 
-        await Service().RemoveFromCartAsync(_user1, ticketId);
+        await Orders().RemoveFromCartAsync(_user1, ticketId);
 
-        await Service().ReserveSeatsAsync(_user2, _showtimeId, [_seatId]);
+        await Orders().ReserveSeatsAsync(_user2, _showtimeId, [_seatId]);
     }
 
     [Fact]
     public async Task CancelledTicketSeatCanBeBoughtAgain()
     {
-        await Service().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
+        await Orders().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
         await Orders().CheckoutAsync(_user1);
         int ticketId;
         using (var db = _db.NewContext())
             ticketId = db.Tickets.Single().Id;
 
         await Service().CancelTicketAsync(_user1, ticketId);
-        await Service().ReserveSeatsAsync(_user2, _showtimeId, [_seatId]);
+        await Orders().ReserveSeatsAsync(_user2, _showtimeId, [_seatId]);
 
         var history = await Service().GetUserTicketsAsync(_user1, TicketHistoryFilter.Cancelled, 1);
         Assert.Single(history.Items);
@@ -202,7 +203,7 @@ public class BookingFlowTests : IDisposable
     [Fact]
     public async Task HistorySplitsUpcomingAndPast_AndDetailsAreOwnerOnly()
     {
-        await Service().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
+        await Orders().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
         await Orders().CheckoutAsync(_user1);
 
         var upcoming = await Service().GetUserTicketsAsync(_user1, TicketHistoryFilter.Upcoming, 1);
