@@ -22,40 +22,37 @@ public class ReportService(IRepository<Ticket> tickets, IRepository<Showtime> sh
             month.Sum(t => t.Price), month.Count);
     }
 
-    public async Task<IReadOnlyList<RevenueRowDto>> RevenueByEventAsync(DateTime? from, DateTime? to) =>
-        (await PaidInRange(from, to)
-            .Select(t => new { Id = t.Showtime.EventId, Name = t.Showtime.Event.Title, t.Price }).ToListAsync())
-        .GroupBy(t => (t.Id, t.Name))
-        .Select(g => new RevenueRowDto(g.Key.Id, g.Key.Name, g.Count(), g.Sum(t => t.Price)))
-        .OrderByDescending(r => r.Revenue).ThenBy(r => r.Name).ToList();
-
-    public async Task<IReadOnlyList<RevenueRowDto>> RevenueByVenueAsync(DateTime? from, DateTime? to) =>
-        (await PaidInRange(from, to)
-            .Select(t => new { Id = t.Showtime.VenueId, Name = t.Showtime.Venue.Name, t.Price }).ToListAsync())
-        .GroupBy(t => (t.Id, t.Name))
-        .Select(g => new RevenueRowDto(g.Key.Id, g.Key.Name, g.Count(), g.Sum(t => t.Price)))
-        .OrderByDescending(r => r.Revenue).ThenBy(r => r.Name).ToList();
-
-    // Showtimes starting in the range; taken = sold + live holds.
-    public async Task<IReadOnlyList<ShowtimeRowDto>> GetOccupancyAsync(DateTime? from, DateTime? to)
+    // Default range = current month; a reversed range is swapped. Two queries: paid tickets, showtimes.
+    public async Task<SalesReport> GetReportAsync(DateTime? from, DateTime? to)
     {
-        var query = showtimes.Query();
-        if (from is { } f) query = query.Where(s => s.StartsAt >= f.Date);
-        if (to is { } t) query = query.Where(s => s.StartsAt < t.Date.AddDays(1));
-        return await query.OrderBy(s => s.StartsAt).ToOccupancyRows(Now).ToListAsync();
+        var now = Now;
+        var monthStart = new DateTime(now.Year, now.Month, 1);
+        var start = (from ?? monthStart).Date;
+        var end = (to ?? monthStart.AddMonths(1).AddDays(-1)).Date;
+        if (end < start) (start, end) = (end, start);
+        var until = end.AddDays(1);
+
+        var sales = await tickets.Query()
+            .Where(t => t.Status == TicketStatus.Paid && t.Order.PaidAt >= start && t.Order.PaidAt < until)
+            .Select(t => new Sale(t.Showtime.EventId, t.Showtime.Event.Title,
+                t.Showtime.VenueId, t.Showtime.Venue.Name, t.Price))
+            .ToListAsync();
+        // Showtimes starting in the range; taken = sold + live holds.
+        var occupancy = await showtimes.Query().Where(s => s.StartsAt >= start && s.StartsAt < until)
+            .OrderBy(s => s.StartsAt).ToOccupancyRows(now).ToListAsync();
+        var byHour = occupancy.GroupBy(r => r.StartsAt.Hour)
+            .Select(g => new HourOccupancyDto(g.Key, g.Count(), g.Average(r => r.Percent)))
+            .OrderBy(h => h.Hour).ToList();
+
+        return new SalesReport(start, end, Revenue(sales, s => (s.EventId, s.EventTitle)),
+            Revenue(sales, s => (s.VenueId, s.VenueName)), occupancy, byHour);
     }
 
-    public async Task<IReadOnlyList<HourOccupancyDto>> GetAverageOccupancyByHourAsync(DateTime? from, DateTime? to) =>
-        (await GetOccupancyAsync(from, to))
-        .GroupBy(r => r.StartsAt.Hour)
-        .Select(g => new HourOccupancyDto(g.Key, g.Count(), g.Average(r => r.Percent)))
-        .OrderBy(h => h.Hour).ToList();
+    // Money is summed in C#, never in SQL (PLAN pitfall 6).
+    private static List<RevenueRowDto> Revenue(IEnumerable<Sale> sales, Func<Sale, (int Id, string Name)> key) =>
+        sales.GroupBy(key)
+            .Select(g => new RevenueRowDto(g.Key.Id, g.Key.Name, g.Count(), g.Sum(s => s.Price)))
+            .OrderByDescending(r => r.Revenue).ThenBy(r => r.Name).ToList();
 
-    private IQueryable<Ticket> PaidInRange(DateTime? from, DateTime? to)
-    {
-        var query = tickets.Query().Where(t => t.Status == TicketStatus.Paid);
-        if (from is { } f) query = query.Where(t => t.Order.PaidAt >= f.Date);
-        if (to is { } e) query = query.Where(t => t.Order.PaidAt < e.Date.AddDays(1));
-        return query;
-    }
+    private record Sale(int EventId, string EventTitle, int VenueId, string VenueName, decimal Price);
 }

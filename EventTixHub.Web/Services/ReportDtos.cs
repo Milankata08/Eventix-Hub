@@ -8,3 +8,8 @@ public record HourOccupancyDto(int Hour, int Showtimes, double AveragePercent)
 {
     public bool IsCritical => AveragePercent >= BookingRules.CriticalOccupancyPercent;
 }
+
+public record SalesReport(
+    DateTime From, DateTime To,
+    IReadOnlyList<RevenueRowDto> ByEvent, IReadOnlyList<RevenueRowDto> ByVenue,
+    IReadOnlyList<ShowtimeRowDto> Occupancy, IReadOnlyList<HourOccupancyDto> ByHour);

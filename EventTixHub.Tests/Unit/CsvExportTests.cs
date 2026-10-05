@@ -1,11 +1,10 @@
 using EventTixHub.Web.Services;
-using EventTixHub.Web.ViewModels;
 
 namespace EventTixHub.Tests.Unit;
 
 public class CsvExportTests
 {
-    private static ReportsVM Vm(params RevenueRowDto[] byEvent) =>
+    private static SalesReport Vm(params RevenueRowDto[] byEvent) =>
         new(new DateTime(2026, 10, 1), new DateTime(2026, 10, 31), byEvent, [],
             [new ShowtimeRowDto(1, 1, "Шоу", "Зала 1", new DateTime(2026, 10, 5, 19, 0, 0), 100, 25, 0)], []);
 

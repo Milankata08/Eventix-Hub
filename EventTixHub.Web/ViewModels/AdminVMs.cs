@@ -192,8 +192,3 @@ public class PromoCodeFormVM : IValidatableObject
             yield return new ValidationResult($"Лимитът не може да е под вече използваните пъти ({TimesUsed}).", [nameof(UsageLimit)]);
     }
 }
-
-public record ReportsVM(
-    DateTime From, DateTime To,
-    IReadOnlyList<RevenueRowDto> ByEvent, IReadOnlyList<RevenueRowDto> ByVenue,
-    IReadOnlyList<ShowtimeRowDto> Occupancy, IReadOnlyList<HourOccupancyDto> ByHour);
