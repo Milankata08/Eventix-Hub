@@ -23,15 +23,15 @@
 
 <form method="get" asp-action="Index" class="afisha-filters mb-4">
     <div class="filter-row">
-        <fieldset class="chips">
-            <legend class="visually-hidden">Вид</legend>
+        <nav class="chips" aria-label="Вид">
             @foreach (var (value, label) in types)
             {
-                var id = "type-" + (value?.ToString() ?? "all");
-                <input type="radio" class="chip-input" name="Type" id="@id" value="@value" checked="@(f.Type == value)" />
-                <label class="chip" for="@id">@label</label>
+                var route = pager.LinkFor(1); // applied filters, back to page 1
+                if (value is null) route.Remove("Type"); else route["Type"] = value.Value.ToString();
+                <a class="chip" asp-action="Index" asp-all-route-data="route" aria-current="@(f.Type == value ? "page" : null)">@label</a>
             }
-        </fieldset>
+        </nav>
+        <input type="hidden" name="Type" value="@f.Type" />
         <div class="filter-city">
             <label for="f-city" class="visually-hidden">Град</label>
             <select name="City" id="f-city" class="form-select">

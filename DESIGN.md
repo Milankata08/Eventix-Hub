@@ -316,9 +316,9 @@ Each component keeps Bootstrap's markup and accessibility behaviour and changes 
   - It is 13px, never Bootstrap's 0.75em, which rendered at 10.5px.
 - **Genre:** plain worn-ink text after a middle dot ("· Драма"), not a badge.
 - **Filter chips** (Афиш type filter):
-  - Radio inputs styled as `{rounded.sm}` chips.
-  - Unselected: an ink outline. Selected: the type's field ("Всички" selects to ink).
-  - They submit with the filter form, which keeps the GET semantics, and they work without JavaScript.
+  - Links styled as `{rounded.sm}` chips. The active one carries `aria-current="page"`.
+  - Unselected: an ink outline. Selected: an ink fill.
+  - A click applies the type at once and keeps the filters already applied (GET link, back to page 1). They work without JavaScript. A hidden `Type` field keeps the type when "Покажи" applies the other filters.
 
 ### Inputs and fields
 
