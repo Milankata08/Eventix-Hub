@@ -19,6 +19,9 @@ public static class Format
 
     public static string LongDate(DateTime d) => d.Day + " " + Bg.DateTimeFormat.MonthNames[d.Month - 1];
 
+    public static string WeekdayShort(DateTime d) =>
+        Bg.DateTimeFormat.GetAbbreviatedDayName(d.DayOfWeek).TrimEnd('.').ToUpper(Bg);
+
     public static string Weekday(DateTime d) => Bg.DateTimeFormat.GetDayName(d.DayOfWeek);
 
     public static string Time(DateTime d) => d.ToString("HH:mm", Bg);

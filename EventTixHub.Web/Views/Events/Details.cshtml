@@ -42,7 +42,7 @@ else
         @foreach (var s in Model.Details.Showtimes)
         {
             <li>
-                <div class="programme-date" aria-hidden="true"><span class="figure">@Format.PosterDay(s.StartsAt)</span><span class="label-caps">@Format.PosterMonth(s.StartsAt) · @Format.Weekday(s.StartsAt)</span></div>
+                <div class="programme-date" aria-hidden="true"><span class="figure">@Format.PosterDay(s.StartsAt)</span><span class="label-caps">@Format.PosterMonth(s.StartsAt) · @Format.WeekdayShort(s.StartsAt)</span></div>
                 <div class="programme-when">
                     <span class="visually-hidden">@Format.LongDate(s.StartsAt), @Format.Weekday(s.StartsAt), </span><strong>@Format.Time(s.StartsAt)</strong>
                     <div>@s.VenueName, @s.City</div>
@@ -121,7 +121,7 @@ else
             @if (r.UserId == Model.CurrentUserId || Model.IsAdmin)
             {
                 <form asp-controller="Reviews" asp-action="Delete" asp-route-id="@r.Id" method="post"
-                      onsubmit="return confirm(@Json.Serialize($"Да изтрием ли оценката на {r.Author}?"));">
+                      data-confirm="Да изтрием ли оценката на @r.Author?" onsubmit="return confirm(this.dataset.confirm);">
                     <input type="hidden" name="eventId" value="@ev.Id" />
                     <button type="submit" class="btn btn-sm btn-outline-danger">Изтрий</button>
                 </form>
