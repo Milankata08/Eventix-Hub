@@ -13,10 +13,10 @@
 </div>
 
 <form method="get" class="admin-filter">
-    <div><label class="form-label label-caps" for="search">Търсене</label><input id="search" name="search" value="@Model.Search" class="form-control" placeholder="По код" /></div>
+    <div><label class="form-label label-caps" for="search">Търсене</label><input id="search" name="search" value="@Model.Search" class="form-control" data-autosubmit="blur" placeholder="По код" /></div>
     <div>
         <label class="form-label label-caps" for="active">Състояние</label>
-        <select id="active" name="active" class="form-select">
+        <select id="active" name="active" class="form-select" data-autosubmit>
             <option value="">Всички</option>
             <option value="true" selected="@(Model.Active == true)">Активни</option>
             <option value="false" selected="@(Model.Active == false)">Неизползваеми</option>

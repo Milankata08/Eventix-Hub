@@ -26,7 +26,7 @@
     tick();
 })();
 
-// [data-autosubmit] fields apply their form on change (Афиш filters). Without JS a <noscript> Покажи button applies them.
+// [data-autosubmit] fields apply their form on change (Афиш and admin list filters). Without JS the form's button (Афиш: <noscript> Покажи) applies them.
 // Arrow keys and type-ahead on a closed select fire change on every key, so a keyboard pick waits for Enter.
 // data-autosubmit="blur" (search, date) applies on Enter or when leaving the field. Enter is handled here because
 // a form with two text-like fields and no submit button has no implicit submission.
