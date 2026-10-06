@@ -11,21 +11,22 @@
         new Dictionary<string, string?> { ["filter"] = Model.Filter.ToString() });
 }
 
-<div class="d-flex justify-content-between align-items-start mb-4">
+<div class="d-flex justify-content-between align-items-start mb-4 gap-3">
     <div>
-        <h1 class="h3">@Model.FullName</h1>
+        <h1 class="headline">@Model.FullName</h1>
         <div class="text-muted">@Model.Email</div>
         <div class="text-muted">@(string.IsNullOrEmpty(Model.PhoneNumber) ? "Няма телефон" : Model.PhoneNumber)</div>
     </div>
-    <a class="btn btn-outline-primary" asp-action="Edit">Редакция</a>
+    <a class="btn btn-outline-secondary" asp-action="Edit">Редакция</a>
 </div>
 
 <h2 class="h4">Моите билети</h2>
-<ul class="nav nav-tabs mb-3">
+<ul class="nav nav-underline mb-3">
     @foreach (var (value, label) in tabs)
     {
+        var active = Model.Filter == value;
         <li class="nav-item">
-            <a class="nav-link @(Model.Filter == value ? "active" : "")" asp-action="Index" asp-route-filter="@value">@label</a>
+            <a class="nav-link @(active ? "active" : "")" asp-action="Index" asp-route-filter="@value" aria-current="@(active ? "page" : null)">@label</a>
         </li>
     }
 </ul>
@@ -36,45 +37,23 @@
 }
 else
 {
-    <div class="table-responsive">
-        <table class="table align-middle">
-            <thead>
-                <tr>
-                    <th>Събитие</th>
-                    <th>Зала</th>
-                    <th>Начало</th>
-                    <th>Място</th>
-                    <th>Намаление</th>
-                    <th>Цена</th>
-                    <th>Код</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var t in Model.Tickets.Items)
-                {
-                    <tr>
-                        <td>@t.EventTitle</td>
-                        <td>@t.VenueName</td>
-                        <td>@t.StartsAt.ToString("dd.MM.yyyy HH:mm")</td>
-                        <td>Ред @t.Row, място @t.Number (@t.Category.DisplayName())</td>
-                        <td>@t.Concession.DisplayName()</td>
-                        <td>@Format.Money(t.Price)</td>
-                        <td>@t.Code</td>
-                        <td class="text-end">
-                            <a class="btn btn-sm btn-outline-secondary" href="/Tickets/Details/@t.TicketId">Детайли</a>
-                            @if (t.CanCancel)
-                            {
-                                <form action="/Tickets/Cancel/@t.TicketId" method="post" asp-antiforgery="true" class="d-inline"
-                                      onsubmit="return confirm('Сигурни ли сте, че искате да откажете билета?');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Откажи</button>
-                                </form>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+    <ul class="list-unstyled profile-tickets">
+        @foreach (var t in Model.Tickets.Items)
+        {
+            <li class="profile-ticket @t.EventType.TypeClass()">
+                <div class="programme-date" aria-hidden="true"><span class="figure">@Format.PosterDay(t.StartsAt)</span><span class="label-caps">@Format.PosterMonth(t.StartsAt) · @Format.WeekdayShort(t.StartsAt)</span></div>
+                <div>
+                    <h3 class="h5 mb-1">@t.EventTitle <span class="badge type-badge">@t.EventType.DisplayName()</span></h3>
+                    <div class="text-muted"><span class="visually-hidden">@Format.LongDate(t.StartsAt), @Format.Weekday(t.StartsAt), </span>@Format.Time(t.StartsAt) · @t.VenueName, @t.City</div>
+                    <div>Ред @t.Row · място @t.Number</div>
+                    <div class="text-nowrap-money fw-semibold">@Format.Money(t.Price)</div>
+                </div>
+                <div class="profile-ticket-actions d-flex flex-wrap align-items-center gap-2">
+                    <a class="btn @(Model.Filter == TicketHistoryFilter.Upcoming ? "btn-primary" : "btn-outline-secondary")" href="/Tickets/Details/@t.TicketId">Покажи билета</a>
+                    <partial name="_CancelControl" model="t" />
+                </div>
+            </li>
+        }
+    </ul>
     <partial name="_Pager" model="pager" />
 }

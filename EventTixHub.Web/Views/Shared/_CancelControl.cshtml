@@ -1,0 +1,12 @@
+@model UserTicketDto
+@if (Model.CanCancel)
+{
+    <form action="/Tickets/Cancel/@Model.TicketId" method="post" asp-antiforgery="true" class="d-inline"
+          onsubmit="return confirm('Да откажем ли билета за ред @Model.Row, място @Model.Number — „@Model.EventTitle“?');">
+        <button type="submit" class="btn btn-outline-danger">Откажи</button>
+    </form>
+}
+else if (Model.Status == TicketStatus.Paid && Model.StartsAt > DateTime.Now)
+{
+    <span class="text-muted small">Отказ е възможен до @BookingRules.CancellationDeadlineHours часа преди началото.</span>
+}
