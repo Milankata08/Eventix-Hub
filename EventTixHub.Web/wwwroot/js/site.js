@@ -28,6 +28,7 @@
 
 // [data-autosubmit] fields apply their form on change (Афиш selects). Without JS the form's submit button still works.
 // Arrow keys and type-ahead on a closed select fire change on every key, so a keyboard pick waits for Enter.
+// data-autosubmit="blur" (the date, which changes per typed segment) waits for Enter or leaving the field.
 (function () {
     let key = null;
     document.addEventListener('keydown', e => {
@@ -37,9 +38,13 @@
     });
     document.addEventListener('keyup', () => { key = null; });
     document.addEventListener('change', e => {
-        if (!e.target.matches('[data-autosubmit]')) return;
-        if (key && key !== 'Enter') e.target.dataset.pending = '1';
-        else e.target.form.requestSubmit();
+        const el = e.target;
+        if (!el.matches('[data-autosubmit]')) return;
+        if (el.dataset.autosubmit === 'blur' || (key && key !== 'Enter')) el.dataset.pending = '1';
+        else el.form.requestSubmit();
+    });
+    document.addEventListener('focusout', e => {
+        if (e.target.matches('[data-autosubmit="blur"]') && e.target.dataset.pending) e.target.form.requestSubmit();
     });
 })();
 
