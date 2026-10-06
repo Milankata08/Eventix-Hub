@@ -58,7 +58,7 @@
             </div>
             <div>
                 <label for="f-genre" class="form-label">Жанр</label>
-                <select name="Genre" id="f-genre" class="form-select">
+                <select name="Genre" id="f-genre" class="form-select" data-autosubmit>
                     <option value="">Всички жанрове</option>
                     @foreach (var g in Model.Options.Genres)
                     {
@@ -68,7 +68,7 @@
             </div>
             <div>
                 <label for="f-venue" class="form-label">Зала</label>
-                <select name="VenueId" id="f-venue" class="form-select">
+                <select name="VenueId" id="f-venue" class="form-select" data-autosubmit>
                     <option value="">Всички зали</option>
                     @foreach (var v in Model.Options.Venues)
                     {
