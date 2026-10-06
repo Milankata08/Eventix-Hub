@@ -10,6 +10,8 @@ public static class Format
     // Non-breaking space so "12,50 €" never wraps.
     public static string Money(decimal value) => value.ToString("0.00", Bg) + " €";
 
+    public static string Rating(double value) => value.ToString("0.0", Bg);
+
     public static string PosterDay(DateTime d) => d.ToString("dd", Bg);
 
     public static string PosterMonth(DateTime d) =>

@@ -600,3 +600,39 @@ button.seat:not(:disabled) { cursor: pointer; }
   color: #FAF9F6;
 }
 .poster-band .poster-title { --cap: 11cqi; }
+
+/* Event details: hero, programme dates, reviews */
+.details-hero { display: grid; gap: 1.5rem; margin-bottom: 2.5rem; }
+.details-desc { max-width: 68ch; }
+@media (min-width: 768px) { .details-hero { grid-template-columns: 1fr 2fr; gap: 2rem; align-items: start; } }
+@media (min-width: 992px) { .details-hero { grid-template-columns: 4fr 8fr; } }
+@media (min-width: 768px) { .details-hero .details-poster.d-md-none { display: none !important; } }
+.programme-title { padding-top: 0.75rem; border-top: 4px solid var(--ink); margin-bottom: 0; }
+.programme { list-style: none; margin: 0 0 2.5rem; padding: 0; font-variant-numeric: tabular-nums; }
+.programme > li {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr auto;
+  grid-template-areas: "date when action" "date price action" "date free action";
+  column-gap: 1rem;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.programme-date { grid-area: date; display: flex; flex-direction: column; }
+.programme-when { grid-area: when; }
+.programme-price { grid-area: price; }
+.programme-free { grid-area: free; color: var(--ink-muted); }
+.programme-action { grid-area: action; text-align: end; }
+@media (max-width: 767.98px) {
+  .programme > li {
+    grid-template-columns: 4.5rem 1fr;
+    grid-template-areas: "date when" "date price" "date free" "action action";
+    row-gap: 0.125rem;
+  }
+  .programme-action { margin-top: 0.75rem; text-align: start; }
+  .programme-action .btn { display: block; width: 100%; }
+}
+.review-form { background: var(--sheet); border-radius: 0; border-color: var(--ink); }
+.reviews { list-style: none; margin: 0; padding: 0; }
+.reviews > li { padding: 1rem 0; border-bottom: 1px solid var(--rule); }
+.review-stars { margin-left: 0.5rem; color: var(--ink); }
