@@ -1,21 +1,29 @@
-// Cart hold countdown: data-countdown holds the seconds left (computed by the server, so no clock skew).
-// When it reaches zero the page reloads and shows the "expired" message.
+// Hold countdown: every [data-hold-seconds] starts from a server-rendered value (no clock skew).
+// Text updates are plain DOM writes; one shared status region speaks only at 5 min, 1 min and expiry.
 (function () {
-    const el = document.querySelector('[data-countdown]');
-    if (!el) return;
-    let left = Number(el.dataset.countdown);
+    const els = [...document.querySelectorAll('[data-hold-seconds]')];
+    if (els.length === 0) return;
+    const announce = document.getElementById('hold-announce');
+    const onCartPage = /^\/Booking\/(Cart|Checkout)\/?$/i.test(location.pathname);
+    const speak = { 300: 'Остават 5 минути.', 60: 'Остава 1 минута.', 0: 'Резервацията изтече.' };
+    let left = Math.min(...els.map(e => Number(e.dataset.holdSeconds)));
     const tick = () => {
+        if (speak[left] && announce) announce.textContent = speak[left];
         if (left <= 0) {
-            location.reload();
+            if (onCartPage) { location.reload(); return; }
+            for (const el of els) {
+                el.closest('[data-hold-text]').textContent = 'Резервацията изтече';
+            }
+            clearInterval(timer);
             return;
         }
-        const m = Math.floor(left / 60);
-        const s = String(left % 60).padStart(2, '0');
-        el.textContent = `${m}:${s} мин.`;
+        const text = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
+        for (const el of els) el.textContent = text;
+        if (left <= 120) for (const b of document.querySelectorAll('[data-hold-badge]')) b.classList.add('is-urgent');
         left--;
     };
+    const timer = setInterval(tick, 1000);
     tick();
-    setInterval(tick, 1000);
 })();
 
 // Dark mode toggle (Bootstrap 5.3 color modes). The <head> script in _Layout applies the saved theme before first paint.

@@ -51,7 +51,11 @@ public class BookingController(TicketService ticketService, OrderService orderSe
             TempData["Error"] = "Въведете промо код.";
             return Task.FromResult<IActionResult>(RedirectToAction(nameof(Cart)));
         }
-        return CartAction(() => orderService.ApplyPromoAsync(User.GetUserId(), code));
+        return CartAction(() => orderService.ApplyPromoAsync(User.GetUserId(), code), ex =>
+        {
+            TempData["PromoCode"] = code;
+            TempData["PromoError"] = ex.Message;
+        });
     }
 
     [HttpPost]
@@ -68,7 +72,7 @@ public class BookingController(TicketService ticketService, OrderService orderSe
         var cart = await orderService.GetCartAsync(User.GetUserId());
         if (cart is null || cart.Lines.Count == 0)
             return RedirectToAction(nameof(Cart));
-        return View(new CheckoutVM(cart, new PaymentVM()));
+        return View(new CheckoutVM(cart, new PaymentVM(), SecondsLeft(cart)));
     }
 
     [HttpPost]
@@ -95,7 +99,7 @@ public class BookingController(TicketService ticketService, OrderService orderSe
             return RedirectToAction(nameof(Cart));
         }
         // Card data is never echoed back.
-        return View(new CheckoutVM(cart, new PaymentVM { CardholderName = payment.CardholderName }));
+        return View(new CheckoutVM(cart, new PaymentVM { CardholderName = payment.CardholderName }, SecondsLeft(cart)));
     }
 
     public async Task<IActionResult> Confirmation(int id)
@@ -113,7 +117,7 @@ public class BookingController(TicketService ticketService, OrderService orderSe
         return View(new ConfirmationVM(order.Id, order.TotalAmount, cards));
     }
 
-    private async Task<IActionResult> CartAction(Func<Task> action)
+    private async Task<IActionResult> CartAction(Func<Task> action, Action<BookingException>? onError = null)
     {
         try
         {
@@ -121,7 +125,10 @@ public class BookingController(TicketService ticketService, OrderService orderSe
         }
         catch (BookingException ex)
         {
-            TempData["Error"] = ex.Message;
+            if (onError is null)
+                TempData["Error"] = ex.Message;
+            else
+                onError(ex);
         }
         return RedirectToAction(nameof(Cart));
     }
