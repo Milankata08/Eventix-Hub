@@ -20,4 +20,8 @@ public static class Format
     public static string Weekday(DateTime d) => Bg.DateTimeFormat.GetDayName(d.DayOfWeek);
 
     public static string Time(DateTime d) => d.ToString("HH:mm", Bg);
+
+    // Character count of the longest word; drives the poster title fit. At least 1.
+    public static int LongestWord(string title) =>
+        Math.Max(1, title.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).Select(w => w.Length).DefaultIfEmpty(1).Max());
 }

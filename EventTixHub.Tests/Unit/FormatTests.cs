@@ -10,6 +10,13 @@ public class FormatTests
     [Fact]
     public void Money_uses_comma_and_non_breaking_space() => Assert.Equal("12,50 €", Format.Money(12.5m));
 
+    [Theory]
+    [InlineData("Симфоничен оркестър: Бетовен", 10)]
+    [InlineData("  Дюн  ", 3)]
+    [InlineData("", 1)]
+    public void LongestWord_counts_longest_whitespace_separated_word(string title, int expected) =>
+        Assert.Equal(expected, Format.LongestWord(title));
+
     [Fact]
     public void Dates_read_in_bulgarian()
     {

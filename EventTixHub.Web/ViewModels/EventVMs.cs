@@ -1,7 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using EventTixHub.Web.Models;
 using EventTixHub.Web.Services;
 
 namespace EventTixHub.Web.ViewModels;
+
+public enum PosterSize { Card, Hero, Band, Thumb }
+
+public record PosterVM(int EventId, string Title, EventType Type, string Genre, string? PosterUrl,
+    DateTime? Date, string? Venue, string? City, PosterSize Size, bool Link = true);
 
 public class AfishaVM
 {
