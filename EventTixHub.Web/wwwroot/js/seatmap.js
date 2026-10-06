@@ -179,10 +179,16 @@
         return seats.filter(s => selected.has(s.id)).reduce((acc, s) => acc + prices[s.category], 0);
     }
 
+    // Clear first so a repeated message is announced again.
+    function say(text) {
+        announce.textContent = '';
+        setTimeout(() => { announce.textContent = text; }, 50);
+    }
+
     function choose(id) {
         const seat = seatById(id);
         if (!selected.has(id) && seat.status !== 'Free') {
-            announce.textContent = 'Мястото е заето.';
+            say('Мястото е заето.');
             return;
         }
         const adding = !selected.has(id);
@@ -190,7 +196,7 @@
         notice.classList.add('d-none');
         update();
         renderSummary();
-        announce.textContent = `${adding ? 'Добавено' : 'Премахнато'}: ${where(seat)}. Общо ${money(currentTotal())}.`;
+        say(`${adding ? 'Добавено' : 'Премахнато'}: ${where(seat)}. Общо ${money(currentTotal())}.`);
     }
 
     function showCounts(map) {
