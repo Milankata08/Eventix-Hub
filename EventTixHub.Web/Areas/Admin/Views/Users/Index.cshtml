@@ -8,12 +8,13 @@
     var roleNames = new Dictionary<string, string> { [Roles.Administrator] = "Администратор", [Roles.Customer] = "Клиент" };
 }
 
-<h1 class="h3 mb-3">Потребители</h1>
+<div class="page-head"><h1 class="headline">Потребители</h1></div>
 
-<form method="get" class="row g-2 mb-3">
-    <div class="col-md-5"><input name="search" value="@Model.Search" class="form-control" placeholder="Търсене по име или имейл" /></div>
-    <div class="col-md-4">
-        <select name="role" class="form-select" aria-label="Роля">
+<form method="get" class="admin-filter">
+    <div><label class="form-label label-caps" for="search">Търсене</label><input id="search" name="search" value="@Model.Search" class="form-control" placeholder="По име или имейл" /></div>
+    <div>
+        <label class="form-label label-caps" for="role">Роля</label>
+        <select id="role" name="role" class="form-select">
             <option value="">Всички роли</option>
             @foreach (var (value, text) in roleNames)
             {
@@ -21,8 +22,8 @@
             }
         </select>
     </div>
-    <div class="col-md-3">
-        <button type="submit" class="btn btn-outline-primary">Търси</button>
+    <div class="admin-filter-actions">
+        <button type="submit" class="btn btn-secondary">Търси</button>
         <a class="btn btn-link" asp-action="Index">Изчисти</a>
     </div>
 </form>
@@ -33,34 +34,39 @@
 }
 else
 {
+    <div class="table-responsive">
     <table class="table align-middle">
-        <thead><tr><th>Име</th><th>Имейл</th><th>Роля</th><th></th></tr></thead>
+        <thead><tr><th>Име</th><th>Имейл</th><th>Роля</th><th><span class="visually-hidden">Действия</span></th></tr></thead>
         <tbody>
         @foreach (var u in Model.Users.Items)
         {
+            var self = u.Id == Model.CurrentUserId;
             <tr>
                 <td>@u.FullName</td>
                 <td>@u.Email</td>
                 <td>
                     <form asp-action="SetRole" asp-route-id="@u.Id" method="post" class="d-flex gap-2">
-                        <select name="role" class="form-select form-select-sm w-auto" aria-label="Роля" disabled="@(u.Id == Model.CurrentUserId)">
+                        <select name="role" class="form-select form-select-sm w-auto" aria-label="Роля на @u.FullName" disabled="@self">
                             @foreach (var (value, text) in roleNames)
                             {
                                 <option value="@value" selected="@(u.Role == value)">@text</option>
                             }
                         </select>
-                        <button type="submit" class="btn btn-sm btn-outline-primary" disabled="@(u.Id == Model.CurrentUserId)">Промени</button>
+                        <button type="submit" class="btn btn-sm btn-secondary" disabled="@self">Промени<span class="visually-hidden"> ролята на @u.FullName</span></button>
                     </form>
                 </td>
-                <td class="text-end">
-                    @if (u.Id != Model.CurrentUserId)
+                <td>
+                    <div class="row-actions">
+                    @if (!self)
                     {
-                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@u.Id">Изтриване</a>
+                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@u.Id">Изтрий<span class="visually-hidden"> @u.FullName</span></a>
                     }
+                    </div>
                 </td>
             </tr>
         }
         </tbody>
     </table>
+    </div>
     <partial name="_Pager" model="pager" />
 }

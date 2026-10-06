@@ -3,7 +3,7 @@
     ViewData["Title"] = Model.Title;
 }
 
-<h1 class="h3">@Model.Title</h1>
+<h1 class="headline mb-3">@Model.Title</h1>
 <p>Сигурни ли сте, че искате да изтриете <strong>@Model.Details</strong>? Действието е необратимо.</p>
 <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
     <button type="submit" class="btn btn-danger">Изтрий</button>

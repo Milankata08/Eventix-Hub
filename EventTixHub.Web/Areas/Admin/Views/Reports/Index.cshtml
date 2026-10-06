@@ -4,15 +4,15 @@
     var empty = Model.ByEvent.Count == 0 && Model.Occupancy.Count == 0;
 }
 
-<h1 class="h3 mb-3">Справки</h1>
+<div class="page-head"><h1 class="headline">Справки</h1></div>
 
-<form method="get" class="row g-2 mb-4">
-    <div class="col-md-3"><input type="date" name="from" value="@Model.From.ToString("yyyy-MM-dd")" class="form-control" aria-label="От дата" /></div>
-    <div class="col-md-3"><input type="date" name="to" value="@Model.To.ToString("yyyy-MM-dd")" class="form-control" aria-label="До дата" /></div>
-    <div class="col-md-3">
-        <button type="submit" class="btn btn-outline-primary">Покажи</button>
+<form method="get" class="admin-filter mb-4">
+    <div><label class="form-label label-caps" for="from">От дата</label><input id="from" type="date" name="from" value="@Model.From.ToString("yyyy-MM-dd")" class="form-control" /></div>
+    <div><label class="form-label label-caps" for="to">До дата</label><input id="to" type="date" name="to" value="@Model.To.ToString("yyyy-MM-dd")" class="form-control" /></div>
+    <div class="admin-filter-actions">
+        <button type="submit" class="btn btn-secondary">Покажи</button>
         <a class="btn btn-link" asp-action="Index">Текущ месец</a>
-        <a class="btn btn-outline-success" asp-action="Export" asp-route-from="@Model.From.ToString("yyyy-MM-dd")" asp-route-to="@Model.To.ToString("yyyy-MM-dd")">Експорт CSV</a>
+        <a class="btn btn-secondary" asp-action="Export" asp-route-from="@Model.From.ToString("yyyy-MM-dd")" asp-route-to="@Model.To.ToString("yyyy-MM-dd")">Експорт CSV</a>
     </div>
 </form>
 
@@ -25,61 +25,60 @@ else
     @await Html.PartialAsync("_RevenueTable", (Title: "Приход по събития", Rows: Model.ByEvent, NameHeader: "Събитие"))
     @await Html.PartialAsync("_RevenueTable", (Title: "Приход по зали", Rows: Model.ByVenue, NameHeader: "Зала"))
 
-    <h2 class="h5 mt-4">Заетост по прожекции</h2>
+    <h2 class="label-caps mt-4">Заетост по прожекции</h2>
     @if (Model.Occupancy.Count == 0)
     {
         <p class="text-muted">Няма данни.</p>
     }
     else
     {
+        <div class="table-responsive">
         <table class="table align-middle">
-            <thead><tr><th>Събитие</th><th>Зала</th><th>Начало</th><th style="width:30%">Заетост</th><th></th></tr></thead>
+            <thead><tr><th>Събитие</th><th>Зала</th><th>Начало</th><th style="min-width:12rem">Заетост</th></tr></thead>
             <tbody>
             @foreach (var o in Model.Occupancy)
             {
                 var percent = (int)Math.Round(o.Percent);
-                <tr>
-                    <td><a asp-controller="Showtimes" asp-action="Details" asp-route-id="@o.Id">@o.EventTitle</a></td>
+                <tr class="@o.Type.TypeClass()">
+                    <td><a asp-controller="Showtimes" asp-action="Details" asp-route-id="@o.Id">@o.EventTitle</a> <span class="badge type-badge @o.Type.TypeClass()">@o.Type.DisplayName()</span></td>
                     <td>@o.VenueName</td>
                     <td>@o.StartsAt.ToString("dd.MM.yyyy HH:mm")</td>
                     <td>
-                        <div class="progress" role="progressbar" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100">
-                            <div class="progress-bar @(o.IsCritical ? "bg-danger" : "")" style="width:@percent%"></div>
-                        </div>
-                        <div class="small text-muted">@percent% · @o.Taken от @o.Capacity места</div>
+                        @await Html.PartialAsync("_Bar", (percent, "Заетост"))
+                        <div class="bar-note">@percent % · @o.Taken от @o.Capacity места@if (o.IsCritical) { <text> · </text><span class="label-caps">критична</span> }</div>
                     </td>
-                    <td>@if (o.IsCritical) { <span class="badge bg-danger">критична</span> }</td>
                 </tr>
             }
             </tbody>
         </table>
+        </div>
     }
 
-    <h2 class="h5 mt-4">Средна заетост по начален час</h2>
+    <h2 class="label-caps mt-4">Средна заетост по начален час</h2>
     @if (Model.ByHour.Count == 0)
     {
         <p class="text-muted">Няма данни.</p>
     }
     else
     {
+        <div class="table-responsive">
         <table class="table align-middle">
-            <thead><tr><th>Час</th><th>Прожекции</th><th style="width:50%">Средна заетост</th></tr></thead>
+            <thead><tr><th>Час</th><th class="num">Прожекции</th><th style="min-width:12rem">Средна заетост</th></tr></thead>
             <tbody>
             @foreach (var h in Model.ByHour)
             {
                 var percent = (int)Math.Round(h.AveragePercent);
                 <tr>
                     <td>@h.Hour.ToString("00"):00</td>
-                    <td>@h.Showtimes</td>
+                    <td class="num">@h.Showtimes</td>
                     <td>
-                        <div class="progress" role="progressbar" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100">
-                            <div class="progress-bar @(h.IsCritical ? "bg-danger" : "")" style="width:@percent%"></div>
-                        </div>
-                        <div class="small text-muted">@percent%</div>
+                        @await Html.PartialAsync("_Bar", (percent, "Средна заетост"))
+                        <div class="bar-note">@percent %@if (h.IsCritical) { <text> · </text><span class="label-caps">критична</span> }</div>
                     </td>
                 </tr>
             }
             </tbody>
         </table>
+        </div>
     }
 }

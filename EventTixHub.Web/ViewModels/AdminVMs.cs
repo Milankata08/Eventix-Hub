@@ -20,13 +20,13 @@ public class EventFormVM
     [StringLength(2000, ErrorMessage = "Описанието може да е до {1} символа."), Display(Name = "Описание")]
     public string? Description { get; set; }
 
-    [Display(Name = "Вид")]
+    [Required(ErrorMessage = "Изберете вид."), Display(Name = "Вид")]
     public EventType Type { get; set; }
 
     [Required(ErrorMessage = "Жанрът е задължителен."), StringLength(50, ErrorMessage = "Жанрът може да е до {1} символа."), Display(Name = "Жанр")]
     public string Genre { get; set; } = "";
 
-    [Range(1, 600, ErrorMessage = "Продължителността трябва да е между {1} и {2} минути."), Display(Name = "Продължителност (мин)")]
+    [Required(ErrorMessage = "Продължителността е задължителна."), Range(1, 600, ErrorMessage = "Продължителността трябва да е между {1} и {2} минути."), Display(Name = "Продължителност (мин)")]
     public int DurationMinutes { get; set; } = 90;
 
     /// <summary>Current poster URL, display only: set by the server, never bound from the form.</summary>
@@ -65,10 +65,10 @@ public class VenueFormVM
     [Required(ErrorMessage = "Адресът е задължителен."), StringLength(200, ErrorMessage = "Адресът може да е до {1} символа."), Display(Name = "Адрес")]
     public string Address { get; set; } = "";
 
-    [Range(1, 30, ErrorMessage = "Редовете трябва да са между {1} и {2}."), Display(Name = "Редове")]
+    [Required(ErrorMessage = "Редовете са задължителни."), Range(1, 30, ErrorMessage = "Редовете трябва да са между {1} и {2}."), Display(Name = "Редове")]
     public int Rows { get; set; } = 8;
 
-    [Range(1, 40, ErrorMessage = "Местата в ред трябва да са между {1} и {2}."), Display(Name = "Места в ред")]
+    [Required(ErrorMessage = "Местата в ред са задължителни."), Range(1, 40, ErrorMessage = "Местата в ред трябва да са между {1} и {2}."), Display(Name = "Места в ред")]
     public int SeatsPerRow { get; set; } = 10;
 
     public static VenueFormVM From(Venue v) => new()
@@ -105,19 +105,19 @@ public class ShowtimeFormVM : IValidatableObject
 {
     public int Id { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "Изберете събитие."), Display(Name = "Събитие")]
+    [Required(ErrorMessage = "Изберете събитие."), Range(1, int.MaxValue, ErrorMessage = "Изберете събитие."), Display(Name = "Събитие")]
     public int EventId { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "Изберете зала."), Display(Name = "Зала")]
+    [Required(ErrorMessage = "Изберете зала."), Range(1, int.MaxValue, ErrorMessage = "Изберете зала."), Display(Name = "Зала")]
     public int VenueId { get; set; }
 
     [Required(ErrorMessage = "Началото е задължително."), Display(Name = "Начало")]
     public DateTime? StartsAt { get; set; }
 
-    [Range(typeof(decimal), "0.01", "1000", ErrorMessage = "Цената трябва да е между {1} и {2} €."), Display(Name = "Стандартна цена (€)")]
+    [Required(ErrorMessage = "Стандартната цена е задължителна."), Range(typeof(decimal), "0.01", "1000", ErrorMessage = "Цената трябва да е между {1} и {2} €."), Display(Name = "Стандартна цена (€)")]
     public decimal StandardPrice { get; set; }
 
-    [Range(typeof(decimal), "0.01", "1000", ErrorMessage = "Цената трябва да е между {1} и {2} €."), Display(Name = "VIP цена (€)")]
+    [Required(ErrorMessage = "VIP цената е задължителна."), Range(typeof(decimal), "0.01", "1000", ErrorMessage = "Цената трябва да е между {1} и {2} €."), Display(Name = "VIP цена (€)")]
     public decimal VipPrice { get; set; }
 
     [BindNever, ValidateNever]
@@ -157,10 +157,10 @@ public class PromoCodeFormVM : IValidatableObject
      RegularExpression("^[A-Za-z0-9]+$", ErrorMessage = "Кодът може да съдържа само букви и цифри."), Display(Name = "Код")]
     public string Code { get; set; } = "";
 
-    [Range(1, 100, ErrorMessage = "Отстъпката трябва да е между {1} и {2} %."), Display(Name = "Отстъпка (%)")]
+    [Required(ErrorMessage = "Отстъпката е задължителна."), Range(1, 100, ErrorMessage = "Отстъпката трябва да е между {1} и {2} %."), Display(Name = "Отстъпка (%)")]
     public int DiscountPercent { get; set; } = 10;
 
-    [Range(1, int.MaxValue, ErrorMessage = "Лимитът трябва да е поне {1}."), Display(Name = "Лимит на използване")]
+    [Required(ErrorMessage = "Лимитът е задължителен."), Range(1, int.MaxValue, ErrorMessage = "Лимитът трябва да е поне {1}."), Display(Name = "Лимит на използване")]
     public int UsageLimit { get; set; } = 100;
 
     // Shown on edit; the service re-checks the stored value.

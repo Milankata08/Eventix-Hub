@@ -5,7 +5,7 @@ namespace EventTixHub.Web.Services;
 // Occupancy of one showtime (PLAN §4). Taken = sold + live holds; critical at >= CriticalOccupancyPercent.
 public record ShowtimeRowDto(
     int Id, int EventId, string EventTitle, string VenueName, DateTime StartsAt,
-    int Capacity, int Sold, int Held)
+    int Capacity, int Sold, int Held, EventType Type = EventType.Movie)
 {
     public int Taken => Sold + Held;
     public int Free => Capacity - Taken;
@@ -22,6 +22,6 @@ public static class OccupancyQueries
         return query.Select(s => new ShowtimeRowDto(s.Id, s.EventId, s.Event.Title, s.Venue.Name, s.StartsAt,
             s.Venue.Rows * s.Venue.SeatsPerRow,
             s.Tickets.Count(t => t.Status == TicketStatus.Paid),
-            s.Tickets.AsQueryable().Count(held)));
+            s.Tickets.AsQueryable().Count(held), s.Event.Type));
     }
 }

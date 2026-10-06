@@ -8,14 +8,14 @@
     };
 }
 
-<ul class="nav nav-pills mb-4">
-    @foreach (var (controller, text) in items)
-    {
-        <li class="nav-item">
-            <a class="nav-link @(current == controller ? "active" : "")" asp-area="Admin" asp-controller="@controller" asp-action="Index">@text</a>
-        </li>
-    }
-</ul>
+<nav aria-label="Администрация">
+    <ul class="admin-tabs">
+        @foreach (var (controller, text) in items)
+        {
+            <li><a asp-area="Admin" asp-controller="@controller" asp-action="Index" aria-current="@(current == controller ? "page" : null)">@text</a></li>
+        }
+    </ul>
+</nav>
 
 @RenderBody()
 
