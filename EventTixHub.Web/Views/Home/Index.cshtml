@@ -82,7 +82,7 @@
             </div>
             <div>
                 <label for="f-sort" class="form-label">Сортиране</label>
-                <select name="Sort" id="f-sort" class="form-select">
+                <select name="Sort" id="f-sort" class="form-select" data-autosubmit>
                     <option value="Date" selected="@(f.Sort == EventSort.Date)">По дата</option>
                     <option value="Title" selected="@(f.Sort == EventSort.Title)">По заглавие</option>
                     <option value="Rating" selected="@(f.Sort == EventSort.Rating)">По оценка</option>
