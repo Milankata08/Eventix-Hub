@@ -1,0 +1,25 @@
+@model HoldBadgeVM
+@{
+    var s = Model.SecondsLeft;
+    var start = $"{s / 60}:{s % 60:00}";
+    var cls = "hold-badge" + (Model.Large ? " hold-badge--large" : "") + (s <= 120 ? " is-urgent" : "");
+}
+@functions {
+    static string Clock = "<svg class=\"hold-clock\" width=\"18\" height=\"18\" viewBox=\"0 0 20 20\" aria-hidden=\"true\" focusable=\"false\"><circle cx=\"10\" cy=\"10\" r=\"8\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><path d=\"M10 5v5l3 2\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>";
+}
+@if (Model.Large)
+{
+    <div class="@cls" data-hold-badge>
+        @Html.Raw(Clock)
+        <span class="hold-perf" aria-hidden="true"></span>
+        <span data-hold-text>Пазим местата ви още <span data-hold-seconds="@s">@start</span></span>
+    </div>
+}
+else
+{
+    <a class="@cls" href="/Booking/Cart" data-hold-badge>
+        @Html.Raw(Clock)
+        <span class="hold-perf" aria-hidden="true"></span>
+        <span data-hold-text><span class="d-none d-md-inline">Пазим местата ви още </span><span data-hold-seconds="@s">@start</span></span>
+    </a>
+}

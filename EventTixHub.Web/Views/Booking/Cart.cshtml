@@ -2,100 +2,130 @@
 @{
     ViewData["Title"] = "Количка";
     var cart = Model.Cart;
+    var promoCode = TempData["PromoCode"] as string;
+    var promoError = TempData["PromoError"] as string;
+    var hasLines = cart is { Lines.Count: > 0 };
 }
 
-<h1 class="h3 mb-3">Количка</h1>
+<h1 class="mb-3">Количка</h1>
 
 @if (cart is { ExpiredCount: > 0 })
 {
-    <div class="alert alert-warning" role="alert">
-        @(cart.ExpiredCount == 1 ? "1 билет е с изтекла резервация и беше премахнат." : $"{cart.ExpiredCount} билета са с изтекла резервация и бяха премахнати.")
-        Изберете местата отново, ако още ги искате.
-    </div>
+    foreach (var g in cart.Expired.GroupBy(e => e.ShowtimeId))
+    {
+        var first = g.First();
+        var seats = g.Select(e => $"ред {e.Row}, място {e.Number}").ToList();
+        var seatText = seats.Count == 1 ? seats[0] : string.Join(", ", seats.Take(seats.Count - 1)) + " и " + seats[^1];
+        <div class="alert alert-warning d-flex flex-wrap align-items-center justify-content-between gap-2" role="alert">
+            <span>Резервацията за @seatText („@first.EventTitle“, @Format.LongDate(first.StartsAt), @Format.Time(first.StartsAt)) изтече.</span>
+            <a class="btn btn-primary" href="/Booking/Seats/@g.Key?seats=@string.Join(",", g.Select(e => e.SeatId))">Опитай отново със същите места</a>
+        </div>
+    }
 }
 
-@if (cart is null || cart.Lines.Count == 0)
+@if (!hasLines)
 {
-    <p class="text-muted">
-        @(cart is null ? "Количката е празна." : "Резервацията изтече или количката е празна. Изберете местата отново.")
-    </p>
-    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Към афиша</a>
+    @if (cart is not { ExpiredCount: > 0 })
+    {
+        <p class="text-muted">Количката е празна.</p>
+        <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Към афиша</a>
+    }
+    else
+    {
+        <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">Към афиша</a>
+    }
 }
 else
 {
-    <div class="alert alert-info" role="status">
-        Местата са запазени за <strong data-countdown="@Model.SecondsLeft">@Model.SecondsLeft сек.</strong>
-    </div>
+    <partial name="_HoldBadge" model="new HoldBadgeVM(Model.SecondsLeft, true)" />
 
-    <div class="table-responsive">
-        <table class="table align-middle">
-            <thead>
-                <tr>
-                    <th>Събитие</th>
-                    <th>Начало</th>
-                    <th>Място</th>
-                    <th>Намаление</th>
-                    <th class="text-end">Цена</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var l in cart.Lines)
+    <div class="row">
+        <div class="col-lg-8">
+            @foreach (var g in cart!.Lines.GroupBy(l => l.ShowtimeId))
+            {
+                var h = g.First();
+                <section class="cart-group mb-4" aria-label="@h.EventTitle">
+                    <header class="cart-group-head">
+                        <span class="badge type-badge @h.EventType.TypeClass()">@h.EventType.DisplayName()</span>
+                        <h2 class="mb-0">@h.EventTitle</h2>
+                        <div class="text-muted">@Format.LongDate(h.StartsAt) · @Format.Time(h.StartsAt) · @h.VenueName</div>
+                    </header>
+                    <ul class="list-unstyled mb-0">
+                        @foreach (var l in g)
+                        {
+                            <li class="cart-line">
+                                <div class="cart-line-main">
+                                    <div class="fw-semibold">Ред @l.Row · място @l.Number · @l.Category.DisplayName()</div>
+                                    <form asp-action="SetConcession" method="post" class="d-flex flex-wrap align-items-end gap-2 mt-1">
+                                        <input type="hidden" name="ticketId" value="@l.TicketId" />
+                                        <div>
+                                            <label class="form-label small mb-0" for="c-@l.TicketId">Намаление за ред @l.Row, място @l.Number</label>
+                                            <select id="c-@l.TicketId" name="concession" class="form-select form-select-sm">
+                                                @foreach (var c in Enum.GetValues<ConcessionType>())
+                                                {
+                                                    <option value="@c" selected="@(c == l.Concession)">@c.DisplayName()@(c == ConcessionType.Student ? " −20%" : c == ConcessionType.Pensioner ? " −30%" : "")</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary">Приложи</button>
+                                    </form>
+                                </div>
+                                <div class="cart-line-side">
+                                    <div class="text-nowrap-money fw-bold">@Format.Money(l.Price)</div>
+                                    <form asp-action="RemoveTicket" method="post">
+                                        <input type="hidden" name="ticketId" value="@l.TicketId" />
+                                        <button type="submit" class="btn btn-sm btn-link text-danger p-0">Премахни<span class="visually-hidden"> ред @l.Row, място @l.Number</span></button>
+                                    </form>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+            <p class="text-muted small">Студентската и пенсионерската карта се проверяват на входа.</p>
+
+            <div class="mb-4">
+                @if (cart.PromoCode is not null)
                 {
-                    <tr>
-                        <td>@l.EventTitle<div class="text-muted small">@l.VenueName</div></td>
-                        <td>@l.StartsAt.ToString("dd.MM.yyyy HH:mm")</td>
-                        <td>Ред @l.Row, място @l.Number (@l.Category.DisplayName())</td>
-                        <td>
-                            <form asp-action="SetConcession" method="post">
-                                <input type="hidden" name="ticketId" value="@l.TicketId" />
-                                <select name="concession" class="form-select form-select-sm" onchange="this.form.submit()"
-                                        aria-label="Намаление за ред @l.Row, място @l.Number">
-                                    @foreach (var c in Enum.GetValues<ConcessionType>())
-                                    {
-                                        <option value="@c" selected="@(c == l.Concession)">@c.DisplayName()@(c == ConcessionType.Student ? " −20%" : c == ConcessionType.Pensioner ? " −30%" : "")</option>
-                                    }
-                                </select>
-                                <noscript><button type="submit" class="btn btn-sm btn-outline-secondary mt-1">Приложи</button></noscript>
-                            </form>
-                        </td>
-                        <td class="text-end">@Format.Money(l.Price)</td>
-                        <td class="text-end">
-                            <form asp-action="RemoveTicket" method="post">
-                                <input type="hidden" name="ticketId" value="@l.TicketId" />
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Премахни</button>
-                            </form>
-                        </td>
-                    </tr>
+                    <form asp-action="RemovePromo" method="post" class="d-flex align-items-center gap-2">
+                        <span>Промо код <strong>@cart.PromoCode</strong> (−@cart.PromoPercent%)</span>
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">Премахни</button>
+                    </form>
                 }
-            </tbody>
-            <tfoot>
-                <tr>
-                    <th colspan="4" class="text-end">Общо</th>
-                    <th class="text-end">@Format.Money(cart.Total)</th>
-                    <th></th>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
-    <p class="text-muted small">Студентската и пенсионерската карта се проверяват на входа.</p>
+                else
+                {
+                    <form asp-action="ApplyPromo" method="post" style="max-width: 22rem">
+                        <label class="form-label" for="promo-code">Промо код</label>
+                        <div class="d-flex gap-2">
+                            <input id="promo-code" name="code" class="form-control" maxlength="20" value="@promoCode"
+                                   aria-invalid="@(promoError is null ? "false" : "true")"
+                                   aria-describedby="@(promoError is null ? null : "promo-error")" />
+                            <button type="submit" class="btn btn-outline-primary">Приложи</button>
+                        </div>
+                        @if (promoError is not null)
+                        {
+                            <div id="promo-error" class="text-danger small mt-1">@promoError</div>
+                        }
+                    </form>
+                }
+            </div>
+        </div>
 
-    <div class="mb-4">
-        @if (cart.PromoCode is not null)
-        {
-            <form asp-action="RemovePromo" method="post" class="d-flex align-items-center gap-2">
-                <span>Промо код <strong>@cart.PromoCode</strong> (−@cart.PromoPercent%)</span>
-                <button type="submit" class="btn btn-sm btn-outline-secondary">Премахни</button>
-            </form>
-        }
-        else
-        {
-            <form asp-action="ApplyPromo" method="post" class="d-flex gap-2" style="max-width: 22rem">
-                <input name="code" class="form-control" placeholder="Промо код" maxlength="20" aria-label="Промо код" />
-                <button type="submit" class="btn btn-outline-primary">Приложи</button>
-            </form>
-        }
+        <aside class="col-lg-4 d-none d-lg-block">
+            <div class="totals-panel">
+                @if (cart.PromoCode is not null)
+                {
+                    <div class="text-muted">Промо код @cart.PromoCode (−@cart.PromoPercent %)</div>
+                }
+                <div class="label-caps">Общо</div>
+                <div class="figure text-nowrap-money mb-3">@Format.Money(cart.Total)</div>
+                <a class="btn btn-primary w-100" asp-action="Checkout">Към плащане</a>
+            </div>
+        </aside>
     </div>
 
-    <a class="btn btn-primary" asp-action="Checkout">Плащане</a>
+    <div class="totals-bar d-lg-none">
+        <span class="fw-bold text-nowrap-money">Общо @Format.Money(cart.Total)</span>
+        <a class="btn btn-primary" asp-action="Checkout">Към плащане</a>
+    </div>
 }

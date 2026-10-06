@@ -112,6 +112,22 @@ public class OrderServiceTests
     }
 
     [Fact]
+    public async Task GetCart_ExpiredHold_ListsTheSeat()
+    {
+        _cart.Tickets.Add(new Ticket
+        {
+            Id = 1, ShowtimeId = 1, SeatId = 5, Status = TicketStatus.Reserved, ReservedUntil = Now.DateTime.AddMinutes(-1),
+            Showtime = new Showtime { StartsAt = Now.DateTime.AddDays(1), Event = new Event { Title = "Дюн" }, Venue = new Venue() },
+            Seat = new Seat { Id = 5, Row = 5, Number = 7 }
+        });
+
+        var cart = await Service().GetCartAsync(1);
+
+        var seat = Assert.Single(cart!.Expired);
+        Assert.Equal((5, 7, 5), (seat.Row, seat.Number, seat.SeatId));
+    }
+
+    [Fact]
     public async Task Checkout_RejectsCartWhoseHoldExpired()
     {
         _cart.Tickets.Add(new Ticket

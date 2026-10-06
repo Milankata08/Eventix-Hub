@@ -155,7 +155,9 @@ public class OrderService(
         return new CartDto(cart.Id, lines, percent > 0 ? cart.PromoCode!.Code : null, percent,
             BookingRules.OrderTotal(lines.Select(l => l.Price)),
             lines.Count == 0 ? null : lines.Min(l => l.ReservedUntil),
-            cart.Tickets.AsQueryable().Count(BookingRules.ExpiredHold(now)));
+            cart.Tickets.AsQueryable().Where(BookingRules.ExpiredHold(now)).OrderBy(t => t.Id)
+                .Select(t => new ExpiredSeatDto(t.ShowtimeId, t.Showtime.Event.Title, t.Showtime.StartsAt, t.SeatId, t.Seat.Row, t.Seat.Number))
+                .ToList());
     }
 
     public async Task SetConcessionAsync(int userId, int ticketId, ConcessionType concession)

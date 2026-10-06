@@ -11,7 +11,9 @@ public record HallVM(SeatMapDto Map, bool Monitor, bool SalesClosed);
 
 public record CartVM(CartDto? Cart, int SecondsLeft);
 
-public record CheckoutVM(CartDto Cart, PaymentVM Payment);
+public record CheckoutVM(CartDto Cart, PaymentVM Payment, int SecondsLeft);
+
+public record HoldBadgeVM(int SecondsLeft, bool Large);
 
 public record TicketCardVM(UserTicketDto Ticket, string? QrDataUri);
 

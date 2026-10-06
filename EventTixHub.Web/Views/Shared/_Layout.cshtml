@@ -27,7 +27,7 @@
         <nav class="navbar navbar-expand-sm site-nav bg-body mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">EventTix Hub</a>
-                <div class="nav-slot ms-auto me-2" id="nav-hold-slot"></div>
+                <div class="nav-slot ms-auto me-2" id="nav-hold-slot">@await Component.InvokeAsync("HoldBadge")</div>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#site-menu" aria-controls="site-menu"
                         aria-expanded="false" aria-label="Превключи навигацията">
                     <span class="navbar-toggler-icon"></span>
@@ -99,6 +99,7 @@
             <p class="mb-0">Учебен проект · плащането е симулирано</p>
         </div>
     </footer>
+    <div class="visually-hidden" role="status" id="hold-announce"></div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
