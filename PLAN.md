@@ -6,6 +6,7 @@ Sources (all read in full):
 
 - `Проект 2.Онлайн платформа за билети за кино и концерти.pdf` — scope, entities, sprint contents, grading.
 - `Обща техническа реализация.pdf` — mandatory stack, CRUD/search/paging/validation/auth conventions, minimum and "excellent" requirements, sprint dates. Its §11 sprint *contents* describe a different project (restaurants); only the **dates** apply here.
+- `03.Планиране на проекта.pdf` — planning assignment: a 9-section plan (client, users and roles, functional and non-functional requirements, team roles, architecture and tasks, testing, deployment, maintenance). Delivered as `docs/ProjectPlan.md`; deployment is local only.
 - `01-2 Примерен проект - OrgVacationManager/` — teacher's sample (ASP.NET MVC 5 + EF6, .NET Framework). Reference for ideas only (separate data layer, filter + pager view models, seeder). Do **not** copy: plaintext passwords, GET requests that delete data, `new DbContext()` inside controllers, crashes on unknown ids.
 
 ---
@@ -43,9 +44,9 @@ Mandatory minimum (general doc §13): working DB, 5–6+ related models, CRUD, u
 | Projects | `EventTixHub.Web` (teacher's recommended folders) + `EventTixHub.Tests` | Fewest projects; layers separated by folders and the repository seam |
 | Repo root | `C:\Users\Kris\Desktop\eventimhub` (current folder); sample folder git-ignored | `/implement` commits to the current repo |
 | Language | Code, commits: English. UI text, validation messages, docs: Bulgarian | Bulgarian commission |
-| Currency | EUR, displayed `12.50 €` | Bulgaria uses the euro since 01.01.2026 |
+| Currency | EUR, displayed `12,50 €` | Bulgaria uses the euro since 01.01.2026 |
 | Time | Local `DateTime` everywhere (one timezone). "Now" comes from injected `TimeProvider` | Deterministic tests (hold expiry, deadlines) |
-| Culture | Invariant culture for model binding; explicit display formats `dd.MM.yyyy HH:mm`, `0.00 €` | Avoids comma/dot decimal binding bugs |
+| Culture | Invariant culture for model binding; explicit display formats `dd.MM.yyyy HH:mm`; money displays in bg-BG (`12,50 €`) via `Format.Money` | Avoids comma/dot decimal binding bugs |
 | Roles | `Administrator` (organizer / admin panel), `Customer` | Spec treats organizer and admin as one module |
 | Payment | Simulated card form, validated then discarded, never stored or logged | No real gateway required |
 | Real time | AJAX polling every 5 s | No SignalR client lib needed |
@@ -443,6 +444,7 @@ Sprint 2 exam demo: services own all logic; 22 unit tests (A + B, 11 with Moq); 
 - **T19 — Poster upload** ("качване на файлове"): `IFormFile` → `wwwroot/uploads`, jpg/png ≤ 2 MB, random file name; replaces PosterUrl input.
 - **T20 — CSV export of reports** ("експорт"): UTF-8 with BOM so Excel shows Cyrillic.
 - **T21 — Dark mode toggle**: navbar button switches Bootstrap 5.3 color modes (`data-bs-theme` on `<html>`); choice kept in `localStorage`, default follows the OS theme; tickets always print light.
+- **T22 — Redesign** (`.scratch/redesign/`): афиш-style visual system (Sofia Sans self-hosted, type inks, poster wall, hall plan, hold badge, invitation ticket, admin programme office); verified against the critique; `DESIGN.md` re-synced from the build.
 
 ## 11. Pitfalls
 
