@@ -767,3 +767,4 @@ button.seat { cursor: pointer; }
 @media print {
   .skip-link, .site-nav, .site-footer, [data-hold-badge], #hold-announce { display: none !important; }
 }
+.profile-date { display: flex; flex-direction: column; }

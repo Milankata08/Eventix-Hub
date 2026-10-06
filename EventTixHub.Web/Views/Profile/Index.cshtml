@@ -41,7 +41,7 @@ else
         @foreach (var t in Model.Tickets.Items)
         {
             <li class="profile-ticket @t.EventType.TypeClass()">
-                <div class="programme-date" aria-hidden="true"><span class="figure">@Format.PosterDay(t.StartsAt)</span><span class="label-caps">@Format.PosterMonth(t.StartsAt) · @Format.WeekdayShort(t.StartsAt)</span></div>
+                <div class="profile-date" aria-hidden="true"><span class="figure">@Format.PosterDay(t.StartsAt)</span><span class="label-caps">@Format.PosterMonth(t.StartsAt) · @Format.WeekdayShort(t.StartsAt)</span></div>
                 <div>
                     <h3 class="h5 mb-1">@t.EventTitle <span class="badge type-badge">@t.EventType.DisplayName()</span></h3>
                     <div class="text-muted"><span class="visually-hidden">@Format.LongDate(t.StartsAt), @Format.Weekday(t.StartsAt), </span>@Format.Time(t.StartsAt) · @t.VenueName, @t.City</div>
