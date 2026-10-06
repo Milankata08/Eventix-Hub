@@ -15,39 +15,51 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+    @{
+        var area = ViewContext.RouteData.Values["area"] as string ?? "";
+        var controller = ViewContext.RouteData.Values["controller"] as string ?? "";
+        var action = ViewContext.RouteData.Values["action"] as string ?? "";
+        string Current(string a, string c) => a == area && (c == "" || c == controller) && !(c == "Home" && action == "Status") ? "page" : null;
+        string CurrentClass(string a, string c) => Current(a, c) is null ? "" : " active";
+    }
+    <a class="skip-link" href="#content">Към съдържанието</a>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm bg-body border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm site-nav bg-body mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">EventTix Hub</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                <div class="nav-slot ms-auto me-2" id="nav-hold-slot"></div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#site-menu" aria-controls="site-menu"
                         aria-expanded="false" aria-label="Превключи навигацията">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="navbar-collapse collapse justify-content-between" id="site-menu">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-body" asp-area="" asp-controller="Home" asp-action="Index">Афиш</a>
+                            <a class="nav-link@(CurrentClass("", "Home"))" aria-current="@Current("", "Home")" asp-area="" asp-controller="Home" asp-action="Index">Афиш</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-body" href="/Booking/Cart">Количка</a>
+                            <a class="nav-link@(CurrentClass("", "Booking"))" aria-current="@Current("", "Booking")" href="/Booking/Cart">Количка</a>
                         </li>
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-body" asp-area="" asp-controller="Profile" asp-action="Index">Профил</a>
+                                <a class="nav-link@(CurrentClass("", "Profile"))" aria-current="@Current("", "Profile")" asp-area="" asp-controller="Profile" asp-action="Index">Профил</a>
                             </li>
                             @if (User.IsInRole(Roles.Administrator))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-body" href="/Admin">Админ панел</a>
+                                    <a class="nav-link@(CurrentClass("Admin", ""))" aria-current="@Current("Admin", "")" href="/Admin">Админ панел</a>
                                 </li>
                             }
                         }
                     </ul>
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <button type="button" id="theme-toggle" class="btn btn-link nav-link text-body"
-                                    aria-pressed="false" aria-label="Тъмна тема" title="Тъмна тема">🌓</button>
+                            <button type="button" id="theme-toggle" class="btn btn-link nav-link theme-toggle"
+                                    aria-pressed="false" aria-label="Тъмна тема" title="Тъмна тема">
+                                <svg class="icon-moon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M17 11.5A7.5 7.5 0 0 1 8.5 3a7.5 7.5 0 1 0 8.5 8.5Z"/></svg>
+                                <svg class="icon-sun" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="3.5" fill="currentColor"/><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M10 1.5v2M10 16.5v2M1.5 10h2M16.5 10h2M4 4l1.4 1.4M14.6 14.6 16 16M4 16l1.4-1.4M14.6 5.4 16 4"/></svg>
+                            </button>
                         </li>
                         @if (User.Identity?.IsAuthenticated == true)
                         {
@@ -56,17 +68,17 @@
                             </li>
                             <li class="nav-item">
                                 <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
-                                    <button type="submit" class="btn btn-link nav-link text-body">Изход</button>
+                                    <button type="submit" class="btn btn-link nav-link">Изход</button>
                                 </form>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-body" asp-area="" asp-controller="Account" asp-action="Login">Вход</a>
+                                <a class="nav-link@(CurrentClass("", "Account"))" aria-current="@Current("", "Account")" asp-area="" asp-controller="Account" asp-action="Login">Вход</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-body" asp-area="" asp-controller="Account" asp-action="Register">Регистрация</a>
+                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Register">Регистрация</a>
                             </li>
                         }
                     </ul>
@@ -75,15 +87,16 @@
         </nav>
     </header>
     <div class="container">
-        <main role="main" class="pb-3">
+        <main id="content" tabindex="-1" class="pb-3">
             <partial name="_Alerts" />
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="site-footer">
         <div class="container">
-            &copy; 2026 - EventTix Hub
+            <p class="mb-1">EventTix Hub · билети за кино, концерти и театър · София · Пловдив · Варна</p>
+            <p class="mb-0">Учебен проект · плащането е симулирано</p>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

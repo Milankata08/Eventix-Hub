@@ -9,7 +9,9 @@
     ViewData["Title"] = title;
 }
 
-<h1>@Model</h1>
-<h2>@title</h2>
-<p>@text</p>
-<a class="btn btn-primary" asp-controller="Home" asp-action="Index">Към афиша</a>
+<section class="status-page">
+    <p class="label-caps status-kicker">Грешка @Model</p>
+    <h1 class="display">@title</h1>
+    <p class="lead">@text</p>
+    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Към афиша</a>
+</section>

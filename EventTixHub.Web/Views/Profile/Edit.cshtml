@@ -5,7 +5,8 @@
 
 <div class="row justify-content-center">
     <div class="col-md-6 col-lg-5">
-        <h1 class="h3 mb-3">Редакция на профила</h1>
+        <h1 class="headline mb-3">Редакция на профила</h1>
+        <div class="sheet-panel">
         <form asp-action="Edit" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="mb-3">
@@ -26,6 +27,7 @@
             <button type="submit" class="btn btn-primary">Запази</button>
             <a class="btn btn-link" asp-action="Index">Отказ</a>
         </form>
+        </div>
     </div>
 </div>
 

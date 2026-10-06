@@ -3,12 +3,15 @@
     ViewData["Title"] = "Грешка";
 }
 
-<h1 class="text-danger">Възникна грешка</h1>
-<p>Заявката не можа да бъде обработена. Опитайте отново след малко.</p>
+<section class="status-page">
+    <p class="label-caps status-kicker">Грешка</p>
+    <h1 class="display">Възникна грешка</h1>
+    <p class="lead">Заявката не можа да бъде обработена. Опитайте отново след малко.</p>
 
-@if (Model.ShowRequestId)
-{
-    <p class="text-muted small">Номер на заявката: <code>@Model.RequestId</code></p>
-}
+    @if (Model.ShowRequestId)
+    {
+        <p class="text-secondary small">Номер на заявката: <code>@Model.RequestId</code></p>
+    }
 
-<a class="btn btn-primary" asp-controller="Home" asp-action="Index">Към афиша</a>
+    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Към афиша</a>
+</section>

@@ -5,7 +5,12 @@
 
 <div class="row justify-content-center">
     <div class="col-md-6 col-lg-5">
-        <h1 class="h3 mb-3">Вход</h1>
+        <h1 class="headline mb-3">Вход</h1>
+        @if (!string.IsNullOrEmpty(Model.ReturnUrl))
+        {
+            <p class="mb-3">Влезте, за да продължите.</p>
+        }
+        <div class="sheet-panel">
         <form asp-action="Login" method="post">
             <input type="hidden" asp-for="ReturnUrl" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -26,6 +31,7 @@
             <button type="submit" class="btn btn-primary">Вход</button>
             <a class="btn btn-link" asp-action="Register">Нямате профил? Регистрация</a>
         </form>
+        </div>
     </div>
 </div>
 

@@ -51,6 +51,7 @@ public class AccountController(UserService userService, SignInManager<User> sign
     public async Task<IActionResult> Logout()
     {
         await signInManager.SignOutAsync();
+        TempData["Success"] = "Излязохте от профила.";
         return RedirectToAction("Index", "Home");
     }
 
