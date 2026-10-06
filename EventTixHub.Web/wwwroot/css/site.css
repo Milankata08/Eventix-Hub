@@ -548,7 +548,6 @@ button.seat { cursor: pointer; }
 .filter-city { flex: 1 1 8rem; max-width: 14rem; }
 @media (min-width: 768px) { .chips { width: auto; } .chip { padding: 0 1rem; } }
 .chips { display: flex; flex-wrap: wrap; gap: 0.25rem; width: 100%; border: 0; padding: 0; margin: 0; min-width: 0; }
-.chip-input { position: absolute; opacity: 0; pointer-events: none; }
 .chip {
   display: inline-flex;
   align-items: center;
@@ -558,10 +557,9 @@ button.seat { cursor: pointer; }
   background: transparent;
   color: var(--ink);
   font-weight: 700;
-  cursor: pointer;
+  text-decoration: none;
 }
-.chip-input:checked + .chip { background: var(--ink); color: var(--paper); }
-.chip-input:focus-visible + .chip { outline: 3px solid var(--ink); outline-offset: 2px; }
+.chip[aria-current] { background: var(--ink); color: var(--paper); }
 .empty-state { padding: 2rem 0; max-width: 32rem; }
 
 /* Generated афиш posters. Title fills the width (The Fit Rule): size comes from the longest word. */
