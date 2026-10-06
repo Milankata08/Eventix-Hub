@@ -1,8 +1,9 @@
 @model UserTicketDto
 @if (Model.CanCancel)
 {
+    var ask = $"Да откажем ли билета за ред {Model.Row}, място {Model.Number} — „{Model.EventTitle}“?";
     <form action="/Tickets/Cancel/@Model.TicketId" method="post" asp-antiforgery="true" class="d-inline"
-          onsubmit="return confirm('Да откажем ли билета за ред @Model.Row, място @Model.Number — „@Model.EventTitle“?');">
+          onsubmit="return confirm(@System.Text.Json.JsonSerializer.Serialize(ask));">
         <button type="submit" class="btn btn-outline-danger">Откажи</button>
     </form>
 }
