@@ -5,7 +5,7 @@ namespace EventTixHub.Web.Services;
 // Occupancy of one showtime (PLAN §4). Taken = sold + live holds; critical at >= CriticalOccupancyPercent.
 public record ShowtimeRowDto(
     int Id, int EventId, string EventTitle, string VenueName, DateTime StartsAt,
-    int Capacity, int Sold, int Held, EventType Type = EventType.Movie)
+    int Capacity, int Sold, int Held, EventType Type)
 {
     public int Taken => Sold + Held;
     public int Free => Capacity - Taken;

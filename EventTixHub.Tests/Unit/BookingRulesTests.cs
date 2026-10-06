@@ -64,7 +64,7 @@ public class BookingRulesTests
     [InlineData(900, true)]
     public void IsCritical_StartsAtNinetyPercent(int sold, bool expected)
     {
-        var row = new ShowtimeRowDto(1, 1, "Шоу", "Зала 1", Now, 1000, sold, 0);
+        var row = new ShowtimeRowDto(1, 1, "Шоу", "Зала 1", Now, 1000, sold, 0, EventType.Movie);
         Assert.Equal(expected, row.IsCritical);
         Assert.Equal(expected, new HourOccupancyDto(19, 1, row.Percent).IsCritical);
     }

@@ -1,3 +1,4 @@
+using EventTixHub.Web.Models;
 using EventTixHub.Web.Services;
 
 namespace EventTixHub.Tests.Unit;
@@ -6,7 +7,7 @@ public class CsvExportTests
 {
     private static SalesReport Report(params RevenueRowDto[] byEvent) =>
         new(new DateTime(2026, 10, 1), new DateTime(2026, 10, 31), byEvent, [],
-            [new ShowtimeRowDto(1, 1, "Шоу", "Зала 1", new DateTime(2026, 10, 5, 19, 0, 0), 100, 25, 0)], []);
+            [new ShowtimeRowDto(1, 1, "Шоу", "Зала 1", new DateTime(2026, 10, 5, 19, 0, 0), 100, 25, 0, EventType.Movie)], []);
 
     [Fact]
     public void Build_WritesSectionsWithInvariantNumbersAndSemicolons()
