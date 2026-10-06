@@ -27,9 +27,21 @@
 })();
 
 // [data-autosubmit] fields apply their form on change (Афиш city). Without JS the form's submit button still works.
-document.addEventListener('change', e => {
-    if (e.target.matches('[data-autosubmit]')) e.target.form.requestSubmit();
-});
+// Arrow keys and type-ahead on a closed select fire change on every key, so a keyboard pick waits for Enter.
+(function () {
+    let key = null;
+    document.addEventListener('keydown', e => {
+        if (!e.target.matches('[data-autosubmit]')) return;
+        key = e.key;
+        if (e.key === 'Enter' && e.target.dataset.pending) { e.preventDefault(); e.target.form.requestSubmit(); }
+    });
+    document.addEventListener('keyup', () => { key = null; });
+    document.addEventListener('change', e => {
+        if (!e.target.matches('[data-autosubmit]')) return;
+        if (key && key !== 'Enter') e.target.dataset.pending = '1';
+        else e.target.form.requestSubmit();
+    });
+})();
 
 // Dark mode toggle (Bootstrap 5.3 color modes). The <head> script in _Layout applies the saved theme before first paint.
 (function () {
