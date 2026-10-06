@@ -4,6 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - EventTix Hub</title>
+    <script>
+        document.documentElement.dataset.bsTheme = localStorage.getItem('theme')
+            ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    </script>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -11,7 +15,7 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm bg-body border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">EventTix Hub</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -21,25 +25,29 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Афиш</a>
+                            <a class="nav-link text-body" asp-area="" asp-controller="Home" asp-action="Index">Афиш</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="/Booking/Cart">Количка</a>
+                            <a class="nav-link text-body" href="/Booking/Cart">Количка</a>
                         </li>
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Profile" asp-action="Index">Профил</a>
+                                <a class="nav-link text-body" asp-area="" asp-controller="Profile" asp-action="Index">Профил</a>
                             </li>
                             @if (User.IsInRole(Roles.Administrator))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" href="/Admin">Админ панел</a>
+                                    <a class="nav-link text-body" href="/Admin">Админ панел</a>
                                 </li>
                             }
                         }
                     </ul>
                     <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <button type="button" id="theme-toggle" class="btn btn-link nav-link text-body"
+                                    aria-pressed="false" aria-label="Тъмна тема" title="Тъмна тема">🌓</button>
+                        </li>
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
@@ -47,17 +55,17 @@
                             </li>
                             <li class="nav-item">
                                 <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
-                                    <button type="submit" class="btn btn-link nav-link text-dark">Изход</button>
+                                    <button type="submit" class="btn btn-link nav-link text-body">Изход</button>
                                 </form>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Вход</a>
+                                <a class="nav-link text-body" asp-area="" asp-controller="Account" asp-action="Login">Вход</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Регистрация</a>
+                                <a class="nav-link text-body" asp-area="" asp-controller="Account" asp-action="Register">Регистрация</a>
                             </li>
                         }
                     </ul>

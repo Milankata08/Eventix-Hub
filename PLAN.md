@@ -442,6 +442,7 @@ Sprint 2 exam demo: services own all logic; 22 unit tests (A + B, 11 with Moq); 
 
 - **T19 — Poster upload** ("качване на файлове"): `IFormFile` → `wwwroot/uploads`, jpg/png ≤ 2 MB, random file name; replaces PosterUrl input.
 - **T20 — CSV export of reports** ("експорт"): UTF-8 with BOM so Excel shows Cyrillic.
+- **T21 — Dark mode toggle**: navbar button switches Bootstrap 5.3 color modes (`data-bs-theme` on `<html>`); choice kept in `localStorage`, default follows the OS theme; tickets always print light.
 
 ## 11. Pitfalls
 
