@@ -1,0 +1,11 @@
+@model DeleteVM
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<h1 class="h3">@Model.Title</h1>
+<p>Сигурни ли сте, че искате да изтриете <strong>@Model.Details</strong>? Действието е необратимо.</p>
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+    <button type="submit" class="btn btn-danger">Изтрий</button>
+    <a class="btn btn-link" asp-action="Index">Отказ</a>
+</form>

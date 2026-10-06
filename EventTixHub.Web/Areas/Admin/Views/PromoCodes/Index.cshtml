@@ -1,0 +1,67 @@
+@model AdminPromoCodesVM
+@{
+    ViewData["Title"] = "Промо кодове";
+    var pager = new PagerVM(Model.Promos.Page, Model.Promos.TotalPages, new Dictionary<string, string?>
+    {
+        ["search"] = Model.Search, ["active"] = Model.Active?.ToString().ToLowerInvariant()
+    });
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Промо кодове</h1>
+    <a class="btn btn-primary" asp-action="Create">Нов промо код</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-5"><input name="search" value="@Model.Search" class="form-control" placeholder="Търсене по код" /></div>
+    <div class="col-md-4">
+        <select name="active" class="form-select" aria-label="Състояние">
+            <option value="">Всички</option>
+            <option value="true" selected="@(Model.Active == true)">Активни</option>
+            <option value="false" selected="@(Model.Active == false)">Неизползваеми</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-outline-primary">Търси</button>
+        <a class="btn btn-link" asp-action="Index">Изчисти</a>
+    </div>
+</form>
+
+@if (Model.Promos.Items.Count == 0)
+{
+    <p class="text-muted">Няма намерени промо кодове.</p>
+}
+else
+{
+    <table class="table align-middle">
+        <thead><tr><th>Код</th><th>Отстъпка</th><th>Използван</th><th>Валиден</th><th>Състояние</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var p in Model.Promos.Items)
+        {
+            <tr>
+                <td>@p.Code</td>
+                <td>@p.DiscountPercent %</td>
+                <td>@p.TimesUsed / @p.UsageLimit</td>
+                <td>@p.ValidFrom.ToString("dd.MM.yyyy") – @p.ValidUntil.ToString("dd.MM.yyyy")</td>
+                @{
+                    var state = Model.StateOf(p);
+                    var badge = state switch
+                    {
+                        PromoState.Usable => "text-bg-success",
+                        PromoState.Exhausted => "text-bg-danger",
+                        PromoState.Expired => "text-bg-warning",
+                        PromoState.NotStarted => "text-bg-info",
+                        _ => "text-bg-secondary"
+                    };
+                }
+                <td><span class="badge @badge">@state.DisplayName()</span></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@p.Id">Редакция</a>
+                    <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@p.Id">Изтриване</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <partial name="_Pager" model="pager" />
+}

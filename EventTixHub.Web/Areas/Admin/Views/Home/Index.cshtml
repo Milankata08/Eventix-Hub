@@ -1,0 +1,46 @@
+@model AdminDashboardVM
+@{
+    ViewData["Title"] = "Админ табло";
+}
+
+<h1 class="h3 mb-3">Табло</h1>
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="card"><div class="card-body">
+        <div class="text-muted small">Приход днес</div><div class="h4 mb-0">@Format.Money(Model.Kpis.RevenueToday)</div>
+    </div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body">
+        <div class="text-muted small">Приход този месец</div><div class="h4 mb-0">@Format.Money(Model.Kpis.RevenueThisMonth)</div>
+    </div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body">
+        <div class="text-muted small">Продадени билети този месец</div><div class="h4 mb-0">@Model.Kpis.TicketsSoldThisMonth</div>
+    </div></div></div>
+</div>
+
+<h2 class="h5">Предстоящи прожекции</h2>
+@if (Model.Upcoming.Count == 0)
+{
+    <p class="text-muted">Няма предстоящи прожекции.</p>
+}
+else
+{
+    <table class="table align-middle">
+        <thead><tr><th>Събитие</th><th>Зала</th><th>Начало</th><th style="width:30%">Заетост</th></tr></thead>
+        <tbody>
+        @foreach (var s in Model.Upcoming)
+        {
+            var percent = (int)Math.Round(s.Percent);
+            <tr>
+                <td><a asp-controller="Showtimes" asp-action="Details" asp-route-id="@s.Id">@s.EventTitle</a></td>
+                <td>@s.VenueName</td>
+                <td>@s.StartsAt.ToString("dd.MM.yyyy HH:mm")</td>
+                <td>
+                    <div class="progress" role="progressbar" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar @(s.IsCritical ? "bg-danger" : "")" style="width:@percent%">@percent%</div>
+                    </div>
+                    <div class="small text-muted">Продадени @s.Sold · резервирани @s.Held · свободни @s.Free</div>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

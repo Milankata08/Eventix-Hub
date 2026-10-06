@@ -1,0 +1,47 @@
+@model VenueFormVM
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Нова зала" : "Редакция на зала";
+}
+
+<div class="row">
+    <div class="col-lg-6">
+        <h1 class="h3 mb-3">@ViewData["Title"]</h1>
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="City" class="form-label"></label>
+                <input asp-for="City" class="form-control" />
+                <span asp-validation-for="City" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Address" class="form-label"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Rows" class="form-label"></label>
+                    <input asp-for="Rows" class="form-control" />
+                    <span asp-validation-for="Rows" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="SeatsPerRow" class="form-label"></label>
+                    <input asp-for="SeatsPerRow" class="form-control" />
+                    <span asp-validation-for="SeatsPerRow" class="text-danger"></span>
+                </div>
+            </div>
+            <p class="text-muted small">Всички места се създават като стандартни. VIP редовете се задават от страницата на залата.</p>
+            <button type="submit" class="btn btn-primary">Запази</button>
+            <a class="btn btn-link" asp-action="Index">Отказ</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

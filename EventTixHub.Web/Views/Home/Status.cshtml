@@ -1,0 +1,17 @@
+@model int
+@{
+    var (title, text) = Model switch
+    {
+        403 => ("Забранен достъп", "Нямате право да виждате тази страница."),
+        404 => ("Страницата не е намерена", "Адресът не съществува или е премахнат."),
+        _ => ("Възникна грешка", "Заявката не можа да бъде обработена.")
+    };
+    ViewData["Title"] = title;
+}
+
+<section class="status-page">
+    <p class="label-caps status-kicker">Грешка @Model</p>
+    <h1 class="display">@title</h1>
+    <p class="lead">@text</p>
+    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Към афиша</a>
+</section>

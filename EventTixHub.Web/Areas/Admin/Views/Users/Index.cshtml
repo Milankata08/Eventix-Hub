@@ -1,0 +1,66 @@
+@model AdminUsersVM
+@{
+    ViewData["Title"] = "Потребители";
+    var pager = new PagerVM(Model.Users.Page, Model.Users.TotalPages, new Dictionary<string, string?>
+    {
+        ["search"] = Model.Search, ["role"] = Model.Role
+    });
+    var roleNames = new Dictionary<string, string> { [Roles.Administrator] = "Администратор", [Roles.Customer] = "Клиент" };
+}
+
+<h1 class="h3 mb-3">Потребители</h1>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-5"><input name="search" value="@Model.Search" class="form-control" placeholder="Търсене по име или имейл" /></div>
+    <div class="col-md-4">
+        <select name="role" class="form-select" aria-label="Роля">
+            <option value="">Всички роли</option>
+            @foreach (var (value, text) in roleNames)
+            {
+                <option value="@value" selected="@(Model.Role == value)">@text</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-outline-primary">Търси</button>
+        <a class="btn btn-link" asp-action="Index">Изчисти</a>
+    </div>
+</form>
+
+@if (Model.Users.Items.Count == 0)
+{
+    <p class="text-muted">Няма намерени потребители.</p>
+}
+else
+{
+    <table class="table align-middle">
+        <thead><tr><th>Име</th><th>Имейл</th><th>Роля</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var u in Model.Users.Items)
+        {
+            <tr>
+                <td>@u.FullName</td>
+                <td>@u.Email</td>
+                <td>
+                    <form asp-action="SetRole" asp-route-id="@u.Id" method="post" class="d-flex gap-2">
+                        <select name="role" class="form-select form-select-sm w-auto" aria-label="Роля" disabled="@(u.Id == Model.CurrentUserId)">
+                            @foreach (var (value, text) in roleNames)
+                            {
+                                <option value="@value" selected="@(u.Role == value)">@text</option>
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-outline-primary" disabled="@(u.Id == Model.CurrentUserId)">Промени</button>
+                    </form>
+                </td>
+                <td class="text-end">
+                    @if (u.Id != Model.CurrentUserId)
+                    {
+                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@u.Id">Изтриване</a>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <partial name="_Pager" model="pager" />
+}

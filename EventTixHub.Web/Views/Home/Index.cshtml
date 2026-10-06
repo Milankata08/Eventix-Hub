@@ -1,0 +1,121 @@
+@model AfishaVM
+@{
+    ViewData["Title"] = "Афиш";
+    var f = Model.Filter;
+    var pager = new PagerVM(Model.Events.Page, Model.Events.TotalPages, Model.RouteValues());
+    var cities = Model.Options.Cities.ToList();
+    var cityList = cities.Count > 1 ? string.Join(", ", cities.Take(cities.Count - 1)) + " и " + cities[^1] : string.Join("", cities);
+    var moreActive = !string.IsNullOrEmpty(f.Search) || !string.IsNullOrEmpty(f.Genre) || f.VenueId is not null
+        || f.Date is not null || f.Sort != EventSort.Date;
+    var types = new (EventType? Value, string Label)[]
+    {
+        (null, "Всички"), (EventType.Movie, "Филми"), (EventType.Concert, "Концерти"), (EventType.Theatre, "Театър")
+    };
+}
+
+<header class="masthead">
+    <h1 class="display">Афиш</h1>
+    @if (cities.Count > 0)
+    {
+        <p class="masthead-sub">Кино, концерти и театър в @cityList</p>
+    }
+</header>
+
+<form method="get" asp-action="Index" class="afisha-filters mb-4">
+    <div class="filter-row">
+        <fieldset class="chips">
+            <legend class="visually-hidden">Вид</legend>
+            @foreach (var (value, label) in types)
+            {
+                var id = "type-" + (value?.ToString() ?? "all");
+                <input type="radio" class="chip-input" name="Type" id="@id" value="@value" checked="@(f.Type == value)" />
+                <label class="chip" for="@id">@label</label>
+            }
+        </fieldset>
+        <div class="filter-city">
+            <label for="f-city" class="visually-hidden">Град</label>
+            <select name="City" id="f-city" class="form-select">
+                <option value="">Всички градове</option>
+                @foreach (var c in Model.Options.Cities)
+                {
+                    <option value="@c" selected="@(f.City == c)">@c</option>
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Покажи</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">Изчисти</a>
+    </div>
+
+    <button type="button" class="btn btn-outline-secondary d-md-none mt-2" data-bs-toggle="collapse"
+            data-bs-target="#more-filters" aria-expanded="@(moreActive ? "true" : "false")" aria-controls="more-filters">
+        Още филтри
+    </button>
+    <div id="more-filters" class="collapse d-md-block @(moreActive ? "show" : "")">
+        <div class="filter-row filter-row--more">
+            <div>
+                <label for="f-search" class="form-label">Търсене</label>
+                <input name="Search" id="f-search" value="@f.Search" class="form-control" placeholder="Заглавие или жанр" />
+            </div>
+            <div>
+                <label for="f-genre" class="form-label">Жанр</label>
+                <select name="Genre" id="f-genre" class="form-select">
+                    <option value="">Всички жанрове</option>
+                    @foreach (var g in Model.Options.Genres)
+                    {
+                        <option value="@g" selected="@(f.Genre == g)">@g</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label for="f-venue" class="form-label">Зала</label>
+                <select name="VenueId" id="f-venue" class="form-select">
+                    <option value="">Всички зали</option>
+                    @foreach (var v in Model.Options.Venues)
+                    {
+                        <option value="@v.Id" selected="@(f.VenueId == v.Id)">@v.Name</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label for="f-date" class="form-label">Дата</label>
+                <input type="date" name="Date" id="f-date" value="@f.Date?.ToString("yyyy-MM-dd")" class="form-control" />
+            </div>
+            <div>
+                <label for="f-sort" class="form-label">Сортиране</label>
+                <select name="Sort" id="f-sort" class="form-select">
+                    <option value="Date" selected="@(f.Sort == EventSort.Date)">По дата</option>
+                    <option value="Title" selected="@(f.Sort == EventSort.Title)">По заглавие</option>
+                    <option value="Rating" selected="@(f.Sort == EventSort.Rating)">По оценка</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</form>
+
+@if (Model.Events.Items.Count == 0)
+{
+    <div class="empty-state">
+        <p class="mb-2">Няма събития по тези филтри.</p>
+        <p class="text-muted">Опитайте друг град или дата.</p>
+        <a class="btn btn-outline-secondary" asp-action="Index">Изчисти филтрите</a>
+    </div>
+}
+else
+{
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 poster-wall mb-4">
+        @foreach (var e in Model.Events.Items)
+        {
+            <div class="col">
+                <partial name="_Poster" model="new PosterVM(e.Id, e.Title, e.Type, e.Genre, e.PosterUrl, e.NextShowtime, e.NextVenueName, e.NextCity, PosterSize.Card)" />
+                @if (e.AverageRating is { } r)
+                {
+                    <div class="poster-caption small">
+                        <span aria-hidden="true">★</span> @r.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("bg-BG"))
+                        <span class="visually-hidden">Оценка @r.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("bg-BG")) от 5</span>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+    <partial name="_Pager" model="pager" />
+}

@@ -1,0 +1,74 @@
+@model PosterVM
+@{
+    var p = Model;
+    var typeWord = p.Type.DisplayName();
+    var dateLine = p.Date is { } d
+        ? $"{Format.LongDate(d)} · {Format.Weekday(d)} · {Format.Time(d)}"
+        : "Без предстоящи дати";
+    var place = string.Join(", ", new[] { p.Venue, p.City }.Where(x => !string.IsNullOrEmpty(x)));
+    var hasImage = !string.IsNullOrEmpty(p.PosterUrl);
+    var cls = $"poster poster--{p.Size.ToString().ToLowerInvariant()} {p.Type.TypeClass()} poster-{p.Type}" + (hasImage ? " poster--image" : "");
+}
+@{
+    // Title: real text, link on the whole poster when requested.
+    Microsoft.AspNetCore.Html.IHtmlContent Title() => p.Link
+        ? new Microsoft.AspNetCore.Html.HtmlString($"<a href=\"{Url.Action("Details", "Events", new { id = p.EventId })}\" class=\"stretched-link\">{System.Net.WebUtility.HtmlEncode(p.Title)}</a>")
+        : new Microsoft.AspNetCore.Html.HtmlString(System.Net.WebUtility.HtmlEncode(p.Title));
+}
+@if (p.Size == PosterSize.Thumb)
+{
+    <span class="@cls" aria-hidden="true"></span>
+}
+else
+{
+<article class="@cls" style="--longest: @Format.LongestWord(p.Title)">
+    @if (hasImage)
+    {
+        <img src="@p.PosterUrl" alt="" class="poster-img" loading="lazy" />
+        <div class="poster-band">
+            <div class="label-caps">@typeWord</div>
+            <h2 class="poster-title">@Title()</h2>
+            <div class="poster-date label-caps">@dateLine</div>
+        </div>
+    }
+    else
+    {
+    <div class="poster-in">
+    @if (p.Type == EventType.Theatre)
+    {
+        <div class="poster-stack">
+            <div class="label-caps">@(place.Length > 0 ? place : typeWord)</div>
+            <hr class="poster-hair" />
+            <h2 class="poster-title">@Title()</h2>
+            <div class="poster-genre">@p.Genre</div>
+            <div class="poster-rule" aria-hidden="true"></div>
+            <div class="poster-date label-caps">@dateLine</div>
+        </div>
+    }
+    else if (p.Type == EventType.Movie)
+    {
+        <div class="poster-top">
+            <div class="label-caps">@typeWord · @p.Genre</div>
+            @if (p.Date is { } md)
+            {
+                <div class="poster-day" aria-hidden="true"><span class="figure">@Format.PosterDay(md)</span><span class="label-caps">@Format.PosterMonth(md)</span></div>
+            }
+        </div>
+        <svg class="poster-arc" viewBox="0 0 100 14" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M2 12 Q50 -4 98 12" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" /></svg>
+        <h2 class="poster-title">@Title()</h2>
+        <div class="poster-date label-caps">@(p.Date is { } mt ? $"{Format.Time(mt)} · {place}" : dateLine)</div>
+    }
+    else
+    {
+        <div class="label-caps">@typeWord · @p.Genre</div>
+        <h2 class="poster-title">@Title()</h2>
+        @if (p.Date is { } cd)
+        {
+            <div class="poster-day" aria-hidden="true"><span class="figure">@Format.PosterDay(cd)</span><span class="label-caps">@Format.PosterMonth(cd)</span></div>
+        }
+        <div class="poster-stage label-caps">@(p.Date is { } ct ? $"{Format.Time(ct)} · {place}" : dateLine)</div>
+    }
+    </div>
+    }
+</article>
+}

@@ -1,0 +1,111 @@
+using System.Globalization;
+using System.Text.Json.Serialization;
+using EventTixHub.Web.Data;
+using EventTixHub.Web.Models;
+using EventTixHub.Web.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<ApplicationDbContext>(o =>
+    o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// One culture for model binding and formatting: decimals always bind with '.'.
+CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+
+builder.Services.AddIdentity<User, Role>()
+    .AddErrorDescriber<BulgarianIdentityErrorDescriber>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(o =>
+{
+    o.LoginPath = "/Account/Login";
+    o.AccessDeniedPath = "/Account/AccessDenied";
+});
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<TicketService>();
+builder.Services.AddScoped<OrderService>();
+builder.Services.AddScoped<PromoCodeService>();
+builder.Services.AddScoped<EventService>();
+builder.Services.AddScoped<VenueService>();
+builder.Services.AddScoped<ReviewService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ReportService>();
+builder.Services.AddSingleton<PosterStorage>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddControllersWithViews(o =>
+{
+    o.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+    o.ModelBindingMessageProvider.SetValueIsInvalidAccessor(v => $"Стойността „{v}“ е невалидна.");
+    o.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "Полето е задължително.");
+}).AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(o =>
+{
+    o.SwaggerDoc("v1", new() { Title = "EventTix Hub API", Version = "v1" });
+    o.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml"));
+    // Only attribute-routed [ApiController] actions; MVC view controllers stay out.
+    o.DocInclusionPredicate((_, api) => api.ActionDescriptor is ControllerActionDescriptor cad
+        && cad.ControllerTypeInfo.IsDefined(typeof(ApiControllerAttribute), true));
+});
+
+var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var sp = scope.ServiceProvider;
+    var db = sp.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+    var roleManager = sp.GetRequiredService<RoleManager<Role>>();
+    // Demo data includes known credentials: development only. SeedAsync also seeds roles.
+    if (app.Environment.IsDevelopment())
+        await DbSeeder.SeedAsync(db, sp.GetRequiredService<UserManager<User>>(), roleManager,
+            sp.GetRequiredService<TimeProvider>());
+    else
+        await DbSeeder.SeedRolesAsync(roleManager);
+}
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+app.UseStatusCodePagesWithReExecute("/Home/Status/{0}");
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseStaticFiles(); // runtime uploads in wwwroot/uploads (MapStaticAssets only serves build-time files)
+app.MapStaticAssets();
+
+app.MapAreaControllerRoute(
+    name: "admin",
+    areaName: "Admin",
+    pattern: "Admin/{controller=Home}/{action=Index}/{id?}")
+    .WithStaticAssets();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}")
+    .WithStaticAssets();
+
+
+app.Run();

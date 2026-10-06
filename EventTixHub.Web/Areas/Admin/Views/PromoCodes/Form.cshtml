@@ -1,0 +1,57 @@
+@model PromoCodeFormVM
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Нов промо код" : "Редакция на промо код";
+}
+
+<div class="row">
+    <div class="col-lg-6">
+        <h1 class="h3 mb-3">@ViewData["Title"]</h1>
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="TimesUsed" />
+            <div class="mb-3">
+                <label asp-for="Code" class="form-label"></label>
+                <input asp-for="Code" class="form-control" />
+                <span asp-validation-for="Code" class="text-danger"></span>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="DiscountPercent" class="form-label"></label>
+                    <input asp-for="DiscountPercent" class="form-control" />
+                    <span asp-validation-for="DiscountPercent" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="UsageLimit" class="form-label"></label>
+                    <input asp-for="UsageLimit" class="form-control" />
+                    <span asp-validation-for="UsageLimit" class="text-danger"></span>
+                    @if (Model.TimesUsed > 0)
+                    {
+                        <div class="form-text">Вече използван: @Model.TimesUsed пъти.</div>
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ValidFrom" class="form-label"></label>
+                    <input asp-for="ValidFrom" type="datetime-local" class="form-control" />
+                    <span asp-validation-for="ValidFrom" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ValidUntil" class="form-label"></label>
+                    <input asp-for="ValidUntil" type="datetime-local" class="form-control" />
+                    <span asp-validation-for="ValidUntil" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-check mb-3">
+                <input asp-for="IsActive" class="form-check-input" />
+                <label asp-for="IsActive" class="form-check-label"></label>
+            </div>
+            <button type="submit" class="btn btn-primary">Запази</button>
+            <a class="btn btn-link" asp-action="Index">Отказ</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

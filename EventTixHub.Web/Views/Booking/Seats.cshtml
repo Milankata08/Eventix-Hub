@@ -1,0 +1,41 @@
+@model SeatsVM
+@{
+    var map = Model.Map;
+    ViewData["Title"] = "Избор на места";
+}
+
+<h1 class="h3">@map.EventTitle</h1>
+<div class="text-muted mb-3">@map.VenueName · @map.StartsAt.ToString("dd.MM.yyyy HH:mm")
+    · Стандартно @Format.Money(map.StandardPrice) · VIP @Format.Money(map.VipPrice)</div>
+
+<div id="seatmap" data-showtime-id="@map.ShowtimeId" data-mode="select"
+     data-standard-price="@map.StandardPrice.ToString("0.00")" data-vip-price="@map.VipPrice.ToString("0.00")">
+    <div class="seat-legend mb-3">
+        <span><i class="seat seat-free"></i> свободно</span>
+        <span><i class="seat seat-vip"></i> VIP</span>
+        <span><i class="seat seat-selected"></i> избрано</span>
+        <span><i class="seat seat-held"></i> резервирано</span>
+        <span><i class="seat seat-sold"></i> продадено</span>
+    </div>
+    <div class="text-center text-muted mb-2">@map.EventType.HallFront()</div>
+    <div class="seat-grid mb-3" data-role="grid" aria-live="polite">Зареждане…</div>
+    <div class="text-muted small mb-3">
+        Свободни: <span data-count="free">@map.FreeCount</span> ·
+        Резервирани: <span data-count="held">@map.HeldCount</span> ·
+        Продадени: <span data-count="sold">@map.SoldCount</span>
+    </div>
+    <div class="alert alert-warning d-none" data-role="notice" role="alert"></div>
+
+    <form asp-action="Reserve" method="post">
+        <input type="hidden" name="showtimeId" value="@map.ShowtimeId" />
+        <div data-role="inputs"></div>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>Избрани места: <strong data-role="selected-count">0</strong> · Общо: <strong data-role="total">0,00&nbsp;€</strong></div>
+            <button type="submit" class="btn btn-primary" data-role="submit" disabled>Добави в количката</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/seatmap.js" asp-append-version="true"></script>
+}

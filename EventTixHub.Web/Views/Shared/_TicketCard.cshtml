@@ -1,0 +1,25 @@
+@model TicketCardVM
+@{
+    var t = Model.Ticket;
+}
+<div class="card mb-3 ticket-card">
+    <div class="card-body d-flex flex-wrap justify-content-between gap-3">
+        <div>
+            <h2 class="h5">@t.EventTitle</h2>
+            <div>@t.VenueName</div>
+            <div>@t.StartsAt.ToString("dd.MM.yyyy HH:mm")</div>
+            <div>Ред @t.Row, място @t.Number (@t.Category.DisplayName())</div>
+            <div>Намаление: @t.Concession.DisplayName()</div>
+            <div>Цена: @Format.Money(t.Price)</div>
+            <div>Статус: @t.Status.DisplayName()</div>
+            @if (t.Code is not null)
+            {
+                <div class="mt-2">Код: <strong>@t.Code</strong></div>
+            }
+        </div>
+        @if (Model.QrDataUri is not null)
+        {
+            <img src="@Model.QrDataUri" alt="QR код @t.Code" width="160" height="160" />
+        }
+    </div>
+</div>
