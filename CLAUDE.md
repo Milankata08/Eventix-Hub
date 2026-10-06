@@ -1,6 +1,6 @@
 # EventTix Hub
 
-Spec, decisions, conventions and tickets T01–T20 live in `PLAN.md`. Read it before implementing. Conventions in §3 are the code-review standards.
+Spec, decisions, conventions and tickets T01–T22 live in `PLAN.md`. Read it before implementing. Conventions in §3 are the code-review standards.
 
 ## Agent skills
 

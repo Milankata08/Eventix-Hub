@@ -238,7 +238,7 @@ Both fonts are variable (weight 1–1000) and self-hosted as woff2 in `wwwroot/f
 - **Figure** (800, 3rem, line-height 0.85, tabular): date day numbers, the seat number on a ticket, KPI values.
 - **Title** (Sofia Sans 700, 1.25rem, line-height 1.25): card and group titles, cart group headers.
 - **Body** (400, 1rem, line-height 1.5, prose capped at 68ch): everything you read. The root stays 16px at every width; the old 14px mobile root is gone.
-- **Label** (700, 0.8125rem, letter-spacing 0.05em, uppercase): kickers, badges, table headers, legend items. This is the floor: no text is smaller than 13px.
+- **Label** (700, 0.8125rem, line-height 1.35, letter-spacing 0.05em, uppercase; inside posters, sentence case except the month): kickers, badges, table headers, legend items. This is the floor: no text is smaller than 13px.
 
 Operate surfaces use the fixed rem steps above. Only Display and poster titles are fluid.
 

@@ -5,7 +5,7 @@ Captures: `desktop-<page>-<light|dark>.png`, `mobile-<page>-<light|dark>.png` (1
 ## Detector (`impeccable detect --json`, 7 public URLs, 1280 and 390 px)
 Before: tight-leading and all-caps-body on poster label lines (both viewports), body-text-viewport-edge on the footer (390 px).
 Fixed: `.label-caps` line-height 1.35; poster label lines sentence case (month stays caps); `.container` gutter 16 px.
-After: 0 findings at 1280 px; 2 at 390 px, both `clipped-overflow-container` on the details band poster (`/Events/Details/1`, `/4`). Justified: the clipped positioned child is the 1 px `.visually-hidden` date text, and `overflow: hidden` is the poster's job. Pages behind login were checked from captures, not the URL scan.
+After: 0 findings at 1280 px; 2 at 390 px, both `clipped-overflow-container` on the details band poster (`/Events/Details/1`, `/4`). Justified: the clipped positioned child is the 1 px `.visually-hidden` date text, and `overflow: hidden` is the poster's job. Pages behind login were checked from the captures only; the in-browser overlay was not run.
 
 ## Defect found in captures (fixed)
 `.type-badge` had no rule, so Bootstrap's white badge text was invisible on paper in light mode (seats page). Now ink text with a 3 px underline in the type ink.
@@ -21,6 +21,9 @@ After: 0 findings at 1280 px; 2 at 390 px, both `clipped-overflow-container` on 
 | free seat number on seat | 17.32 | 12.32 |
 | review stars | 16.14 (was 1.63) | 15.88 |
 Critique's 3.29–3.43 dark pairs are now 8.18–15.88.
+
+## Tests
+`dotnet test`: 126 passed, 0 failed (2026-10-06, after the CSS fixes).
 
 ## Finish review
 No `impeccable-finish-reviewer` agent exists in this environment, so the review was done by the implementer from the captures, detector output and contrast table above. Scope: self-review only; no independent verdict.
