@@ -26,7 +26,7 @@
     tick();
 })();
 
-// [data-autosubmit] fields apply their form on change (Афиш city). Without JS the form's submit button still works.
+// [data-autosubmit] fields apply their form on change (Афиш city and sort). Without JS the form's submit button still works.
 // Arrow keys and type-ahead on a closed select fire change on every key, so a keyboard pick waits for Enter.
 (function () {
     let key = null;
