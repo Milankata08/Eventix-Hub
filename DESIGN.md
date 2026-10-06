@@ -318,7 +318,8 @@ Each component keeps Bootstrap's markup and accessibility behaviour and changes 
 - **Filter chips** (Афиш type filter):
   - Links styled as `{rounded.sm}` chips. The active one carries `aria-current="page"`.
   - Unselected: an ink outline. Selected: an ink fill.
-  - A click applies the type at once and keeps the filters already applied (GET link, back to page 1). They work without JavaScript. A hidden `Type` field keeps the type when "Покажи" applies the other filters.
+  - A click applies the type at once and keeps the filters already applied (GET link, back to page 1). They work without JavaScript. A hidden `Type` field keeps the type when the other filters apply.
+- **Other Афиш filters** apply without a button: selects on change (a keyboard pick waits for Enter), search and date on Enter or when leaving the field (`data-autosubmit` in `site.js`). Without JavaScript a "Покажи" button appears inside `<noscript>`.
 
 ### Inputs and fields
 

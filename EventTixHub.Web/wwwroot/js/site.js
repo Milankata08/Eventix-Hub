@@ -26,15 +26,17 @@
     tick();
 })();
 
-// [data-autosubmit] fields apply their form on change (Афиш selects). Without JS the form's submit button still works.
+// [data-autosubmit] fields apply their form on change (Афиш filters). Without JS a <noscript> Покажи button applies them.
 // Arrow keys and type-ahead on a closed select fire change on every key, so a keyboard pick waits for Enter.
-// data-autosubmit="blur" (the date, which changes per typed segment) waits for Enter or leaving the field.
+// data-autosubmit="blur" (search, date) applies on Enter or when leaving the field. Enter is handled here because
+// a form with two text-like fields and no submit button has no implicit submission.
 (function () {
     let key = null;
     document.addEventListener('keydown', e => {
-        if (!e.target.matches('[data-autosubmit]')) return;
+        const el = e.target;
+        if (!el.matches('[data-autosubmit]')) return;
         key = e.key;
-        if (e.key === 'Enter' && e.target.dataset.pending) { e.preventDefault(); e.target.form.requestSubmit(); }
+        if (e.key === 'Enter' && (el.dataset.pending || el.dataset.autosubmit === 'blur')) { e.preventDefault(); el.form.requestSubmit(); }
     });
     document.addEventListener('keyup', () => { key = null; });
     document.addEventListener('change', e => {

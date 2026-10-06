@@ -42,7 +42,7 @@
                 }
             </select>
         </div>
-        <button type="submit" class="btn btn-primary">Покажи</button>
+        <noscript><button type="submit" class="btn btn-primary">Покажи</button></noscript>
         <a class="btn btn-outline-secondary" asp-action="Index">Изчисти</a>
     </div>
 
@@ -54,7 +54,7 @@
         <div class="filter-row filter-row--more">
             <div>
                 <label for="f-search" class="form-label">Търсене</label>
-                <input name="Search" id="f-search" value="@f.Search" class="form-control" placeholder="Заглавие или жанр" />
+                <input name="Search" id="f-search" value="@f.Search" class="form-control" placeholder="Заглавие или жанр" data-autosubmit="blur" />
             </div>
             <div>
                 <label for="f-genre" class="form-label">Жанр</label>
