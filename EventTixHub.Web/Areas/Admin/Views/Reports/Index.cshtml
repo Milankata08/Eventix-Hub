@@ -34,7 +34,7 @@ else
     {
         <div class="table-responsive">
         <table class="table align-middle">
-            <thead><tr><th>Събитие</th><th>Зала</th><th>Начало</th><th style="min-width:12rem">Заетост</th></tr></thead>
+            <thead><tr><th>Събитие</th><th>Зала</th><th>Начало</th><th class="col-bar">Заетост</th></tr></thead>
             <tbody>
             @foreach (var o in Model.Occupancy)
             {
@@ -63,7 +63,7 @@ else
     {
         <div class="table-responsive">
         <table class="table align-middle">
-            <thead><tr><th>Час</th><th class="num">Прожекции</th><th style="min-width:12rem">Средна заетост</th></tr></thead>
+            <thead><tr><th>Час</th><th class="num">Прожекции</th><th class="col-bar">Средна заетост</th></tr></thead>
             <tbody>
             @foreach (var h in Model.ByHour)
             {

@@ -799,7 +799,7 @@ button.seat { cursor: pointer; }
 .admin-filter { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.75rem; margin-bottom: 1.5rem; }
 .admin-filter > div { flex: 1 1 12rem; }
 .admin-filter .form-label { margin-bottom: 0.25rem; }
-.admin-filter-actions { display: flex; align-items: center; gap: 0.5rem; flex: 0 0 auto !important; }
+.admin-filter > .admin-filter-actions { display: flex; align-items: center; gap: 0.5rem; flex: 0 0 auto; }
 
 .table-responsive { position: relative; } /* contains .visually-hidden, which would otherwise widen the page */
 .table-responsive > .table { margin-bottom: 0; }
@@ -807,6 +807,7 @@ button.seat { cursor: pointer; }
 .row-actions { display: flex; align-items: center; justify-content: flex-end; gap: 1rem; white-space: nowrap; }
 .row-actions .btn { --bs-btn-padding-x: 0; min-height: 44px; display: inline-flex; align-items: center; }
 .admin-thumb { width: 3.5rem; }
+.col-bar { min-width: 12rem; }
 
 /* Occupancy / revenue bar: type ink on a hairline track */
 .bar { height: 0.5rem; background: var(--rule); }
