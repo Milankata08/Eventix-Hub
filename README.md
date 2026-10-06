@@ -35,7 +35,7 @@ dotnet run --project EventTixHub.Web
 dotnet test
 ```
 
-Модулни тестове (xUnit, Moq) и интеграционни тестове (SQLite in-memory) — общо 114.
+Модулни тестове (xUnit, Moq) и интеграционни тестове (SQLite in-memory) — общо 126.
 
 ## Swagger
 
@@ -45,4 +45,5 @@ http://localhost:5226/swagger (само в Development): `GET /api/events`, `GET
 
 - [Документация](docs/Documentation.md) — описание, изисквания, роли, база данни, ER и UML диаграми, бизнес правила, тестови сценарии, стартиране.
 - [Ръководство на потребителя](docs/UserGuide.md) — стъпки за клиент и администратор.
+- [План на проекта](docs/ProjectPlan.md) — клиент, роли, изисквания, екип, технологии, тестване, внедряване, поддръжка.
 - [PLAN.md](PLAN.md) — спецификация и тикети.

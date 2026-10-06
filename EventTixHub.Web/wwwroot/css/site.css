@@ -179,7 +179,7 @@ h4, .h4, h5, .h5, h6, .h6 { font-weight: 700; }
 .label-caps {
   font-size: 0.8125rem;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.35;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -363,6 +363,11 @@ h4, .h4, h5, .h5, h6, .h6 { font-weight: 700; }
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
+.badge.type-badge {
+  padding: 0 0 2px;
+  color: var(--ink);
+  border-bottom: 3px solid var(--type, var(--ink));
+}
 .text-bg-primary, .text-bg-secondary, .text-bg-danger, .text-bg-success { color: var(--sheet) !important; }
 .badge.text-bg-info, .badge.text-bg-warning, .badge.text-bg-light {
   background-color: var(--sheet) !important;
@@ -434,6 +439,7 @@ main:focus { outline: none; }
 [data-bs-theme=dark] .theme-toggle .icon-moon { display: none; }
 [data-bs-theme=dark] .theme-toggle .icon-sun { display: block; }
 
+.container { --bs-gutter-x: 2rem; }
 .site-footer {
   margin-top: 3rem;
   padding: 1rem 0;
@@ -583,7 +589,8 @@ button.seat { cursor: pointer; }
 .poster:has(a:focus-visible) { outline: 3px solid var(--ink); outline-offset: 2px; }
 .poster a:focus-visible { outline: none !important; }
 .poster a { color: inherit; text-decoration: none; }
-.poster .label-caps { font-size: max(0.6875rem, 4.2cqi); }
+.poster .label-caps { font-size: max(0.6875rem, 4.2cqi); text-transform: none; letter-spacing: 0.02em; }
+.poster-day .label-caps { text-transform: uppercase; letter-spacing: 0.05em; }
 .poster-title {
   margin: 0;
   font-family: var(--font-display);

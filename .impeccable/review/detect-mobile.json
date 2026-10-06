@@ -1,0 +1,22 @@
+[
+  {
+    "antipattern": "clipped-overflow-container",
+    "name": "Positioned child clipped by overflow container",
+    "description": "A clipping container (overflow hidden or clip) wrapping an absolutely-positioned child cuts off tooltips, menus, and popovers that need to escape. Let the overflow be visible, or move the positioned layer out of the clip.",
+    "severity": "warning",
+    "category": "quality",
+    "file": "http://localhost:5226/Events/Details/1",
+    "line": 0,
+    "snippet": "article.poster.poster--band.type-movie.poster-Movie clips a positioned child"
+  },
+  {
+    "antipattern": "clipped-overflow-container",
+    "name": "Positioned child clipped by overflow container",
+    "description": "A clipping container (overflow hidden or clip) wrapping an absolutely-positioned child cuts off tooltips, menus, and popovers that need to escape. Let the overflow be visible, or move the positioned layer out of the clip.",
+    "severity": "warning",
+    "category": "quality",
+    "file": "http://localhost:5226/Events/Details/4",
+    "line": 0,
+    "snippet": "article.poster.poster--band.type-concert.poster-Concert clips a positioned child"
+  }
+]
