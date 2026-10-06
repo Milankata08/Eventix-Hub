@@ -1,0 +1,81 @@
+@model HallVM
+@using EventTixHub.Web.Services
+@{
+    var map = Model.Map;
+    var readOnly = Model.Monitor || Model.SalesClosed;
+}
+
+<div id="seatmap" class="hall-layout @map.EventType.TypeClass()" data-showtime-id="@map.ShowtimeId" data-mode="@(readOnly ? "monitor" : "select")"
+     data-standard-price="@map.StandardPrice.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
+     data-vip-price="@map.VipPrice.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)">
+    <div class="hall-main">
+        <div class="seat-legend mb-3">
+            <span><i class="seat seat-free" aria-hidden="true"></i> свободно</span>
+            @if (!readOnly)
+            {
+                <span><i class="seat seat-selected" aria-hidden="true"></i> избрано</span>
+            }
+            <span><i class="seat seat-held" aria-hidden="true"></i> резервирано</span>
+            <span><i class="seat seat-sold" aria-hidden="true"></i> продадено</span>
+            <span><i class="zone-swatch" aria-hidden="true"></i> VIP зона</span>
+        </div>
+
+        <div class="hall-frame">
+            <div class="hall-inner">
+                @if (map.EventType == EventTixHub.Web.Models.EventType.Movie)
+                {
+                    <div class="hall-front hall-screen" aria-hidden="true">
+                        <svg viewBox="0 0 400 28" preserveAspectRatio="none" focusable="false"><path d="M6 24 Q200 -10 394 24" fill="none" stroke="var(--type)" stroke-width="6" stroke-linecap="round" /></svg>
+                        <span class="label-caps">@map.EventType.HallFront()</span>
+                    </div>
+                }
+                else
+                {
+                    <div class="hall-front hall-stage" aria-hidden="true"><span class="label-caps">@map.EventType.HallFront()</span></div>
+                }
+                <div class="seat-grid" data-role="grid">
+                    <p class="text-muted" data-role="loading">Зареждане на схемата…</p>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-muted small my-3">
+            Свободни: <span data-count="free">@map.FreeCount</span> ·
+            Резервирани: <span data-count="held">@map.HeldCount</span> ·
+            Продадени: <span data-count="sold">@map.SoldCount</span>
+            @if (Model.Monitor)
+            {
+                <text>(обновява се на всеки 5 секунди)</text>
+            }
+        </p>
+        <div class="alert alert-warning d-none" data-role="status" role="status">Схемата не можа да се зареди. Опитваме отново…</div>
+        <div class="alert alert-warning d-none" data-role="notice" role="alert"></div>
+    </div>
+
+    @if (Model.SalesClosed)
+    {
+        <p class="hall-closed"><strong>Продажбата за @map.EventType.ShowtimeThis() @map.EventType.ShowtimeNoun() приключи.</strong></p>
+    }
+    else if (!Model.Monitor)
+    {
+        <aside class="hall-summary" aria-label="Избрани места">
+            <form asp-controller="Booking" asp-action="Reserve" method="post">
+                <input type="hidden" name="showtimeId" value="@map.ShowtimeId" />
+                <div class="summary-panel" data-role="panel" id="summary-panel">
+                    <h2 class="headline h5">Избрани места</h2>
+                    <p class="text-muted mb-2" data-role="empty">Още няма избрани места.</p>
+                    <ul class="summary-list" data-role="list"></ul>
+                    <p class="summary-total">Общо: <strong data-role="total">0,00&nbsp;€</strong></p>
+                    <p class="small text-muted">Ще пазим местата @BookingRules.HoldMinutes минути, докато платите. До @BookingRules.MaxTicketsPerOrder билета в поръчка.</p>
+                </div>
+                <div class="summary-bar">
+                    <button type="button" class="btn btn-link summary-toggle d-lg-none" data-role="toggle" aria-expanded="false" aria-controls="summary-panel">
+                        <span data-role="bar-text">0 места · 0,00 €</span>
+                    </button>
+                    <button type="submit" class="btn btn-primary" data-role="submit" disabled>Добави в количката</button>
+                </div>
+            </form>
+            <div class="visually-hidden" role="status" aria-live="polite" data-role="announce"></div>
+        </aside>
+    }
+</div>

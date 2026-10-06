@@ -5,7 +5,9 @@ using QRCoder;
 
 namespace EventTixHub.Web.ViewModels;
 
-public record SeatsVM(SeatMapDto Map);
+public record SeatsVM(SeatMapDto Map, bool SalesClosed = false);
+
+public record HallVM(SeatMapDto Map, bool Monitor, bool SalesClosed);
 
 public record CartVM(CartDto? Cart, int SecondsLeft);
 

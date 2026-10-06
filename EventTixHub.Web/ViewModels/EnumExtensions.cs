@@ -27,6 +27,13 @@ public static class EnumExtensions
         _ => "прожекции"
     };
 
+    public static string ShowtimeThis(this EventType type) => type switch
+    {
+        EventType.Concert => "този",
+        EventType.Theatre => "това",
+        _ => "тази"
+    };
+
     public static string HallFront(this EventType type) => type == EventType.Movie ? "ЕКРАН" : "СЦЕНА";
 
     public static string InvitationLine(this EventType type) => type switch

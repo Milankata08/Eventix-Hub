@@ -36,4 +36,11 @@ public class FormatTests
         Assert.Equal(plural, t.ShowtimeNoun(true));
         Assert.Equal(front, t.HallFront());
     }
+
+    [Theory]
+    [InlineData(EventType.Movie, "тази")]
+    [InlineData(EventType.Concert, "този")]
+    [InlineData(EventType.Theatre, "това")]
+    public void Showtime_demonstrative_follows_gender(EventType t, string expected) =>
+        Assert.Equal(expected, t.ShowtimeThis());
 }
