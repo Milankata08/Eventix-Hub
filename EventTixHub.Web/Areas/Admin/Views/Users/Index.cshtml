@@ -11,10 +11,10 @@
 <div class="page-head"><h1 class="headline">Потребители</h1></div>
 
 <form method="get" class="admin-filter">
-    <div><label class="form-label label-caps" for="search">Търсене</label><input id="search" name="search" value="@Model.Search" class="form-control" placeholder="По име или имейл" /></div>
+    <div><label class="form-label label-caps" for="search">Търсене</label><input id="search" name="search" value="@Model.Search" class="form-control" data-autosubmit="blur" placeholder="По име или имейл" /></div>
     <div>
         <label class="form-label label-caps" for="role">Роля</label>
-        <select id="role" name="role" class="form-select">
+        <select id="role" name="role" class="form-select" data-autosubmit>
             <option value="">Всички роли</option>
             @foreach (var (value, text) in roleNames)
             {

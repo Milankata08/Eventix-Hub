@@ -13,10 +13,10 @@
 </div>
 
 <form method="get" class="admin-filter">
-    <div><label class="form-label label-caps" for="search">Търсене</label><input id="search" name="search" value="@Model.Search" class="form-control" placeholder="По име или адрес" /></div>
+    <div><label class="form-label label-caps" for="search">Търсене</label><input id="search" name="search" value="@Model.Search" class="form-control" data-autosubmit="blur" placeholder="По име или адрес" /></div>
     <div>
         <label class="form-label label-caps" for="city">Град</label>
-        <select id="city" name="city" class="form-select">
+        <select id="city" name="city" class="form-select" data-autosubmit>
             <option value="">Всички градове</option>
             @foreach (var c in Model.Cities)
             {

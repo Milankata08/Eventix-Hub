@@ -17,7 +17,7 @@
 <form method="get" class="admin-filter">
     <div>
         <label class="form-label label-caps" for="eventId">Събитие</label>
-        <select id="eventId" name="eventId" class="form-select">
+        <select id="eventId" name="eventId" class="form-select" data-autosubmit>
             <option value="">Всички събития</option>
             @foreach (var e in Model.Events)
             {
@@ -27,7 +27,7 @@
     </div>
     <div>
         <label class="form-label label-caps" for="venueId">Зала</label>
-        <select id="venueId" name="venueId" class="form-select">
+        <select id="venueId" name="venueId" class="form-select" data-autosubmit>
             <option value="">Всички зали</option>
             @foreach (var v in Model.Venues)
             {
@@ -35,8 +35,8 @@
             }
         </select>
     </div>
-    <div><label class="form-label label-caps" for="from">От дата</label><input id="from" type="date" name="from" value="@f.From?.ToString("yyyy-MM-dd")" class="form-control" /></div>
-    <div><label class="form-label label-caps" for="to">До дата</label><input id="to" type="date" name="to" value="@f.To?.ToString("yyyy-MM-dd")" class="form-control" /></div>
+    <div><label class="form-label label-caps" for="from">От дата</label><input id="from" type="date" name="from" value="@f.From?.ToString("yyyy-MM-dd")" class="form-control" data-autosubmit="blur" /></div>
+    <div><label class="form-label label-caps" for="to">До дата</label><input id="to" type="date" name="to" value="@f.To?.ToString("yyyy-MM-dd")" class="form-control" data-autosubmit="blur" /></div>
     <div class="admin-filter-actions">
         <button type="submit" class="btn btn-secondary">Филтрирай</button>
     </div>

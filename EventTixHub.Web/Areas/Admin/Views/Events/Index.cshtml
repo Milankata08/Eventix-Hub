@@ -13,10 +13,10 @@
 </div>
 
 <form method="get" class="admin-filter">
-    <div><label class="form-label label-caps" for="search">Търсене</label><input id="search" name="search" value="@Model.Search" class="form-control" placeholder="По заглавие или жанр" /></div>
+    <div><label class="form-label label-caps" for="search">Търсене</label><input id="search" name="search" value="@Model.Search" class="form-control" data-autosubmit="blur" placeholder="По заглавие или жанр" /></div>
     <div>
         <label class="form-label label-caps" for="type">Вид</label>
-        <select id="type" name="type" class="form-select">
+        <select id="type" name="type" class="form-select" data-autosubmit>
             <option value="">Всички видове</option>
             @foreach (var t in Enum.GetValues<EventType>())
             {
@@ -26,7 +26,7 @@
     </div>
     <div>
         <label class="form-label label-caps" for="genre">Жанр</label>
-        <select id="genre" name="genre" class="form-select">
+        <select id="genre" name="genre" class="form-select" data-autosubmit>
             <option value="">Всички жанрове</option>
             @foreach (var g in Model.Options.Genres)
             {
