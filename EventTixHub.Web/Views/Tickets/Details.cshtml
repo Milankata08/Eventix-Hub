@@ -5,14 +5,8 @@
 
 <partial name="_TicketCard" model="Model" />
 
-<div class="d-print-none">
+<div class="d-print-none d-flex flex-wrap align-items-center gap-2">
     <a class="btn btn-outline-secondary" asp-controller="Profile" asp-action="Index">Назад</a>
     <button type="button" class="btn btn-outline-secondary" onclick="window.print()">Печат</button>
-    @if (Model.Ticket.CanCancel)
-    {
-        <form asp-action="Cancel" asp-route-id="@Model.Ticket.TicketId" method="post" class="d-inline"
-              onsubmit="return confirm('Сигурни ли сте, че искате да откажете билета?');">
-            <button type="submit" class="btn btn-outline-danger">Откажи билета</button>
-        </form>
-    }
+    <partial name="_CancelControl" model="Model.Ticket" />
 </div>

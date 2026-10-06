@@ -1,15 +1,29 @@
 @model ConfirmationVM
 @{
     ViewData["Title"] = "Потвърждение";
+    var groups = Model.Tickets.GroupBy(c => (c.Ticket.EventTitle, c.Ticket.StartsAt, c.Ticket.VenueName));
 }
 
-<h1 class="h3">Поръчка №@Model.OrderId е платена</h1>
-<p class="text-muted">Общо: @Format.Money(Model.Total). Представете QR кода на входа.</p>
+<p class="label-caps text-muted mb-3">Платено · поръчка №@Model.OrderId · @Format.Money(Model.Total)</p>
+<h1 class="visually-hidden">Потвърждение на поръчка №@Model.OrderId</h1>
 
-@foreach (var card in Model.Tickets)
+@foreach (var g in groups)
 {
-    <partial name="_TicketCard" model="card" />
+    var h = g.First().Ticket;
+    <section class="invitation mb-4 @h.EventType.TypeClass()" aria-label="@h.EventTitle">
+        <header class="invitation-head">
+            <div class="label-caps">@h.EventType.InvitationLine()</div>
+            <div class="display invitation-title">@h.EventTitle</div>
+            <div class="fs-5">@Format.LongDate(h.StartsAt), @Format.Weekday(h.StartsAt), @Format.Time(h.StartsAt)</div>
+            <div class="text-muted">@h.VenueName · @h.VenueAddress, @h.City</div>
+        </header>
+        @foreach (var card in g)
+        {
+            <partial name="_TicketCard" model="card" />
+        }
+    </section>
 }
 
+<p class="text-muted">Представете QR кода на входа.</p>
 <button type="button" class="btn btn-outline-secondary d-print-none" onclick="window.print()">Печат</button>
 <a class="btn btn-primary d-print-none" asp-controller="Profile" asp-action="Index">Моите билети</a>
