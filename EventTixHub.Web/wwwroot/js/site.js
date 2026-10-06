@@ -26,6 +26,11 @@
     tick();
 })();
 
+// [data-autosubmit] fields apply their form on change (Афиш city). Without JS the form's submit button still works.
+document.addEventListener('change', e => {
+    if (e.target.matches('[data-autosubmit]')) e.target.form.requestSubmit();
+});
+
 // Dark mode toggle (Bootstrap 5.3 color modes). The <head> script in _Layout applies the saved theme before first paint.
 (function () {
     const html = document.documentElement;

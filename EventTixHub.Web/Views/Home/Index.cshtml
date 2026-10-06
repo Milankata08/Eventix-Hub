@@ -34,7 +34,7 @@
         <input type="hidden" name="Type" value="@f.Type" />
         <div class="filter-city">
             <label for="f-city" class="visually-hidden">Град</label>
-            <select name="City" id="f-city" class="form-select">
+            <select name="City" id="f-city" class="form-select" data-autosubmit>
                 <option value="">Всички градове</option>
                 @foreach (var c in Model.Options.Cities)
                 {
