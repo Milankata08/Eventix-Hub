@@ -6,6 +6,7 @@
         ? $"{Format.LongDate(d)} · {Format.Weekday(d)} · {Format.Time(d)}"
         : "Без предстоящи дати";
     var place = string.Join(", ", new[] { p.Venue, p.City }.Where(x => !string.IsNullOrEmpty(x)));
+    var timePlace = p.Date is { } td ? string.Join(" · ", new[] { Format.Time(td), place }.Where(x => x.Length > 0)) : dateLine;
     var hasImage = !string.IsNullOrEmpty(p.PosterUrl);
     var cls = $"poster poster--{p.Size.ToString().ToLowerInvariant()} {p.Type.TypeClass()} poster-{p.Type}" + (hasImage ? " poster--image" : "");
 }
@@ -56,7 +57,7 @@ else
         </div>
         <svg class="poster-arc" viewBox="0 0 100 14" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M2 12 Q50 -4 98 12" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" /></svg>
         <h2 class="poster-title">@Title()</h2>
-        <div class="poster-date label-caps">@(p.Date is { } mt ? $"{Format.Time(mt)} · {place}" : dateLine)</div>
+        <div class="poster-date label-caps"><span class="visually-hidden">@dateLine. </span>@timePlace</div>
     }
     else
     {
@@ -66,7 +67,7 @@ else
         {
             <div class="poster-day" aria-hidden="true"><span class="figure">@Format.PosterDay(cd)</span><span class="label-caps">@Format.PosterMonth(cd)</span></div>
         }
-        <div class="poster-stage label-caps">@(p.Date is { } ct ? $"{Format.Time(ct)} · {place}" : dateLine)</div>
+        <div class="poster-stage label-caps"><span class="visually-hidden">@dateLine. </span>@timePlace</div>
     }
     </div>
     }
