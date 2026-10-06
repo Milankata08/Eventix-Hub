@@ -13,12 +13,12 @@
             {
                 <li class="list-group-item d-flex justify-content-between">
                     <span>@l.EventTitle, ред @l.Row, място @l.Number</span>
-                    <span>@l.Price.ToString("0.00") €</span>
+                    <span>@Format.Money(l.Price)</span>
                 </li>
             }
             <li class="list-group-item d-flex justify-content-between fw-bold">
                 <span>Общо@(Model.Cart.PromoCode is null ? "" : $" (промо код {Model.Cart.PromoCode})")</span>
-                <span>@Model.Cart.Total.ToString("0.00") €</span>
+                <span>@Format.Money(Model.Cart.Total)</span>
             </li>
         </ul>
         <a asp-action="Cart">Обратно към количката</a>
@@ -50,7 +50,7 @@
                     <span asp-validation-for="Payment.Cvv" class="text-danger"></span>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Плати @Model.Cart.Total.ToString("0.00") €</button>
+            <button type="submit" class="btn btn-primary">Плати @Format.Money(Model.Cart.Total)</button>
         </form>
     </div>
 </div>

@@ -10,7 +10,8 @@ public record EventFilter(
 
 public record EventCardDto(
     int Id, string Title, EventType Type, string Genre, string? PosterUrl,
-    double? AverageRating, DateTime? NextShowtime);
+    double? AverageRating, DateTime? NextShowtime,
+    string? NextVenueName = null, string? NextCity = null);
 
 public record VenueOption(int Id, string Name);
 

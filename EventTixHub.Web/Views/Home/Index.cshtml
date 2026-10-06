@@ -83,8 +83,8 @@ else
                         <div class="card-img-top bg-secondary-subtle d-flex align-items-center justify-content-center text-muted" style="height:220px">Без плакат</div>
                     }
                     <div class="card-body">
-                        <span class="badge text-bg-primary">@e.Type.DisplayName()</span>
-                        <span class="badge text-bg-light">@e.Genre</span>
+                        <span class="badge type-badge @e.Type.TypeClass()">@e.Type.DisplayName()</span>
+                        <span class="text-muted small">· @e.Genre</span>
                         <h2 class="h5 mt-2"><a asp-controller="Events" asp-action="Details" asp-route-id="@e.Id" class="stretched-link text-decoration-none">@e.Title</a></h2>
                         <div class="small text-muted">
                             @(e.AverageRating is { } r ? $"★ {r:0.0}" : "Няма оценки")

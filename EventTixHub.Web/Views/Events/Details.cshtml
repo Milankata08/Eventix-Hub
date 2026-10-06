@@ -19,8 +19,8 @@
     <div class="col-md-9">
         <h1 class="h3">@ev.Title</h1>
         <p>
-            <span class="badge text-bg-primary">@ev.Type.DisplayName()</span>
-            <span class="badge text-bg-light">@ev.Genre</span>
+            <span class="badge type-badge @ev.Type.TypeClass()">@ev.Type.DisplayName()</span>
+            <span class="text-muted small">· @ev.Genre</span>
             <span class="text-muted">@ev.DurationMinutes мин.</span>
         </p>
         <p>
@@ -37,7 +37,7 @@
     </div>
 </div>
 
-<h2 class="h4">Предстоящи прожекции</h2>
+<h2 class="h4">Предстоящи @ev.Type.ShowtimeNoun(true)</h2>
 @if (Model.Details.Showtimes.Count == 0)
 {
     <p class="text-muted">Няма предстоящи прожекции.</p>
@@ -56,8 +56,8 @@ else
                         <td>@s.StartsAt.ToString("dd.MM.yyyy HH:mm")</td>
                         <td>@s.VenueName</td>
                         <td>@s.City</td>
-                        <td>@s.StandardPrice.ToString("0.00") €</td>
-                        <td>@s.VipPrice.ToString("0.00") €</td>
+                        <td>@Format.Money(s.StandardPrice)</td>
+                        <td>@Format.Money(s.VipPrice)</td>
                         <td>@s.FreeSeats</td>
                         <td class="text-end">
                             @if (s.FreeSeats > 0)

@@ -59,7 +59,7 @@ else
                                 <noscript><button type="submit" class="btn btn-sm btn-outline-secondary mt-1">Приложи</button></noscript>
                             </form>
                         </td>
-                        <td class="text-end">@l.Price.ToString("0.00") €</td>
+                        <td class="text-end">@Format.Money(l.Price)</td>
                         <td class="text-end">
                             <form asp-action="RemoveTicket" method="post">
                                 <input type="hidden" name="ticketId" value="@l.TicketId" />
@@ -72,7 +72,7 @@ else
             <tfoot>
                 <tr>
                     <th colspan="4" class="text-end">Общо</th>
-                    <th class="text-end">@cart.Total.ToString("0.00") €</th>
+                    <th class="text-end">@Format.Money(cart.Total)</th>
                     <th></th>
                 </tr>
             </tfoot>

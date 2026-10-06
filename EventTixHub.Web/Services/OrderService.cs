@@ -149,7 +149,7 @@ public class OrderService(
         var now = Now;
         var active = ActiveTickets(cart, now);
         var percent = PromoPercent(cart, now);
-        var lines = active.Select(t => new CartLineDto(t.Id, t.Showtime.Event.Title, t.Showtime.Venue.Name,
+        var lines = active.Select(t => new CartLineDto(t.Id, t.ShowtimeId, t.Showtime.Event.Type, t.Showtime.Event.Title, t.Showtime.Venue.Name,
             t.Showtime.StartsAt, t.Seat.Row, t.Seat.Number, t.Seat.Category, t.Concession, PriceOf(t, percent),
             t.ReservedUntil!.Value)).ToList();
         return new CartDto(cart.Id, lines, percent > 0 ? cart.PromoCode!.Code : null, percent,

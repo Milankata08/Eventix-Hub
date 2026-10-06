@@ -16,6 +16,9 @@
     let seats = [];
     let prices = { Standard: Number(root.dataset.standardPrice), Vip: Number(root.dataset.vipPrice) };
 
+    const moneyFormat = new Intl.NumberFormat('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const money = n => moneyFormat.format(n) + ' €';
+
     const statusText = { Free: 'свободно', Held: 'резервирано', Sold: 'продадено' };
 
     function seatClass(seat) {
@@ -45,9 +48,9 @@
                 button.className = 'seat ' + seatClass(seat);
                 button.textContent = seat.number;
                 const state = selected.has(seat.id) ? 'избрано' : statusText[seat.status];
-                const price = prices[seat.category].toFixed(2);
+                const price = money(prices[seat.category]);
                 button.setAttribute('aria-label',
-                    `Ред ${seat.row}, място ${seat.number}, ${seat.category === 'Vip' ? 'VIP' : 'стандартно'}, ${price} €, ${state}`);
+                    `Ред ${seat.row}, място ${seat.number}, ${seat.category === 'Vip' ? 'VIP' : 'стандартно'}, ${price}, ${state}`);
                 button.setAttribute('aria-pressed', selected.has(seat.id) ? 'true' : 'false');
                 if (monitor || seat.status !== 'Free') button.disabled = true;
                 button.addEventListener('click', () => toggle(seat.id));
@@ -61,7 +64,7 @@
         if (monitor) return;
         const sum = seats.filter(s => selected.has(s.id)).reduce((acc, s) => acc + prices[s.category], 0);
         selectedCount.textContent = selected.size;
-        total.textContent = sum.toFixed(2) + ' €';
+        total.textContent = money(sum);
         submit.disabled = selected.size === 0;
         inputs.replaceChildren();
         for (const id of selected) {

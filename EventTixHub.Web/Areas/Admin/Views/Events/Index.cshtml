@@ -51,7 +51,7 @@ else
         {
             <tr>
                 <td>@e.Title</td>
-                <td>@e.Type.DisplayName()</td>
+                <td><span class="badge type-badge @e.Type.TypeClass()">@e.Type.DisplayName()</span></td>
                 <td>@e.Genre</td>
                 <td class="text-end">
                     <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@e.Id">Детайли</a>

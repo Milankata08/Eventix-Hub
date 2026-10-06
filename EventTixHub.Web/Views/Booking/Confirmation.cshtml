@@ -4,7 +4,7 @@
 }
 
 <h1 class="h3">Поръчка №@Model.OrderId е платена</h1>
-<p class="text-muted">Общо: @Model.Total.ToString("0.00") €. Представете QR кода на входа.</p>
+<p class="text-muted">Общо: @Format.Money(Model.Total). Представете QR кода на входа.</p>
 
 @foreach (var card in Model.Tickets)
 {

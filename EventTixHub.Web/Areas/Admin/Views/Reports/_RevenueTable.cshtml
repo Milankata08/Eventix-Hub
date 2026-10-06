@@ -23,7 +23,7 @@ else
                     <div class="progress" role="progressbar" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100">
                         <div class="progress-bar" style="width:@percent%"></div>
                     </div>
-                    <div class="small">@r.Revenue.ToString("0.00") €</div>
+                    <div class="small">@Format.Money(r.Revenue)</div>
                 </td>
             </tr>
         }

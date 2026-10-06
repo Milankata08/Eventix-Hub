@@ -59,7 +59,7 @@ else
                         <td>@t.StartsAt.ToString("dd.MM.yyyy HH:mm")</td>
                         <td>Ред @t.Row, място @t.Number (@t.Category.DisplayName())</td>
                         <td>@t.Concession.DisplayName()</td>
-                        <td>@t.Price.ToString("0.00") €</td>
+                        <td>@Format.Money(t.Price)</td>
                         <td>@t.Code</td>
                         <td class="text-end">
                             <a class="btn btn-sm btn-outline-secondary" href="/Tickets/Details/@t.TicketId">Детайли</a>

@@ -6,10 +6,10 @@
 <h1 class="h3 mb-3">Табло</h1>
 <div class="row g-3 mb-4">
     <div class="col-md-4"><div class="card"><div class="card-body">
-        <div class="text-muted small">Приход днес</div><div class="h4 mb-0">@Model.Kpis.RevenueToday.ToString("0.00") €</div>
+        <div class="text-muted small">Приход днес</div><div class="h4 mb-0">@Format.Money(Model.Kpis.RevenueToday)</div>
     </div></div></div>
     <div class="col-md-4"><div class="card"><div class="card-body">
-        <div class="text-muted small">Приход този месец</div><div class="h4 mb-0">@Model.Kpis.RevenueThisMonth.ToString("0.00") €</div>
+        <div class="text-muted small">Приход този месец</div><div class="h4 mb-0">@Format.Money(Model.Kpis.RevenueThisMonth)</div>
     </div></div></div>
     <div class="col-md-4"><div class="card"><div class="card-body">
         <div class="text-muted small">Продадени билети този месец</div><div class="h4 mb-0">@Model.Kpis.TicketsSoldThisMonth</div>

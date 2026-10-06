@@ -3,7 +3,7 @@ using EventTixHub.Web.Models;
 namespace EventTixHub.Web.Services;
 
 public record CartLineDto(
-    int TicketId, string EventTitle, string VenueName, DateTime StartsAt, int Row, int Number,
+    int TicketId, int ShowtimeId, EventType EventType, string EventTitle, string VenueName, DateTime StartsAt, int Row, int Number,
     SeatCategory Category, ConcessionType Concession, decimal Price, DateTime ReservedUntil);
 
 public record CartDto(

@@ -21,7 +21,7 @@ public class TicketService(
             .Select(s => new
             {
                 s.Id, s.VenueId, s.StartsAt, s.StandardPrice, s.VipPrice,
-                EventTitle = s.Event.Title, VenueName = s.Venue.Name
+                EventType = s.Event.Type, EventTitle = s.Event.Title, VenueName = s.Venue.Name
             })
             .FirstOrDefaultAsync();
         if (showtime is null)
@@ -45,7 +45,7 @@ public class TicketService(
                     : BookingRules.StatusOf(null, null, now)))
             .ToList();
 
-        return new SeatMapDto(showtime.Id, showtime.EventTitle, showtime.VenueName, showtime.StartsAt,
+        return new SeatMapDto(showtime.Id, showtime.EventType, showtime.EventTitle, showtime.VenueName, showtime.StartsAt,
             showtime.StandardPrice, showtime.VipPrice, map,
             map.Count(s => s.Status == SeatStatus.Free),
             map.Count(s => s.Status == SeatStatus.Held),
@@ -125,6 +125,7 @@ public class TicketService(
         .Where(t => t.Order.UserId == userId && t.Status != TicketStatus.Reserved);
 
     private static IQueryable<UserTicketDto> ToDto(IQueryable<Ticket> query) => query
-        .Select(t => new UserTicketDto(t.Id, t.Showtime.Event.Title, t.Showtime.Venue.Name, t.Showtime.StartsAt,
+        .Select(t => new UserTicketDto(t.Id, t.Showtime.Event.Type, t.Showtime.Event.Title, t.Showtime.Venue.Name,
+            t.Showtime.Venue.City, t.Showtime.Venue.Address, t.Showtime.StartsAt,
             t.Seat.Row, t.Seat.Number, t.Seat.Category, t.Concession, t.Price, t.Code, t.Status));
 }

@@ -5,7 +5,7 @@ namespace EventTixHub.Web.Services;
 public enum TicketHistoryFilter { Upcoming, Past, Cancelled }
 
 public record UserTicketDto(
-    int TicketId, string EventTitle, string VenueName, DateTime StartsAt, int Row, int Number,
+    int TicketId, EventType EventType, string EventTitle, string VenueName, string City, string VenueAddress, DateTime StartsAt, int Row, int Number,
     SeatCategory Category, ConcessionType Concession, decimal Price, string? Code,
     TicketStatus Status)
 {

@@ -10,7 +10,7 @@
             <div>@t.StartsAt.ToString("dd.MM.yyyy HH:mm")</div>
             <div>Ред @t.Row, място @t.Number (@t.Category.DisplayName())</div>
             <div>Намаление: @t.Concession.DisplayName()</div>
-            <div>Цена: @t.Price.ToString("0.00") €</div>
+            <div>Цена: @Format.Money(t.Price)</div>
             <div>Статус: @t.Status.DisplayName()</div>
             @if (t.Code is not null)
             {
