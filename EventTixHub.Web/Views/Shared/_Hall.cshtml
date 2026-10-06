@@ -5,7 +5,7 @@
     var readOnly = Model.Monitor || Model.SalesClosed;
 }
 
-<div id="seatmap" class="hall-layout @map.EventType.TypeClass()" data-showtime-id="@map.ShowtimeId" data-mode="@(readOnly ? "monitor" : "select")"
+<div id="seatmap" class="hall-layout @(readOnly ? "" : "hall-layout--split") @map.EventType.TypeClass()" data-showtime-id="@map.ShowtimeId" data-mode="@(readOnly ? "monitor" : "select")"
      data-standard-price="@map.StandardPrice.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
      data-vip-price="@map.VipPrice.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)">
     <div class="hall-main">
@@ -66,8 +66,8 @@
                     <p class="text-muted mb-2" data-role="empty">Още няма избрани места.</p>
                     <ul class="summary-list" data-role="list"></ul>
                     <p class="summary-total">Общо: <strong data-role="total">0,00&nbsp;€</strong></p>
-                    <p class="small text-muted">Ще пазим местата @BookingRules.HoldMinutes минути, докато платите. До @BookingRules.MaxTicketsPerOrder билета в поръчка.</p>
                 </div>
+                <p class="small text-muted summary-promise">Ще пазим местата @BookingRules.HoldMinutes минути, докато платите. До @BookingRules.MaxTicketsPerOrder билета в поръчка.</p>
                 <div class="summary-bar">
                     <button type="button" class="btn btn-link summary-toggle d-lg-none" data-role="toggle" aria-expanded="false" aria-controls="summary-panel">
                         <span data-role="bar-text">0 места · 0,00 €</span>
