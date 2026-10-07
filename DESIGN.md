@@ -349,7 +349,7 @@ Each component keeps Bootstrap's markup and accessibility behaviour and changes 
 
 ### Афиш poster (signature)
 
-A container (`container-type: inline-size`) at 3:4 as a minimum ratio (it grows if the content needs more height, and its wall row mates grow with it), filled with the event's ink. Label lines on the poster are sentence case (long uppercase lines were flagged by the detector); only the month under the day figure stays uppercase. All its text is real HTML text: the title is the card's link, made clickable across the whole card with a stretched link.
+A container (`container-type: inline-size`) at 3:4 as a minimum ratio (it grows if the content needs more height, and its wall row mates grow with it), filled with the event's ink. Label lines on the poster are sentence case (long uppercase lines were flagged by the detector); only the month under the day figure stays uppercase. Every poster label is at least 13px (0.8125rem) at every width; the fluid size may grow above that, and labels wrap rather than clip. All its text is real HTML text: the title is the card's link, made clickable across the whole card with a stretched link.
 
 - **Fitted title:**
   - `font-size: min(var(--cap), calc(100cqi / (var(--longest) * 0.55)))`
@@ -360,7 +360,7 @@ The three art forms get three typographic voices, not one template in three colo
 
 - **Театър, the classic афиш:**
   - centred stack
-  - venue in label style, then a hairline
+  - type word and venue in label style ("Театър · зала, град"), then a hairline
   - TITLE
   - genre in Sofia Sans italic
   - double rule
@@ -376,7 +376,7 @@ The three art forms get three typographic voices, not one template in three colo
   - flush left, the heaviest set
   - TITLE stacked
   - day figure large
-  - the bottom of the sheet is an ink stage bar carrying time, venue and city in saffron (9.6:1)
+  - the bottom of the sheet is an ink stage bar carrying time, venue and city in saffron (9.6:1), with a 1px saffron rule on its bottom edge so the poster keeps its edge on the night background
 
 **Other poster states:**
 

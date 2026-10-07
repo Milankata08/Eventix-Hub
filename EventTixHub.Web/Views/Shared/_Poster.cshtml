@@ -38,7 +38,7 @@ else
     @if (p.Type == EventType.Theatre)
     {
         <div class="poster-stack">
-            <div class="label-caps">@(place.Length > 0 ? place : typeWord)</div>
+            <div class="label-caps">@(place.Length > 0 ? typeWord + " · " + place : typeWord)</div>
             <hr class="poster-hair" />
             <h2 class="poster-title">@Title()</h2>
             <div class="poster-genre">@p.Genre</div>

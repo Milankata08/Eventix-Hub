@@ -26,6 +26,14 @@ public static class Format
 
     public static string Time(DateTime d) => d.ToString("HH:mm", Bg);
 
+    // "във Варна, Пловдив и София": "във" before a city starting with в or ф, else "в". Empty for no cities.
+    public static string CityPhrase(IReadOnlyList<string> cities)
+    {
+        if (cities.Count == 0) return "";
+        var list = cities.Count == 1 ? cities[0] : string.Join(", ", cities.Take(cities.Count - 1)) + " и " + cities[^1];
+        return (char.ToLower(cities[0][0], Bg) is 'в' or 'ф' ? "във " : "в ") + list;
+    }
+
     // Character count of the longest word; drives the poster title fit. At least 1.
     public static int LongestWord(string title) =>
         Math.Max(1, title.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).Select(w => w.Length).DefaultIfEmpty(1).Max());

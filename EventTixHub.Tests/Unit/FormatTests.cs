@@ -28,6 +28,16 @@ public class FormatTests
     }
 
     [Theory]
+    [InlineData("в Пловдив и София", "Пловдив", "София")]
+    [InlineData("във Варна, Пловдив и София", "Варна", "Пловдив", "София")]
+    [InlineData("в София", "София")]
+    [InlineData("във Фрайбург и София", "Фрайбург", "София")]
+    [InlineData("във велико Търново", "велико Търново")]
+    [InlineData("", new string[0])]
+    public void City_phrase_picks_preposition_and_joins(string expected, params string[] cities) =>
+        Assert.Equal(expected, Format.CityPhrase(cities));
+
+    [Theory]
     [InlineData(EventType.Movie, "прожекции", "ЕКРАН")]
     [InlineData(EventType.Concert, "концерти", "СЦЕНА")]
     [InlineData(EventType.Theatre, "представления", "СЦЕНА")]

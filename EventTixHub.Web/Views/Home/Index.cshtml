@@ -4,7 +4,6 @@
     var f = Model.Filter;
     var pager = new PagerVM(Model.Events.Page, Model.Events.TotalPages, Model.RouteValues());
     var cities = Model.Options.Cities.ToList();
-    var cityList = cities.Count > 1 ? string.Join(", ", cities.Take(cities.Count - 1)) + " и " + cities[^1] : string.Join("", cities);
     var moreActive = !string.IsNullOrEmpty(f.Search) || !string.IsNullOrEmpty(f.Genre) || f.VenueId is not null
         || f.Date is not null || f.Sort != EventSort.Date;
     var types = new (EventType? Value, string Label)[]
@@ -17,7 +16,7 @@
     <h1 class="display">Афиш</h1>
     @if (cities.Count > 0)
     {
-        <p class="masthead-sub">Кино, концерти и театър в @cityList</p>
+        <p class="masthead-sub">Кино, концерти и театър @Format.CityPhrase(cities)</p>
     }
 </header>
 

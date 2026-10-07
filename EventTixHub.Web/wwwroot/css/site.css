@@ -589,7 +589,7 @@ button.seat { cursor: pointer; }
 .poster:has(a:focus-visible) { outline: 3px solid var(--ink); outline-offset: 2px; }
 .poster a:focus-visible { outline: none !important; }
 .poster a { color: inherit; text-decoration: none; }
-.poster .label-caps { font-size: max(0.6875rem, 4.2cqi); text-transform: none; letter-spacing: 0.02em; }
+.poster .label-caps { font-size: max(0.8125rem, 4.2cqi); text-transform: none; letter-spacing: 0.02em; }
 .poster-day .label-caps { text-transform: uppercase; letter-spacing: 0.05em; }
 .poster-title {
   margin: 0;
@@ -608,7 +608,7 @@ button.seat { cursor: pointer; }
 /* Театър: centred stack, double rule */
 .poster-Theatre .poster-stack { margin: auto 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.5em; }
 .poster-hair { width: 100%; margin: 0; border: 0; border-top: 1px solid currentColor; opacity: 1; }
-.poster-genre { font-style: italic; font-size: max(0.6875rem, 5cqi); }
+.poster-genre { font-style: italic; font-size: max(0.8125rem, 5cqi); }
 .poster-rule { width: 100%; height: 7px; border-top: 3px solid currentColor; border-bottom: 1px solid currentColor; }
 
 /* Филм: flush left, day top right, screen arc */
@@ -627,6 +627,7 @@ button.seat { cursor: pointer; }
   padding: 3cqi var(--pad);
   background: #171614; /* fixed ink: the stage bar stays dark in both themes */
   color: var(--concert);
+  border-bottom: 1px solid var(--concert); /* keeps the poster edge on the night background */
 }
 
 /* Uploaded image: ink band keeps the type word, title and date as real text */
