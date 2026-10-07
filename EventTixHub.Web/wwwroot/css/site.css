@@ -429,7 +429,6 @@ main:focus { outline: none; }
   text-underline-offset: 6px;
 }
 .site-nav .navbar-toggler { border-color: var(--ink); }
-[data-bs-theme=dark] .site-nav .navbar-toggler-icon { filter: invert(1); }
 @media (max-width: 575.98px) {
   .site-nav .navbar-collapse { border-top: 2px solid var(--ink); margin-top: 0.5rem; }
 }
@@ -566,6 +565,8 @@ button.seat { cursor: pointer; }
 /* Generated афиш posters. Title fills the width (The Fit Rule): size comes from the longest word. */
 .poster-wall { --bs-gutter-x: 0.75rem; --bs-gutter-y: 0.75rem; }
 @media (min-width: 768px) { .poster-wall { --bs-gutter-x: 1rem; --bs-gutter-y: 1rem; } }
+.poster-wall > .col { display: flex; flex-direction: column; }
+.poster-wall .poster { flex-grow: 1; } /* a grown poster stretches its row mates */
 .poster-caption { margin-top: 0.25rem; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
 
 .poster {
@@ -576,7 +577,7 @@ button.seat { cursor: pointer; }
   flex-direction: column;
   container-type: inline-size;
   aspect-ratio: 3 / 4;
-  overflow: hidden;
+  overflow: clip; /* not hidden: a scroll container drops the automatic min height, so the ratio would clip instead of grow */
   background: var(--type);
   color: var(--on-type);
   border-radius: 0;
@@ -584,7 +585,7 @@ button.seat { cursor: pointer; }
 .poster--band { aspect-ratio: 16 / 10; }
 .poster--thumb { display: inline-block; width: 48px; }
 /* cqi resolves against an ancestor container, so padding lives on a child of the poster */
-.poster-in { flex: 1; display: flex; flex-direction: column; min-height: 0; padding: var(--pad); }
+.poster-in { flex: 1 0 auto; display: flex; flex-direction: column; padding: var(--pad); }
 .poster:has(a:focus-visible) { outline: 3px solid var(--ink); outline-offset: 2px; }
 .poster a:focus-visible { outline: none !important; }
 .poster a { color: inherit; text-decoration: none; }

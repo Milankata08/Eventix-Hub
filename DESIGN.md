@@ -257,7 +257,7 @@ Operate surfaces use the fixed rem steps above. Only Display and poster titles a
   - Filters sit in one row above the wall. Type chips (Всички · Филми · Концерти · Театър) and the city are always visible. Genre, venue, date, sort and search fold into a "Още филтри" disclosure below md.
 - **Event details:**
   - lg: the poster takes 4 columns, title and facts take 8, and the programme dates run full width below.
-  - Below md: the poster becomes a full-bleed band (about 16:10) with the title. The dates follow at once, so "Избери места" is on screen without sideways scrolling.
+  - Below md: the poster becomes a full-bleed band (16:10 as a minimum; it grows to fit the title and date) with the title. The dates follow at once, so "Избери места" is on screen without sideways scrolling.
 - **Booking (seats, cart, checkout):**
   - lg: work area 8 columns, sticky summary 4 columns.
   - Below lg: a single column plus a sticky bottom bar (paper, 2px ink top rule, safe-area padding) holding the total and the one primary action.
@@ -349,7 +349,7 @@ Each component keeps Bootstrap's markup and accessibility behaviour and changes 
 
 ### Афиш poster (signature)
 
-A container (`container-type: inline-size`) at 3:4, filled with the event's ink. Label lines on the poster are sentence case (long uppercase lines were flagged by the detector); only the month under the day figure stays uppercase. All its text is real HTML text: the title is the card's link, made clickable across the whole card with a stretched link.
+A container (`container-type: inline-size`) at 3:4 as a minimum ratio (it grows if the content needs more height, and its wall row mates grow with it), filled with the event's ink. Label lines on the poster are sentence case (long uppercase lines were flagged by the detector); only the month under the day figure stays uppercase. All its text is real HTML text: the title is the card's link, made clickable across the whole card with a stretched link.
 
 - **Fitted title:**
   - `font-size: min(var(--cap), calc(100cqi / (var(--longest) * 0.55)))`
