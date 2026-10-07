@@ -474,12 +474,13 @@ main:focus { outline: none; }
 /* width 0 + min-width 100%: the front spans the seat rows but never widens the hall */
 .hall-front { width: 0; min-width: 100%; margin-bottom: 1rem; text-align: center; }
 .hall-screen svg { display: block; width: 100%; height: 28px; }
-.hall-screen .label-caps { color: var(--type); }
+.hall-screen .label-caps { color: var(--ink); }
+.venue-plan { --type: var(--ink); --on-type: var(--sheet); } /* admin plan: neutral stage block */
 .hall-stage { padding: 0.5rem 1rem; background: var(--type); color: var(--on-type); }
 
 .seat-grid { min-width: 12rem; }
 .seat-row { display: flex; justify-content: center; align-items: center; gap: 4px; margin-bottom: 4px; }
-.seat-row-label { flex: none; width: 1.5rem; color: var(--ink-muted); font-size: 0.8rem; text-align: center; }
+.seat-row-label { flex: none; width: 1.5rem; color: var(--ink-muted); font-size: 0.8125rem; text-align: center; }
 @media (min-width: 768px) { .seat-row { gap: 6px; margin-bottom: 6px; } }
 
 .zone-vip { margin: 0.5rem -0.5rem; padding: 0.25rem 0.5rem; background: color-mix(in srgb, var(--type) 14%, transparent); }
@@ -498,10 +499,10 @@ main:focus { outline: none; }
   border-radius: 10px 10px 4px 4px; /* chair back */
   background: var(--seat-free);
   color: var(--ink);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   line-height: 1;
 }
-@media (min-width: 768px) { .seat { width: 36px; height: 36px; font-size: 0.8125rem; } }
+@media (min-width: 768px) { .seat { width: 36px; height: 36px; } }
 button.seat { cursor: pointer; }
 .seat:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
 .seat-free { background: var(--seat-free); }
