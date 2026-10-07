@@ -213,12 +213,12 @@
     function preselect() {
         if (monitor) return;
         const wanted = (new URLSearchParams(location.search).get('seats') || '')
-            .split(',').map(Number).filter(Number.isInteger);
+            .split(',').map(Number).filter(id => Number.isInteger(id) && id > 0 && seatById(id));
         if (wanted.length === 0) return;
         const missed = [];
         for (const id of wanted) {
             const seat = seatById(id);
-            if (seat?.status === 'Free') selected.add(id); else missed.push(seat ? where(seat) : `място ${id}`);
+            if (seat.status === 'Free') selected.add(id); else missed.push(where(seat));
         }
         if (missed.length > 0)
             showAlert('Тези места не са свободни и не бяха избрани: ' + missed.join('; ') + '.');
