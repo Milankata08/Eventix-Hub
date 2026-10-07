@@ -45,7 +45,7 @@ else
                     <td>@o.StartsAt.ToString("dd.MM.yyyy HH:mm")</td>
                     <td>
                         @await Html.PartialAsync("_Bar", (percent, "Заетост"))
-                        <div class="bar-note">@percent % · @o.Taken от @o.Capacity места@if (o.IsCritical) { <text> · </text><span class="label-caps">критична</span> }</div>
+                        <div class="bar-note">@percent % · @o.Taken от @o.Capacity места@{ if (o.IsCritical) { <text> · </text><span class="label-caps">критична</span> } }</div>
                     </td>
                 </tr>
             }
