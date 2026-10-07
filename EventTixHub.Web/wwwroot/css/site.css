@@ -463,7 +463,7 @@ main:focus { outline: none; }
 .event-band { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 3px solid var(--ink); }
 .event-band .headline { margin: 0.5rem 0; }
 
-.hall-layout--split { padding-bottom: 6rem; }
+.hall-layout--split { padding-bottom: var(--summary-h, 6rem); } /* seatmap.js sets --summary-h to the fixed bar's height */
 @media (min-width: 992px) {
   .hall-layout--split { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; align-items: start; padding-bottom: 0; }
   .hall-summary { position: sticky; top: 1rem; }
@@ -472,7 +472,8 @@ main:focus { outline: none; }
 .hall-frame { overflow-x: auto; padding-bottom: 0.5rem; }
 .hall-inner { width: max-content; margin-inline: auto; }
 
-.hall-front { margin-bottom: 1rem; text-align: center; }
+/* width 0 + min-width 100%: the front spans the seat rows but never widens the hall */
+.hall-front { width: 0; min-width: 100%; margin-bottom: 1rem; text-align: center; }
 .hall-screen svg { display: block; width: 100%; height: 28px; }
 .hall-screen .label-caps { color: var(--type); }
 .hall-stage { padding: 0.5rem 1rem; background: var(--type); color: var(--on-type); }

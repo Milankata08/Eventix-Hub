@@ -224,6 +224,11 @@
             showAlert('Тези места не са свободни и не бяха избрани: ' + missed.join('; ') + '.');
     }
 
+    const frame = root.querySelector('.hall-frame');
+    const hint = role('scroll-hint');
+    const wide = () => frame.scrollWidth > frame.clientWidth;
+    const updateHint = () => { hint.hidden = !wide(); };
+
     function fail() {
         failures++;
         if (firstLoad) role('loading').hidden = true;
@@ -249,6 +254,7 @@
         const rebuild = ids !== signature;
         signature = ids;
         if (rebuild) build();
+        const first = firstLoad;
         if (firstLoad) {
             firstLoad = false;
             preselect();
@@ -261,6 +267,9 @@
         showCounts(map);
         update();
         renderSummary();
+        // Measure only after update() has given the seats their size.
+        if (first && wide()) frame.scrollLeft = (frame.scrollWidth - frame.clientWidth) / 2; // centre once; never again
+        updateHint();
     }
 
     grid.addEventListener('focusin', e => {
@@ -298,6 +307,12 @@
             toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
         });
     }
+
+    window.addEventListener('resize', updateHint);
+
+    // The bottom bar's height changes with the open panel and wrapping; keep the page padding equal to it.
+    const bar = root.querySelector('.hall-summary');
+    if (bar) new ResizeObserver(() => root.style.setProperty('--summary-h', bar.offsetHeight + 'px')).observe(bar);
 
     load();
     setInterval(load, 5000);

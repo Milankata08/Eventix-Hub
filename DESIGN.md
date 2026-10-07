@@ -404,6 +404,12 @@ The seat map is drawn as the hall.
 - **Front of the hall:**
   - Film: the screen arc in film ink, labelled ЕКРАН.
   - Concert and theatre: the stage block in the event's ink, labelled СЦЕНА.
+  - The front spans exactly the seat rows and never widens the hall.
+- **Phones:**
+  - A hall wider than its frame opens scrolled once to its centre; later updates, selection and resizes never move it.
+  - While the hall is wider than its frame, one muted line under the frame says "Превъртете настрани, за да видите цялата зала." It is hidden from assistive technology, follows viewport resizes, and the native scrollbar stays. No edge fades.
+  - The connection and conflict notices sit between the legend and the frame, so they never fall under the fixed summary bar.
+  - Below lg the page's bottom padding always equals the summary bar's current height.
 - **Rows:** row numbers on both sides. VIP rows sit on the zone band, labelled "VIP · 14,00 €".
 - **Seats:** `<button>`s with the chair-back corner. They are 36px (32px below md) with 6px gaps (4px below md). The hall scrolls sideways inside its frame instead of shrinking seats.
 - **Seat states:**
