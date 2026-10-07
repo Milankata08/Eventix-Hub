@@ -475,8 +475,8 @@ main:focus { outline: none; }
 .hall-front { width: 0; min-width: 100%; margin-bottom: 1rem; text-align: center; }
 .hall-screen svg { display: block; width: 100%; height: 28px; }
 .hall-screen .label-caps { color: var(--ink); }
-.venue-plan { --type: var(--ink); --on-type: var(--sheet); } /* admin plan: neutral stage block */
 .hall-stage { padding: 0.5rem 1rem; background: var(--type); color: var(--on-type); }
+.venue-plan .hall-stage { background: var(--ink); color: var(--sheet); } /* admin plan: neutral, no event type */
 
 .seat-grid { min-width: 12rem; }
 .seat-row { display: flex; justify-content: center; align-items: center; gap: 4px; margin-bottom: 4px; }
