@@ -482,6 +482,7 @@ The confirmation is a покана (invitation), not a receipt.
 ### Motion
 
 - State changes (seat fill, button hover, chip select) take 150–200 ms ease-out.
+- A press shows on pointer-down: buttons, chips and selectable seats scale to 0.96 over 100 ms and return on release. Held and sold seats do not react.
 - There is no page-load choreography.
 - The hold badge's urgent switch is instant.
 - Under `prefers-reduced-motion: reduce`, every transition is removed.

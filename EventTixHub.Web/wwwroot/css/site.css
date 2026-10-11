@@ -205,6 +205,12 @@ h4, .h4, h5, .h5, h6, .h6 { font-weight: 700; }
   box-shadow: none !important;
 }
 
+/* Motion: state changes ease out over 150 ms; a press sinks on pointer-down, before the click lands */
+.btn, .chip, .seat {
+  transition: color 150ms ease-out, background-color 150ms ease-out, border-color 150ms ease-out, transform 100ms ease-out;
+}
+.btn:active, .chip:active, button.seat:not([aria-disabled="true"]):active { transform: scale(0.96); }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     transition: none !important;
