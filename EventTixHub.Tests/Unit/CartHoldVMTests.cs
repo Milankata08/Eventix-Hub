@@ -10,7 +10,7 @@ public class CartHoldVMTests
 
     private static CartLineDto Line(int showtimeId, int minutesLeft) => new(
         0, showtimeId, EventType.Movie, "Дюн", "Зала 1", Now.AddDays(1), 1, 1,
-        SeatCategory.Standard, ConcessionType.Regular, 10m, Now.AddMinutes(minutesLeft));
+        SeatCategory.Standard, ConcessionType.Regular, 10m, 10m, Now.AddMinutes(minutesLeft));
 
     private static CartDto Cart(params CartLineDto[] lines) => new(1, lines, null, 0, 0m, null, []);
 
