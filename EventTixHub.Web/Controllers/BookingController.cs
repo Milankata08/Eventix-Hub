@@ -16,7 +16,7 @@ public class BookingController(TicketService ticketService, OrderService orderSe
             return NotFound();
         var now = clock.GetLocalNow().DateTime;
         var hold = CartHoldVM.From(await orderService.GetCartAsync(User.GetUserId()), id, now);
-        return View(new HallVM(map, false, map.StartsAt <= now, hold));
+        return View(new HallVM(map, Monitor: false, SalesClosed: map.StartsAt <= now, Hold: hold));
     }
 
     [HttpPost]
@@ -135,7 +135,5 @@ public class BookingController(TicketService ticketService, OrderService orderSe
         return RedirectToAction(nameof(Cart));
     }
 
-    private int SecondsLeft(CartDto? cart) => cart?.EarliestExpiry is { } expiry
-        ? BookingRules.SecondsLeft(expiry, clock.GetLocalNow().DateTime)
-        : 0;
+    private int SecondsLeft(CartDto? cart) => cart?.SecondsLeft(clock.GetLocalNow().DateTime) ?? 0;
 }

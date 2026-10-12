@@ -12,8 +12,8 @@ public class HoldBadgeViewComponent(OrderService orderService, TimeProvider cloc
         if (User.Identity?.IsAuthenticated != true)
             return Content("");
         var cart = await orderService.GetCartAsync(UserClaimsPrincipal.GetUserId());
-        if (cart?.EarliestExpiry is not { } expiry || cart.Lines.Count == 0)
+        if (cart is null || cart.Lines.Count == 0)
             return Content("");
-        return View(new HoldBadgeVM(BookingRules.SecondsLeft(expiry, clock.GetLocalNow().DateTime), false));
+        return View(new HoldBadgeVM(cart.SecondsLeft(clock.GetLocalNow().DateTime), false));
     }
 }

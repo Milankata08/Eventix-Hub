@@ -15,19 +15,21 @@ public class CartHoldVMTests
     private static CartDto Cart(params CartLineDto[] lines) => new(1, lines, null, 0, 0m, null, []);
 
     [Fact]
-    public void SeatsForThisShowtime_CountOnlyThoseAndExpireWithThem()
+    public void SeatsForThisShowtime_EachExpireOnTheirOwn()
     {
-        var hold = CartHoldVM.From(Cart(Line(1, 8), Line(1, 9), Line(2, 3)), 1, Now);
+        var hold = CartHoldVM.From(Cart(Line(1, 9), Line(1, 8), Line(2, 3)), 1, Now)!;
 
-        Assert.Equal(new CartHoldVM(2, true, 480), hold);
+        Assert.True(hold.ForThisShowtime);
+        Assert.Equal([480, 540], hold.SecondsLeft);
     }
 
     [Fact]
     public void SeatsOnlyForOtherShowtimes_CountTheWholeCart()
     {
-        var hold = CartHoldVM.From(Cart(Line(2, 3), Line(3, 7)), 1, Now);
+        var hold = CartHoldVM.From(Cart(Line(2, 3), Line(3, 7)), 1, Now)!;
 
-        Assert.Equal(new CartHoldVM(2, false, 180), hold);
+        Assert.False(hold.ForThisShowtime);
+        Assert.Equal([180, 420], hold.SecondsLeft);
     }
 
     [Fact]
