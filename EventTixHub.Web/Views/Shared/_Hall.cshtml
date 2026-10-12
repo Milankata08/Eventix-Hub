@@ -3,9 +3,10 @@
 @{
     var map = Model.Map;
     var readOnly = Model.Monitor || Model.SalesClosed;
+    var mode = Model.Monitor ? "monitor" : Model.SalesClosed ? "closed" : "select";
 }
 
-<div id="seatmap" class="hall-layout @(readOnly ? "" : "hall-layout--split") @(Model.SalesClosed ? "hall-layout--closed" : "") @map.EventType.TypeClass()" data-showtime-id="@map.ShowtimeId" data-mode="@(readOnly ? "monitor" : "select")"
+<div id="seatmap" class="hall-layout @(readOnly ? "" : "hall-layout--split") @(Model.SalesClosed ? "hall-layout--closed" : "") @map.EventType.TypeClass()" data-showtime-id="@map.ShowtimeId" data-mode="@mode"
      data-standard-price="@map.StandardPrice.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
      data-vip-price="@map.VipPrice.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)">
     <div class="hall-main">
