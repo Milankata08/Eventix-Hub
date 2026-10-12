@@ -13,8 +13,8 @@
             <h2 class="h5 mb-1">@t.EventTitle</h2>
         }
         <div class="text-muted">@Format.LongDate(t.StartsAt), @Format.Weekday(t.StartsAt) · @Format.Time(t.StartsAt) · @t.VenueName</div>
-        <div class="figure ticket-seat my-3">Ред @t.Row · Място @t.Number</div>
-        <div>@t.Category.DisplayName()@(t.Concession == ConcessionType.Regular ? "" : " · " + t.Concession.DisplayName())</div>
+        <div class="figure ticket-seat my-3">Ред @t.Row · място @t.Number</div>
+        <div>@Format.Fare(t.Category, t.Concession)</div>
         <div class="text-nowrap-money fw-semibold">@Format.Money(t.Price)</div>
         @if (t.Status != TicketStatus.Paid)
         {

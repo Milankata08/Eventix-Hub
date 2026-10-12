@@ -75,7 +75,9 @@
             </div>
             <div>
                 <label for="f-date" class="form-label">Дата</label>
-                <input type="date" name="Date" id="f-date" value="@f.Date?.ToString("yyyy-MM-dd")" class="form-control" data-autosubmit="blur" />
+                <div class="date-field" data-placeholder="Всички дати">
+                    <input type="date" name="Date" id="f-date" value="@f.Date?.ToString("yyyy-MM-dd")" class="form-control" data-autosubmit="blur" />
+                </div>
             </div>
             <div>
                 <label for="f-sort" class="form-label">Сортиране</label>
