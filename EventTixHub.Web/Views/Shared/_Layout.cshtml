@@ -19,8 +19,10 @@
         var area = ViewContext.RouteData.Values["area"] as string ?? "";
         var controller = ViewContext.RouteData.Values["controller"] as string ?? "";
         var action = ViewContext.RouteData.Values["action"] as string ?? "";
-        string Current(string a, string c) => a == area && (c == "" || c == controller) && !(c == "Home" && action == "Status") ? "page" : null;
-        string CurrentClass(string a, string c) => Current(a, c) is null ? "" : " active";
+        // actions narrows a controller to some of its pages; empty means every page.
+        string Current(string a, string c, params string[] actions) =>
+            a == area && (c == "" || c == controller) && (actions.Length == 0 || actions.Contains(action)) && !(c == "Home" && action == "Status") ? "page" : null;
+        string CurrentClass(string a, string c, params string[] actions) => Current(a, c, actions) is null ? "" : " active";
     }
     <a class="skip-link" href="#content">Към съдържанието</a>
     <header>
@@ -38,7 +40,7 @@
                             <a class="nav-link@(CurrentClass("", "Home"))" aria-current="@Current("", "Home")" asp-area="" asp-controller="Home" asp-action="Index">Афиш</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link@(CurrentClass("", "Booking"))" aria-current="@Current("", "Booking")" href="/Booking/Cart">Количка</a>
+                            <a class="nav-link@(CurrentClass("", "Booking", "Cart", "Checkout"))" aria-current="@Current("", "Booking", "Cart", "Checkout")" href="/Booking/Cart">Количка</a>
                         </li>
                         @if (User.Identity?.IsAuthenticated == true)
                         {
