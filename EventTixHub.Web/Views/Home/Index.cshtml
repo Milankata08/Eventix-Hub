@@ -104,16 +104,17 @@ else
         {
             <div class="col">
                 <partial name="_Poster" model="new PosterVM(e.Id, e.Title, e.Type, e.Genre, e.PosterUrl, e.NextShowtime, e.NextVenueName, e.NextCity, PosterSize.Card)" />
-                @if (e.AverageRating is { } r)
-                {
-                    <div class="poster-caption small">
-                        <span aria-hidden="true">★ @Format.Rating(r)</span><span class="visually-hidden">Оценка @Format.Rating(r) от 5</span>
-                    </div>
-                }
-                else
-                {
-                    <div class="poster-caption small" aria-hidden="true">&nbsp;</div>
-                }
+                @* Always rendered: a fixed-height row keeps the wall's rows level with or without price or rating. *@
+                <div class="poster-meta">
+                    @if (e.MinPrice is { } price)
+                    {
+                        <span class="poster-meta-price">от @Format.Money(price)</span>
+                    }
+                    @if (e.AverageRating is { } r)
+                    {
+                        <span class="poster-meta-rating"><span aria-hidden="true">★ @Format.Rating(r)</span><span class="visually-hidden">Оценка @Format.Rating(r) от 5</span></span>
+                    }
+                </div>
             </div>
         }
     </div>
