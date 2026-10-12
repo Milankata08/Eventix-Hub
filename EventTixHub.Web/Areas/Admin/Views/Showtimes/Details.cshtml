@@ -1,4 +1,4 @@
-@model SeatsVM
+@model HallVM
 @{
     var map = Model.Map;
     ViewData["Title"] = "Заетост на прожекция";
@@ -8,7 +8,7 @@
 <div class="text-muted mb-3">@map.VenueName · @map.StartsAt.ToString("dd.MM.yyyy HH:mm")
     · Стандартно @Format.Money(map.StandardPrice) · VIP @Format.Money(map.VipPrice)</div>
 
-<partial name="_Hall" model="new HallVM(map, true, false)" />
+<partial name="_Hall" model="Model" />
 <a class="btn btn-link" asp-action="Index">Към прожекциите</a>
 
 @section Scripts {

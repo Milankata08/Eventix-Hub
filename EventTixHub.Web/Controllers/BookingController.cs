@@ -14,8 +14,9 @@ public class BookingController(TicketService ticketService, OrderService orderSe
         var map = await ticketService.GetSeatMapAsync(id);
         if (map is null)
             return NotFound();
-        var cart = await orderService.GetCartAsync(User.GetUserId());
-        return View(new SeatsVM(map, map.StartsAt <= clock.GetLocalNow().DateTime, cart?.SeatsFor(id) ?? 0));
+        var now = clock.GetLocalNow().DateTime;
+        var hold = CartHoldVM.From(await orderService.GetCartAsync(User.GetUserId()), id, now);
+        return View(new HallVM(map, false, map.StartsAt <= now, hold));
     }
 
     [HttpPost]
@@ -135,6 +136,6 @@ public class BookingController(TicketService ticketService, OrderService orderSe
     }
 
     private int SecondsLeft(CartDto? cart) => cart?.EarliestExpiry is { } expiry
-        ? Math.Max(0, (int)(expiry - clock.GetLocalNow().DateTime).TotalSeconds)
+        ? BookingRules.SecondsLeft(expiry, clock.GetLocalNow().DateTime)
         : 0;
 }

@@ -1,6 +1,8 @@
 // Hold countdown: every [data-hold-seconds] starts from a server-rendered value (no clock skew).
 // Text updates are plain DOM writes; one shared status region speaks only at 5 min, 1 min and expiry.
 (function () {
+    // The seat page's "you have N seats in the cart" line leaves when its own seats' hold ends.
+    for (const el of document.querySelectorAll('[data-hold-summary]')) setTimeout(() => { el.hidden = true; }, el.dataset.holdSummary * 1000);
     const els = [...document.querySelectorAll('[data-hold-seconds]')];
     if (els.length === 0) return;
     const announce = document.getElementById('hold-announce');
@@ -14,7 +16,6 @@
             for (const el of els) {
                 el.closest('[data-hold-text]').textContent = 'Резервацията изтече';
             }
-            for (const el of document.querySelectorAll('[data-hold-line]')) el.hidden = true;
             clearInterval(timer);
             return;
         }
