@@ -50,6 +50,26 @@
     });
 })();
 
+// Field errors. A page that comes back with server-side errors (FieldErrorTagHelper sets aria-invalid) focuses the
+// first one, as a failed client submit does; a form-level error (e.g. wrong password) only shows in the summary, so
+// then the summary takes focus and is read out. jquery.validate sets aria-invalid only on per-field checks, not on submit,
+// so highlight/unhighlight keep it in step with the danger border. The ready handler registers before
+// jquery.validate.unobtrusive's, so these defaults are in place when it builds each form's validator.
+(function () {
+    const firstError = document.querySelector('main form [aria-invalid="true"]:not([type=hidden])')
+        ?? document.querySelector('main form .validation-summary-errors');
+    if (firstError?.matches('.validation-summary-errors')) firstError.tabIndex = -1;
+    firstError?.focus();
+    $(() => {
+        if (!$.validator) return;
+        const { highlight, unhighlight } = $.validator.defaults;
+        $.validator.setDefaults({
+            highlight(el, ...rest) { highlight.call(this, el, ...rest); el.setAttribute('aria-invalid', 'true'); },
+            unhighlight(el, ...rest) { unhighlight.call(this, el, ...rest); el.setAttribute('aria-invalid', 'false'); },
+        });
+    });
+})();
+
 // Dark mode toggle (Bootstrap 5.3 color modes). The <head> script in _Layout applies the saved theme before first paint.
 (function () {
     const html = document.documentElement;
