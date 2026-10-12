@@ -4,7 +4,7 @@
     var ask = $"Да откажем ли билета за ред {Model.Row}, място {Model.Number} — „{Model.EventTitle}“?";
     <form action="/Tickets/Cancel/@Model.TicketId" method="post" asp-antiforgery="true" class="d-inline"
           onsubmit="return confirm(@System.Text.Json.JsonSerializer.Serialize(ask));">
-        <button type="submit" class="btn btn-outline-danger">Откажи</button>
+        <button type="submit" class="btn btn-outline-danger" aria-label="Откажи билета: ред @Model.Row, място @Model.Number, „@Model.EventTitle“">Откажи</button>
     </form>
 }
 else if (Model.Status == TicketStatus.Paid && Model.StartsAt > DateTime.Now)

@@ -10,16 +10,16 @@
 @foreach (var g in groups)
 {
     var h = g.First().Ticket;
-    <section class="invitation mb-4 @h.EventType.TypeClass()" aria-label="@h.EventTitle">
+    <section class="invitation mb-4 @h.EventType.TypeClass()">
         <header class="invitation-head">
             <div class="label-caps">@h.EventType.InvitationLine()</div>
-            <div class="display invitation-title">@h.EventTitle</div>
+            <h2 class="display invitation-title">@h.EventTitle</h2>
             <div class="fs-5">@Format.LongDate(h.StartsAt), @Format.Weekday(h.StartsAt), @Format.Time(h.StartsAt)</div>
             <div class="text-muted">@h.VenueName · @h.VenueAddress, @h.City</div>
         </header>
         @foreach (var card in g)
         {
-            <partial name="_TicketCard" model="card" />
+            <partial name="_TicketCard" model="card" view-data="@(new ViewDataDictionary(ViewData) { ["Nested"] = true })" />
         }
     </section>
 }

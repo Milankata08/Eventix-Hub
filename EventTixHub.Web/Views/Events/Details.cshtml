@@ -11,11 +11,9 @@
 }
 
 <div class="details-hero">
-    <div class="details-poster d-none d-md-block">
+    @* Decorative copy of the h1: hidden from assistive tech, and left out on phones so the programme sits higher. *@
+    <div class="details-poster d-none d-md-block" aria-hidden="true">
         <partial name="_Poster" model="new PosterVM(ev.Id, ev.Title, ev.Type, ev.Genre, ev.PosterUrl, first?.StartsAt, first?.VenueName, first?.City, PosterSize.Hero, false)" />
-    </div>
-    <div class="details-poster d-md-none">
-        <partial name="_Poster" model="new PosterVM(ev.Id, ev.Title, ev.Type, ev.Genre, ev.PosterUrl, first?.StartsAt, first?.VenueName, first?.City, PosterSize.Band, false)" />
     </div>
     <div class="details-facts">
         <h1 class="display">@ev.Title</h1>
@@ -64,7 +62,7 @@ else
     </ol>
 }
 
-<h2 class="h4">Оценки</h2>
+<h2 class="headline programme-title mb-3">Оценки</h2>
 @if (Model.CanReview)
 {
     <form asp-controller="Reviews" asp-action="Add" method="post" class="card card-body review-form mb-4">
