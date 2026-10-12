@@ -150,10 +150,12 @@ public class OrderService(
         var active = ActiveTickets(cart, now);
         var percent = PromoPercent(cart, now);
         var lines = active.Select(t => new CartLineDto(t.Id, t.ShowtimeId, t.Showtime.Event.Type, t.Showtime.Event.Title, t.Showtime.Venue.Name,
-            t.Showtime.StartsAt, t.Seat.Row, t.Seat.Number, t.Seat.Category, t.Concession, PriceOf(t, percent),
+            t.Showtime.StartsAt, t.Seat.Row, t.Seat.Number, t.Seat.Category, t.Concession, PriceOf(t, promoPercent: 0), PriceOf(t, percent),
             t.ReservedUntil!.Value)).ToList();
+        var subtotal = BookingRules.OrderTotal(lines.Select(l => l.PriceBeforePromo));
+        var total = BookingRules.OrderTotal(lines.Select(l => l.Price));
         return new CartDto(cart.Id, lines, percent > 0 ? cart.PromoCode!.Code : null, percent,
-            BookingRules.OrderTotal(lines.Select(l => l.Price)),
+            subtotal, BookingRules.PromoDiscount(subtotal, total), total,
             lines.Count == 0 ? null : lines.Min(l => l.ReservedUntil),
             cart.Tickets.AsQueryable().Where(BookingRules.ExpiredHold(now)).OrderBy(t => t.Id)
                 .Select(t => new ExpiredSeatDto(t.ShowtimeId, t.Showtime.Event.Title, t.Showtime.StartsAt, t.SeatId, t.Seat.Row, t.Seat.Number))

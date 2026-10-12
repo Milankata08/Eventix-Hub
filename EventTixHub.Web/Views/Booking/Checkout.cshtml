@@ -24,14 +24,15 @@
                     {
                         <li class="summary-line">
                             <span>Ред @l.Row · място @l.Number · @Format.Fare(l.Category, l.Concession)</span>
-                            <span class="text-nowrap-money">@Format.Money(l.Price)</span>
+                            <span class="text-nowrap-money">@Format.Money(l.PriceBeforePromo)</span>
                         </li>
                     }
                 </ul>
             </section>
         }
+        <div class="px-3"><partial name="_PriceBreakdown" model="Model.Cart" /></div>
         <div class="summary-line fw-bold">
-            <span>Общо@(Model.Cart.PromoCode is null ? "" : $" (промо код {Model.Cart.PromoCode})")</span>
+            <span>Общо</span>
             <span class="figure text-nowrap-money">@Format.Money(Model.Cart.Total)</span>
         </div>
         <a asp-action="Cart">Обратно към количката</a>
