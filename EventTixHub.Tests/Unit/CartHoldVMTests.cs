@@ -12,7 +12,7 @@ public class CartHoldVMTests
         0, showtimeId, EventType.Movie, "Дюн", "Зала 1", Now.AddDays(1), 1, 1,
         SeatCategory.Standard, ConcessionType.Regular, 10m, 10m, Now.AddMinutes(minutesLeft));
 
-    private static CartDto Cart(params CartLineDto[] lines) => new(1, lines, null, 0, 0m, null, []);
+    private static CartDto Cart(params CartLineDto[] lines) => new(1, lines, null, 0, 0m, 0m, 0m, null, []);
 
     [Fact]
     public void SeatsForThisShowtime_AndTheWholeCart_EachExpireOnTheirOwn()

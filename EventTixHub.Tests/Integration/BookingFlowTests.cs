@@ -120,7 +120,7 @@ public class BookingFlowTests : IDisposable
 
         var cart = (await Orders().GetCartAsync(_user1))!;
 
-        Assert.Equal([8.00m, 20.00m], cart.Lines.Select(l => l.Fare)); // seat price after the concession, before the promo
+        Assert.Equal([8.00m, 20.00m], cart.Lines.Select(l => l.PriceBeforePromo));
         Assert.Equal([7.20m, 18.00m], cart.Lines.Select(l => l.Price));
         Assert.Equal(28.00m, cart.Subtotal);
         Assert.Equal(2.80m, cart.PromoDiscount);
