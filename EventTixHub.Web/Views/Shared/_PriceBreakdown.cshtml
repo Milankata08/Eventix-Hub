@@ -1,0 +1,13 @@
+@model EventTixHub.Web.Services.CartDto
+@* Lines show fares before the promo; with a promo, these rows bridge them to the total. *@
+@if (Model.PromoCode is not null)
+{
+    <div class="summary-line px-0">
+        <span>Междинна сума</span>
+        <span class="text-nowrap-money">@Format.Money(Model.Subtotal)</span>
+    </div>
+    <div class="summary-line px-0">
+        <span>Промо код @Model.PromoCode (−@Model.PromoPercent&nbsp;%)</span>
+        <span class="text-nowrap-money">−@Format.Money(Model.PromoDiscount)</span>
+    </div>
+}

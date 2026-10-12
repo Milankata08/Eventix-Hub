@@ -26,10 +26,10 @@ public class HoldBadgeViewComponentTests
         var service = new OrderService(orders.Object, Mock.Of<IRepository<Ticket>>(), Mock.Of<IRepository<PromoCode>>(),
             Mock.Of<IRepository<Showtime>>(), Mock.Of<IRepository<Seat>>(), new FakeClock(Now), NullLogger<OrderService>.Instance);
         var line = new CartLineDto(1, 1, EventType.Movie, "Дюн", "Зала 1", Now.DateTime.AddDays(1), 1, 1,
-            SeatCategory.Standard, ConcessionType.Regular, 10m, Now.DateTime.AddMinutes(5));
+            SeatCategory.Standard, ConcessionType.Regular, 10m, 10m, Now.DateTime.AddMinutes(5));
         var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
         {
-            [HoldBadgeViewComponent.CartKey] = new CartDto(1, [line], null, 0, 10m, line.ReservedUntil, [])
+            [HoldBadgeViewComponent.CartKey] = new CartDto(1, [line], null, 0, 10m, 0m, 10m, line.ReservedUntil, [])
         };
         var user = new ClaimsPrincipal(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, "1")], "test"));
         var badge = new HoldBadgeViewComponent(service, new FakeClock(Now))

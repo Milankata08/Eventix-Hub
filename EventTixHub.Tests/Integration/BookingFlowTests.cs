@@ -108,6 +108,26 @@ public class BookingFlowTests : IDisposable
     }
 
     [Fact]
+    public async Task Cart_BreaksThePromoOutOfTheLinePrices()
+    {
+        int vipSeat;
+        using (var db = _db.NewContext())
+            vipSeat = db.Seats.Single(s => s.Category == SeatCategory.Vip).Id;
+        await Orders().ReserveSeatsAsync(_user1, _showtimeId, [_seatId, vipSeat]);
+        var student = (await Orders().GetCartAsync(_user1))!.Lines[0].TicketId;
+        await Orders().SetConcessionAsync(_user1, student, ConcessionType.Student);
+        await Orders().ApplyPromoAsync(_user1, "WELCOME10");
+
+        var cart = (await Orders().GetCartAsync(_user1))!;
+
+        Assert.Equal([8.00m, 20.00m], cart.Lines.Select(l => l.PriceBeforePromo));
+        Assert.Equal([7.20m, 18.00m], cart.Lines.Select(l => l.Price));
+        Assert.Equal(28.00m, cart.Subtotal);
+        Assert.Equal(2.80m, cart.PromoDiscount);
+        Assert.Equal(25.20m, cart.Total);
+    }
+
+    [Fact]
     public async Task SecondUserCannotReserveSeatHeldByFirst()
     {
         await Orders().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
