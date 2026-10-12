@@ -5,9 +5,21 @@ using QRCoder;
 
 namespace EventTixHub.Web.ViewModels;
 
-public record SeatsVM(SeatMapDto Map, bool SalesClosed = false);
+public record HallVM(SeatMapDto Map, bool Monitor, bool SalesClosed, CartHoldVM? Hold);
 
-public record HallVM(SeatMapDto Map, bool Monitor, bool SalesClosed);
+// The buyer's own hold, named in the seat summary: seats for this showtime while any are held, then the whole
+// cart. Seconds left per seat, soonest first, so the page can lower each count as holds end.
+public record CartHoldVM(IReadOnlyList<int> Here, IReadOnlyList<int> All)
+{
+    public static CartHoldVM? From(CartDto? cart, int showtimeId, DateTime now)
+    {
+        if (cart is null || cart.Lines.Count == 0)
+            return null;
+        List<int> SecondsLeft(IEnumerable<CartLineDto> lines) =>
+            lines.Select(l => BookingRules.SecondsLeft(l.ReservedUntil, now)).Order().ToList();
+        return new CartHoldVM(SecondsLeft(cart.Lines.Where(l => l.ShowtimeId == showtimeId)), SecondsLeft(cart.Lines));
+    }
+}
 
 public record CartVM(CartDto? Cart, int SecondsLeft);
 

@@ -13,4 +13,7 @@ public record CartDto(
     decimal Total, DateTime? EarliestExpiry, IReadOnlyList<ExpiredSeatDto> Expired)
 {
     public int ExpiredCount => Expired.Count;
+
+    // Seconds until the soonest hold in the cart ends; 0 for an empty cart.
+    public int SecondsLeft(DateTime now) => EarliestExpiry is { } expiry ? BookingRules.SecondsLeft(expiry, now) : 0;
 }
