@@ -252,4 +252,28 @@ public class BookingFlowTests : IDisposable
         Assert.Equal(2, mine.Select(t => t.Code).Distinct().Count());
         Assert.Empty(await Service().GetOrderTicketsAsync(_user2, order.Id));
     }
+
+    [Fact]
+    public async Task PaidTicket_FromPromoOrder_NamesThePromo()
+    {
+        await Orders().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
+        await Orders().ApplyPromoAsync(_user1, "WELCOME10");
+        var order = await Orders().CheckoutAsync(_user1);
+
+        var ticket = (await Service().GetOrderTicketsAsync(_user1, order.Id)).Single();
+        Assert.Equal((9.00m, "WELCOME10", 10), (ticket.Price, ticket.PromoCode, ticket.PromoPercent));
+        Assert.Equal("WELCOME10", (await Service().GetUserTicketAsync(_user1, ticket.TicketId))!.PromoCode);
+        Assert.Equal("WELCOME10",
+            (await Service().GetUserTicketsAsync(_user1, TicketHistoryFilter.Upcoming, 1)).Items.Single().PromoCode);
+    }
+
+    [Fact]
+    public async Task PaidTicket_WithoutPromo_NamesNoPromo()
+    {
+        await Orders().ReserveSeatsAsync(_user1, _showtimeId, [_seatId]);
+        var order = await Orders().CheckoutAsync(_user1);
+
+        var ticket = (await Service().GetOrderTicketsAsync(_user1, order.Id)).Single();
+        Assert.Equal((10.00m, null, 0), (ticket.Price, ticket.PromoCode, ticket.PromoPercent));
+    }
 }
