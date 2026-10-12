@@ -13,11 +13,22 @@ public sealed class TestDb : IDisposable
     {
         _connection.Open();
         _options = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(_connection).Options;
-        using var db = new ApplicationDbContext(_options);
+        using var db = NewContext();
         db.Database.EnsureCreated();
     }
 
-    public ApplicationDbContext NewContext() => new(_options);
+    public ApplicationDbContext NewContext() => new SqliteDbContext(_options);
 
     public void Dispose() => _connection.Dispose();
+
+    // SQLite cannot aggregate or order decimal columns; SQL Server can. Storing money as REAL here
+    // keeps production queries on decimal. Two-place prices round-trip exactly.
+    private sealed class SqliteDbContext(DbContextOptions<ApplicationDbContext> options) : ApplicationDbContext(options)
+    {
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            base.ConfigureConventions(configurationBuilder);
+            configurationBuilder.Properties<decimal>().HaveConversion<double>();
+        }
+    }
 }
