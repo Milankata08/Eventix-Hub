@@ -47,6 +47,10 @@ else
                     <div class="text-muted"><span class="visually-hidden">@Format.LongDate(t.StartsAt), @Format.Weekday(t.StartsAt), </span>@Format.Time(t.StartsAt) · @Format.Place(t.VenueName, t.City)</div>
                     <div>Ред @t.Row · място @t.Number</div>
                     <div class="text-nowrap-money fw-semibold">@Format.Money(t.Price)</div>
+                    @if (Format.PromoNote(t.PromoCode, t.PromoPercent) is { } promo)
+                    {
+                        <div class="small text-muted">@promo</div>
+                    }
                 </div>
                 <div class="profile-ticket-actions d-flex flex-wrap align-items-center gap-2">
                     <a class="btn @(Model.Filter == TicketHistoryFilter.Upcoming ? "btn-primary" : "btn-outline-secondary")" href="/Tickets/Details/@t.TicketId" aria-label="Покажи билета: ред @t.Row, място @t.Number, „@t.EventTitle“">Покажи билета</a>
