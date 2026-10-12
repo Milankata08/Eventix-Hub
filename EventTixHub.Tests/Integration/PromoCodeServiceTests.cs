@@ -46,4 +46,47 @@ public class PromoCodeServiceTests : IDisposable
     [Fact]
     public async Task Search_NullListsAll() =>
         Assert.Equal(["EXHAUSTED", "EXPIRED", "INACTIVE", "NOTSTARTED", "USABLE"], await CodesAsync(null));
+
+    private PromoCode Load(string code)
+    {
+        using var db = _db.NewContext();
+        return db.PromoCodes.Single(p => p.Code == code);
+    }
+
+    [Theory]
+    [InlineData("USABLE2", 10)]
+    [InlineData("USABLE", 20)]
+    public async Task Update_RefusesToChangeTheCodeOrPercentOfAUsedPromo(string code, int percent)
+    {
+        var promo = Load("USABLE");
+        promo.Code = code;
+        promo.DiscountPercent = percent;
+
+        await Assert.ThrowsAsync<BookingException>(() => Service().UpdateAsync(promo));
+        Assert.Equal(("USABLE", 10), (Load("USABLE").Code, Load("USABLE").DiscountPercent));
+    }
+
+    [Fact]
+    public async Task Update_StillChangesTheRestOfAUsedPromo()
+    {
+        var promo = Load("USABLE");
+        promo.UsageLimit = 50;
+        promo.IsActive = false;
+
+        await Service().UpdateAsync(promo);
+
+        Assert.Equal((50, false), (Load("USABLE").UsageLimit, Load("USABLE").IsActive));
+    }
+
+    [Fact]
+    public async Task Update_ChangesTheCodeAndPercentOfAnUnusedPromo()
+    {
+        var promo = Load("INACTIVE");
+        promo.Code = "FRESH";
+        promo.DiscountPercent = 20;
+
+        await Service().UpdateAsync(promo);
+
+        Assert.Equal(20, Load("FRESH").DiscountPercent);
+    }
 }
