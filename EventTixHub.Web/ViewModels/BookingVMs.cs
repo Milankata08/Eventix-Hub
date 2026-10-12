@@ -7,17 +7,17 @@ namespace EventTixHub.Web.ViewModels;
 
 public record HallVM(SeatMapDto Map, bool Monitor, bool SalesClosed, CartHoldVM? Hold);
 
-// The buyer's own hold, named in the seat summary: seats for this showtime, or else the whole cart.
-// One entry per seat, soonest first, so the page can lower the count as each seat's hold ends.
-public record CartHoldVM(bool ForThisShowtime, IReadOnlyList<int> SecondsLeft)
+// The buyer's own hold, named in the seat summary: seats for this showtime while any are held, then the whole
+// cart. Seconds left per seat, soonest first, so the page can lower each count as holds end.
+public record CartHoldVM(IReadOnlyList<int> Here, IReadOnlyList<int> All)
 {
     public static CartHoldVM? From(CartDto? cart, int showtimeId, DateTime now)
     {
-        var all = cart?.Lines ?? [];
-        var here = all.Where(l => l.ShowtimeId == showtimeId).ToList();
-        IReadOnlyList<CartLineDto> lines = here.Count > 0 ? here : all;
-        return lines.Count == 0 ? null
-            : new CartHoldVM(here.Count > 0, lines.Select(l => BookingRules.SecondsLeft(l.ReservedUntil, now)).Order().ToList());
+        if (cart is null || cart.Lines.Count == 0)
+            return null;
+        List<int> SecondsLeft(IEnumerable<CartLineDto> lines) =>
+            lines.Select(l => BookingRules.SecondsLeft(l.ReservedUntil, now)).Order().ToList();
+        return new CartHoldVM(SecondsLeft(cart.Lines.Where(l => l.ShowtimeId == showtimeId)), SecondsLeft(cart.Lines));
     }
 }
 
