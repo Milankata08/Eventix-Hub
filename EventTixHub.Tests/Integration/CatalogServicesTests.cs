@@ -73,6 +73,24 @@ public class CatalogServicesTests : IDisposable
     }
 
     [Fact]
+    public async Task Search_FromPriceIsLowestStandardPriceOfUpcomingShowtimes()
+    {
+        using (var db = _db.NewContext())
+        {
+            // A cheaper showtime that already started must not count; a dearer upcoming one must not win.
+            db.AddRange(
+                new Showtime { EventId = _movieId, VenueId = _venueId, StartsAt = _clock.Now.DateTime.AddHours(-1), StandardPrice = 5m, VipPrice = 8m },
+                new Showtime { EventId = _movieId, VenueId = _venueId, StartsAt = _clock.Now.DateTime.AddDays(3), StandardPrice = 12.5m, VipPrice = 18m });
+            db.SaveChanges();
+        }
+
+        var items = (await Events().SearchAsync(new EventFilter(), 1)).Items;
+
+        Assert.Equal(10m, items.Single(i => i.Id == _movieId).MinPrice);
+        Assert.Null(items.Single(i => i.Id == _concertId).MinPrice);
+    }
+
+    [Fact]
     public async Task Details_ShowsUpcomingShowtimeWithFreeSeatCount()
     {
         var details = await Events().GetDetailsAsync(_movieId);

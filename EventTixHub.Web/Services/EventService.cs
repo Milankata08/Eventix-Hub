@@ -45,6 +45,8 @@ public class EventService(
             e.Id, e.Title, e.Type, e.Genre, e.PosterUrl,
             AverageRating = e.Reviews.Any() ? e.Reviews.Average(r => (double)r.Rating) : (double?)null,
             NextShowtime = e.Showtimes.Where(s => s.StartsAt >= now).Min(s => (DateTime?)s.StartsAt),
+            // Aggregated as double: SQLite (tests) cannot Min a decimal. Two-place prices round-trip exactly.
+            MinPrice = e.Showtimes.Where(s => s.StartsAt >= now).Min(s => (double?)s.StandardPrice),
             Next = e.Showtimes.Where(s => s.StartsAt >= now).OrderBy(s => s.StartsAt)
                 .Select(s => new { s.Venue.Name, s.Venue.City }).FirstOrDefault()
         });
@@ -59,7 +61,7 @@ public class EventService(
         var result = await cards.ToPagedResultAsync(page, pageSize);
         return new PagedResult<EventCardDto>(
             result.Items.Select(c => new EventCardDto(c.Id, c.Title, c.Type, c.Genre, c.PosterUrl,
-                c.AverageRating, c.NextShowtime, c.Next?.Name, c.Next?.City)).ToList(),
+                c.AverageRating, c.NextShowtime, c.Next?.Name, c.Next?.City, (decimal?)c.MinPrice)).ToList(),
             result.Page, result.PageSize, result.TotalCount);
     }
 
