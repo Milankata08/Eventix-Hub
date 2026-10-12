@@ -20,7 +20,7 @@ public class TicketService(
             .Where(s => s.Id == showtimeId)
             .Select(s => new
             {
-                s.Id, s.VenueId, s.StartsAt, s.StandardPrice, s.VipPrice,
+                s.Id, s.EventId, s.VenueId, s.StartsAt, s.StandardPrice, s.VipPrice,
                 EventType = s.Event.Type, EventTitle = s.Event.Title, VenueName = s.Venue.Name
             })
             .FirstOrDefaultAsync();
@@ -45,7 +45,7 @@ public class TicketService(
                     : BookingRules.StatusOf(null, null, now)))
             .ToList();
 
-        return new SeatMapDto(showtime.Id, showtime.EventType, showtime.EventTitle, showtime.VenueName, showtime.StartsAt,
+        return new SeatMapDto(showtime.Id, showtime.EventId, showtime.EventType, showtime.EventTitle, showtime.VenueName, showtime.StartsAt,
             showtime.StandardPrice, showtime.VipPrice, map,
             map.Count(s => s.Status == SeatStatus.Free),
             map.Count(s => s.Status == SeatStatus.Held),
