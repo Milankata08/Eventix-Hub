@@ -67,7 +67,7 @@
   --success: #1D7A3E;
   --seat-free: #FBFAF7;
   --seat-held: #8F8C84;
-  --seat-sold: #C8C6BF;
+  --seat-sold: #CDCBC4; /* worn-ink number 4.6:1 */
 
   --font-display: 'Sofia Sans Extra Condensed', 'Arial Narrow', sans-serif;
   --font-body: 'Sofia Sans', system-ui, 'Segoe UI', Arial, sans-serif;
@@ -118,7 +118,7 @@
   --success: #6FCF8E;
   --seat-free: #2A2926;
   --seat-held: #8A877F;
-  --seat-sold: #45433F;
+  --seat-sold: #68655E; /* 2.5:1 against a free seat */
 
   --bs-body-bg-rgb: 18, 18, 17;
   --bs-body-color-rgb: 238, 236, 231;
@@ -415,7 +415,7 @@ h4, .h4, h5, .h5, h6, .h6 { font-weight: 700; }
   font-weight: 600;
 }
 .skip-link:focus { top: 0.5rem; color: var(--sheet); }
-main:focus { outline: none; }
+main#content:focus { outline: none !important; } /* programmatic focus only (skip link, blank clicks); the global ring is !important too */
 
 .site-nav {
   --bs-navbar-nav-link-padding-x: 0.75rem;
@@ -470,6 +470,7 @@ main:focus { outline: none; }
 .page-link { min-height: 44px; display: inline-flex; align-items: center; }
 
 /* Hall plan (DESIGN.md → Hall plan) */
+.back-link { display: inline-block; margin-bottom: 0.75rem; }
 .event-band { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 3px solid var(--ink); }
 .event-band .headline { margin: 0.5rem 0; }
 
@@ -494,6 +495,11 @@ main:focus { outline: none; }
 .seat-grid { min-width: 12rem; }
 .seat-row { display: flex; justify-content: center; align-items: center; gap: 4px; margin-bottom: 4px; }
 .seat-row-label { flex: none; width: 1.5rem; color: var(--ink-muted); font-size: 0.8125rem; text-align: center; }
+/* Row numbers stay in view while the hall scrolls sideways; the label covers the seats passing under it. */
+.hall-frame .seat-row-label { position: sticky; z-index: 1; align-self: stretch; display: flex; align-items: center; justify-content: center; background: var(--paper); }
+.hall-frame .seat-row-label:first-child { left: 0; }
+.hall-frame .seat-row-label:last-child { right: 0; }
+.hall-frame .zone-vip .seat-row-label { background: color-mix(in srgb, var(--type) 14%, var(--paper)); }
 @media (min-width: 768px) { .seat-row { gap: 6px; margin-bottom: 6px; } }
 
 .zone-vip { margin: 0.5rem -0.5rem; padding: 0.25rem 0.5rem; background: color-mix(in srgb, var(--type) 14%, transparent); }
@@ -524,9 +530,11 @@ button.seat { cursor: pointer; }
   background: repeating-linear-gradient(45deg, var(--seat-held) 0 3px, var(--seat-free) 3px 7px);
   color: var(--ink);
 }
+.seat-held .seat-num { display: inline-block; padding: 3px 3px 2px; border-radius: 2px; background: var(--seat-free); } /* backplate: the number never sits on a hatch stripe */
 .seat-vip { background: color-mix(in srgb, var(--concert) 35%, var(--seat-free)); } /* admin venue plan */
-.seat-sold { background: var(--seat-sold); color: var(--ink-muted); }
+.seat-sold { background: var(--seat-sold); border-color: var(--seat-sold); color: var(--ink-muted); } /* no outline: free seats are drawn, sold ones are solid */
 .seat[aria-disabled="true"] { cursor: not-allowed; }
+[data-bs-theme=dark] .seat-sold { color: var(--ink); } /* 4.9:1 on the lifted sold fill */
 
 .seat-legend { display: flex; flex-wrap: wrap; gap: 1rem; }
 .seat-legend .seat { width: 1.2rem; height: 1.2rem; vertical-align: -0.2rem; margin-right: 0.25rem; border-width: 1.5px; }
@@ -584,7 +592,21 @@ button.seat { cursor: pointer; }
 @media (min-width: 768px) { .poster-wall { --bs-gutter-x: 1rem; --bs-gutter-y: 1rem; } }
 .poster-wall > .col { display: flex; flex-direction: column; }
 .poster-wall .poster { flex-grow: 1; } /* a grown poster stretches its row mates */
-.poster-caption { margin-top: 0.25rem; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+/* One line under every poster: price leads in ink, rating follows muted. The fixed height holds when either is missing. */
+.poster-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: calc(0.875rem * 1.5);
+  margin-top: 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.poster-meta-price { font-weight: 700; color: var(--ink); }
+.poster-meta-rating { margin-left: auto; color: var(--ink-muted); }
 
 .poster {
   --pad: 6cqi;

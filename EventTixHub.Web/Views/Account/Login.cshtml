@@ -6,32 +6,43 @@
 <div class="row justify-content-center">
     <div class="col-md-6 col-lg-5">
         <h1 class="headline mb-3">Вход</h1>
-        @if (!string.IsNullOrEmpty(Model.ReturnUrl))
+        @if (User.Identity?.IsAuthenticated == true)
         {
-            <p class="mb-3">Влезте, за да продължите.</p>
+            <div class="sheet-panel">
+                <p>Вече сте влезли като <strong>@User.Identity.Name</strong>.</p>
+                <a class="btn btn-primary" asp-controller="Profile" asp-action="Index">Към профила</a>
+                <a class="btn btn-link" asp-controller="Home" asp-action="Index">Към афиша</a>
+            </div>
         }
-        <div class="sheet-panel">
-        <form asp-action="Login" method="post">
-            <input type="hidden" asp-for="ReturnUrl" />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="mb-3">
-                <label asp-for="Email" class="form-label"></label>
-                <input asp-for="Email" class="form-control" autocomplete="username" />
-                <span asp-validation-for="Email" class="text-danger"></span>
+        else
+        {
+            if (!string.IsNullOrEmpty(Model.ReturnUrl))
+            {
+                <p class="mb-3">Влезте, за да продължите.</p>
+            }
+            <div class="sheet-panel">
+            <form asp-action="Login" method="post">
+                <input type="hidden" asp-for="ReturnUrl" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" autocomplete="username" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label"></label>
+                    <input asp-for="Password" class="form-control" autocomplete="current-password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="form-check mb-3">
+                    <input asp-for="RememberMe" class="form-check-input" />
+                    <label asp-for="RememberMe" class="form-check-label"></label>
+                </div>
+                <button type="submit" class="btn btn-primary">Вход</button>
+                <a class="btn btn-link" asp-action="Register">Нямате профил? Регистрация</a>
+            </form>
             </div>
-            <div class="mb-3">
-                <label asp-for="Password" class="form-label"></label>
-                <input asp-for="Password" class="form-control" autocomplete="current-password" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-check mb-3">
-                <input asp-for="RememberMe" class="form-check-input" />
-                <label asp-for="RememberMe" class="form-check-label"></label>
-            </div>
-            <button type="submit" class="btn btn-primary">Вход</button>
-            <a class="btn btn-link" asp-action="Register">Нямате профил? Регистрация</a>
-        </form>
-        </div>
+        }
     </div>
 </div>
 

@@ -17,7 +17,7 @@ colors:
   danger: "#B42318"
   success: "#1D7A3E"
   seat-held: "#8F8C84"
-  seat-sold: "#C8C6BF"
+  seat-sold: "#CDCBC4"
   night: "#121211"
   night-sheet: "#1C1B19"
   night-ink: "#EEECE7"
@@ -30,7 +30,7 @@ colors:
   night-success: "#6FCF8E"
   night-seat-free: "#2A2926"
   night-seat-held: "#8A877F"
-  night-seat-sold: "#45433F"
+  night-seat-sold: "#68655E"
 typography:
   display:
     fontFamily: "'Sofia Sans Extra Condensed', 'Arial Narrow', sans-serif"
@@ -173,9 +173,9 @@ The three type inks. Each is the colour of one art form and appears only as a fi
 - **Newsprint Paper** (`{colors.paper}`, dark `{colors.night}`): the page ground, the wall the posters hang on.
 - **Fresh Sheet** (`{colors.sheet}`, dark `{colors.night-sheet}`): raised paper for forms, panels, cart and summary, tables and tickets.
 - **Press Ink** (`{colors.ink}`, dark `{colors.night-ink}`): body text, headings, primary buttons, rules and the focus ring (16:1 on paper).
-- **Worn Ink** (`{colors.ink-muted}`, dark `{colors.night-ink-muted}`): secondary text, metadata and seat outlines (6.6:1 on paper).
+- **Worn Ink** (`{colors.ink-muted}`, dark `{colors.night-ink-muted}`): secondary text and metadata (6.6:1 on paper).
 - **Hairline** (`{colors.rule}`, dark `{colors.night-rule}`): decorative row dividers only. It is never the only boundary of a control.
-- **Field Edge** (`{colors.field-border}`, dark `{colors.night-field-border}`): input and select borders (at least 3.4:1, which meets the 3:1 rule for UI boundaries).
+- **Field Edge** (`{colors.field-border}`, dark `{colors.night-field-border}`): input, select and seat outlines (at least 3.4:1, which meets the 3:1 rule for UI boundaries).
 
 ### State
 
@@ -306,7 +306,7 @@ Each component keeps Bootstrap's markup and accessibility behaviour and changes 
   - In lists, a quiet danger-coloured text button. It is never a filled red block, and never ten of them stacked down a table.
   - The filled danger button appears only on the delete confirmation page.
   - Each destructive control names its object for screen readers, e.g. "Изтрий „Под игото“".
-- **Focus:** `outline: 3px solid ink; outline-offset: 2px` on every focusable element, posters and seats included. It replaces Bootstrap's blue box-shadow.
+- **Focus:** `outline: 3px solid ink; outline-offset: 2px` on every focusable element, posters and seats included. The one exception is `main#content`, which takes focus only from script (skip link, clicks on blank space) and shows no ring. It replaces Bootstrap's blue box-shadow.
 
 ### Type badges and filter chips
 
@@ -412,12 +412,12 @@ The seat map is drawn as the hall.
   - The connection and conflict notices sit between the legend and the frame, so they never fall under the fixed summary bar.
   - Below lg the page's bottom padding always equals the summary bar's current height.
 - **Rows:** row numbers on both sides. VIP rows sit on the zone band, labelled "VIP · 14,00 €".
-- **Seats:** `<button>`s with the chair-back corner. They are 36px (32px below md) with 6px gaps (4px below md). Seat numbers and row labels are at least 13px. The hall scrolls sideways inside its frame instead of shrinking seats.
+- **Seats:** `<button>`s with the chair-back corner. They are 36px (32px below md) with 6px gaps (4px below md). Seat numbers and row labels are at least 13px. The hall scrolls sideways inside its frame instead of shrinking seats; the row numbers on both ends stay pinned to the frame edges while it scrolls.
 - **Seat states:**
-  - **Free:** sheet fill (night-seat-free in dark), 1.5px worn-ink outline, ink number.
+  - **Free:** sheet fill (night-seat-free in dark), 1.5px field-edge outline, ink number.
   - **Selected:** the event's ink fill with its paired number colour, a 3px ink border and `aria-pressed="true"`.
-  - **Held:** a diagonal hatch in seat-held.
-  - **Sold:** a solid seat-sold fill with a muted number.
+  - **Held:** a diagonal hatch in seat-held. The number sits on a small free-seat backplate, so it reads as ink on a free seat in both themes; the hatch shows around it.
+  - **Sold:** a solid seat-sold fill with no outline. The number is worn ink in light (4.6:1); in dark the sold fill is lifted to 2.5:1 against a free seat and the number is night ink (4.9:1).
   - Held and sold seats are `aria-disabled="true"`, not `disabled`, so they stay reachable and are announced.
   - Once sales close, every seat is `aria-disabled="true"`, and the legend and hall are greyed out under the alert.
 - **Behaviour:**

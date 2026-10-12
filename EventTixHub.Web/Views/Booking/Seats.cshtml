@@ -4,6 +4,8 @@
     ViewData["Title"] = "Избор на места";
 }
 
+<a class="back-link" asp-controller="Events" asp-action="Details" asp-route-id="@map.EventId">Обратно към „@map.EventTitle“</a>
+
 <div class="event-band @map.EventType.TypeClass()">
     <span class="badge type-badge">@map.EventType.DisplayName()</span>
     <h1 class="headline">@map.EventTitle</h1>
