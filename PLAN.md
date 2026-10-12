@@ -267,7 +267,7 @@ JSON API (attribute-routed `[ApiController]`, documented in Swagger):
 |---|---|---|---|
 | A | `BookingRules` public functions | Plain xUnit, no mocks | Unit tests |
 | B | Service public methods | `Mock<IRepository<T>>` (MockQueryable `BuildMock()` for async LINQ) + `FakeClock` | Unit tests + Mocking with Moq |
-| C | Service public methods over real `Repository<T>` + `ApplicationDbContext` | SQLite in-memory, `EnsureCreated`, `FakeClock` | Integration tests (service + repository) |
+| C | Service public methods over real `Repository<T>` + `ApplicationDbContext` | SQLite in-memory (test subclass stores `decimal` as REAL), `EnsureCreated`, `FakeClock` | Integration tests (service + repository) |
 
 Nothing else gets automated tests; UI is checked by the manual scenarios in T17/T18. Good tests here assert outcomes through the public interface (returned value, entity state, `BookingException`), take expected values from the spec as literals, and cover one behavior each. Verify `SaveChangesAsync` only to prove a rejected command saved nothing.
 
@@ -333,7 +333,7 @@ Seam C — integration (`RepositoryTests`, `BookingFlowTests`):
 
 - `IRepository<T>` / `Repository<T>` per §7, open-generic DI registration.
 - `PagedResult<T>` + `ToPagedResultAsync`.
-- Test helpers: `TestDb` (one open SQLite in-memory connection, `EnsureCreated`, fresh context per call), `FakeClock : TimeProvider` (settable now, UTC local zone).
+- Test helpers: `TestDb` (one open SQLite in-memory connection, `EnsureCreated`, fresh context per call, `decimal` stored as REAL), `FakeClock : TimeProvider` (settable now, UTC local zone).
 - [ ] C1 green.
 
 **T04 — BookingRules (TDD, seam A).** Blocked by: T02.
@@ -453,7 +453,7 @@ Sprint 2 exam demo: services own all logic; 22 unit tests (A + B, 11 with Moq); 
 3. SQL Server "multiple cascade paths" — keep every FK into Ticket on Restrict.
 4. `HasFilter("[Status] <> 2")` / `"[Status] = 0"` works on SQL Server and SQLite. Enum int values are part of the schema.
 5. Unique index on nullable `Ticket.Code`: EF adds `IS NOT NULL` automatically for SQL Server; SQLite allows multiple NULLs.
-6. Decimals: `[Precision(10,2)]`. SQLite stores decimals as TEXT — keep money math in C#; don't run report SQL in SQLite tests.
+6. Decimals: `[Precision(10,2)]`. SQLite cannot aggregate or order decimals, so `TestDb` maps every `decimal` to REAL (test-only); production queries stay on `decimal`. Stored two-place prices round-trip exactly, but computed sums may not — keep money math in C#; don't run report SQL in SQLite tests.
 7. Culture: `<input type="number" step="0.01">` and `datetime-local` post invariant formats; bind with invariant culture; set Bulgarian `ErrorMessage` on every attribute (defaults are English).
 8. Moq + async EF: `list.BuildMock()` from MockQueryable. `Include` is a no-op on mocks — populate navigations in test data. Don't use `ExecuteUpdate`/`ExecuteDelete` in services.
 9. Unit of work: `SaveChangesAsync` on any repository saves everything tracked in the request. After a failed save, stop using the context and return the error.
