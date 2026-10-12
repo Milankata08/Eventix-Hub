@@ -16,11 +16,6 @@ public class OrderService(
 {
     private DateTime Now => clock.GetLocalNow().DateTime;
 
-    // GetCartAsync result, memoized per request (the service is scoped), since one request can read the cart more
-    // than once. Every save here clears it; a failed read is not kept. Writes through other services (TicketService)
-    // do not clear it, so do not read the cart, change tickets elsewhere, then read it again in one request.
-    private (int UserId, Task<CartDto?> Cart)? _cartMemo;
-
     // The user's Pending order with its tickets (seat + showtime loaded) and promo; null when there is no cart.
     private Task<Order?> LoadCartAsync(int userId) => orders.Query()
         .Include(o => o.PromoCode)
@@ -42,7 +37,6 @@ public class OrderService(
 
     private async Task SaveAsync(string conflictMessage)
     {
-        _cartMemo = null;
         try
         {
             await orders.SaveChangesAsync();
@@ -146,14 +140,7 @@ public class OrderService(
         await SaveAsync("Билетът току-що беше променен. Опреснете количката.");
     }
 
-    public Task<CartDto?> GetCartAsync(int userId)
-    {
-        if (_cartMemo is not { } memo || memo.UserId != userId || memo.Cart.IsFaulted)
-            _cartMemo = memo = (userId, BuildCartAsync(userId));
-        return memo.Cart;
-    }
-
-    private async Task<CartDto?> BuildCartAsync(int userId)
+    public async Task<CartDto?> GetCartAsync(int userId)
     {
         var cart = await LoadCartAsync(userId);
         if (cart is null)

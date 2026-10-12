@@ -542,6 +542,8 @@ button.seat { cursor: pointer; }
 @media (max-width: 991.98px) {
   .hall-summary { position: fixed; left: 0; right: 0; bottom: 0; z-index: 1030; background: var(--sheet); border-top: 3px solid var(--ink); }
   .summary-promise { margin: 0; padding: 0.5rem 1rem 0; }
+  /* Kept outside the collapsible panel on purpose: the bottom sheet grows by a line or two, but a buyer who
+     returns to the hall always sees that the "резервирано" seats are theirs. */
   .summary-held { margin: 0.5rem 1rem 0; }
   .summary-panel { display: none; max-height: 50vh; overflow-y: auto; padding: 1rem 1rem 0; }
   .summary-panel.is-open { display: block; }

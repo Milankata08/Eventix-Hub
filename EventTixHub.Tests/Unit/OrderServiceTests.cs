@@ -2,7 +2,6 @@ using EventTixHub.Tests.TestHelpers;
 using EventTixHub.Web.Data;
 using EventTixHub.Web.Models;
 using EventTixHub.Web.Services;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using MockQueryable;
 using Moq;
@@ -149,33 +148,6 @@ public class OrderServiceTests
     }
 
     [Fact]
-    public async Task GetCart_TwiceInOneRequest_QueriesOnce()
-    {
-        _cart.Tickets.Add(LiveHold(1));
-        var service = Service();
-
-        await service.GetCartAsync(1);
-        await service.GetCartAsync(1);
-
-        _orders.Verify(r => r.Query(), Times.Once);
-    }
-
-    [Fact]
-    public async Task GetCart_AfterAFailedRead_ReadsAgain()
-    {
-        _cart.Tickets.Add(LiveHold(1));
-        var service = Service();
-        _orders.SetupSequence(r => r.Query())
-            .Throws(new InvalidOperationException("database unavailable"))
-            .Returns(new List<Order> { _cart }.BuildMock());
-
-        await Assert.ThrowsAsync<InvalidOperationException>(() => service.GetCartAsync(1));
-        var cart = await service.GetCartAsync(1);
-
-        Assert.Single(cart!.Lines);
-    }
-
-    [Fact]
     public async Task GetCart_AfterAChangeInTheSameRequest_ShowsTheChange()
     {
         _cart.Tickets.Add(LiveHold(1));
@@ -186,20 +158,6 @@ public class OrderServiceTests
         var cart = await service.GetCartAsync(1);
 
         Assert.Equal(ConcessionType.Student, Assert.Single(cart!.Lines).Concession);
-    }
-
-    [Fact]
-    public async Task GetCart_AfterAFailedSave_ReadsAgain()
-    {
-        _cart.Tickets.Add(LiveHold(1));
-        var service = Service();
-        _orders.Setup(r => r.SaveChangesAsync()).ThrowsAsync(new DbUpdateException());
-
-        await service.GetCartAsync(1);
-        await Assert.ThrowsAsync<BookingException>(() => service.SetConcessionAsync(1, 1, ConcessionType.Student));
-        await service.GetCartAsync(1);
-
-        _orders.Verify(r => r.Query(), Times.Exactly(3)); // first read, the change's own load, the fresh read
     }
 
     [Fact]
