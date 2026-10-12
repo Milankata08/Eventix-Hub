@@ -325,6 +325,30 @@
     const bar = root.querySelector('.hall-summary');
     if (bar) new ResizeObserver(() => root.style.setProperty('--summary-h', bar.offsetHeight + 'px')).observe(bar);
 
+    // "Имате N места в количката": each line counts its seats down as their holds end; the first line with seats
+    // left is shown (this showtime's, then the whole cart's), and none once all have ended. Plain text writes,
+    // no live region, so screen readers are not interrupted.
+    const held = root.querySelector('[data-hold-summary]');
+    if (held) {
+        const lines = [...held.querySelectorAll('[data-hold-line]')].map(el => ({
+            el,
+            count: el.querySelector('[data-hold-count]'),
+            words: [...el.querySelectorAll('[data-one]')],
+            seconds: el.dataset.holdLine.split(' ').filter(Boolean).map(Number)
+        }));
+        const render = () => {
+            const shown = lines.find(l => l.seconds.length > 0);
+            for (const l of lines) {
+                l.el.hidden = l !== shown;
+                l.count.textContent = l.seconds.length;
+                for (const w of l.words) w.textContent = l.seconds.length === 1 ? w.dataset.one : w.dataset.many;
+            }
+            held.hidden = !shown;
+        };
+        for (const l of lines) for (const s of l.seconds) setTimeout(() => { l.seconds.shift(); render(); }, s * 1000);
+        render();
+    }
+
     load();
     setInterval(load, 5000);
 })();

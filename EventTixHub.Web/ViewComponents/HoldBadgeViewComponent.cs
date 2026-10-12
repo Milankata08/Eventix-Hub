@@ -7,15 +7,18 @@ namespace EventTixHub.Web.ViewComponents;
 
 public class HoldBadgeViewComponent(OrderService orderService, TimeProvider clock) : ViewComponent
 {
+    // A page that already loaded the cart puts it in ViewData under this key, so the badge does not query again.
+    public const string CartKey = "HoldBadge.Cart";
+
     public async Task<IViewComponentResult> InvokeAsync()
     {
         if (User.Identity?.IsAuthenticated != true)
             return Content("");
-        // ponytail: one cart query per page for signed-in users; memoize per request if it ever shows up in profiling.
-        var cart = await orderService.GetCartAsync(UserClaimsPrincipal.GetUserId());
-        if (cart?.EarliestExpiry is not { } expiry || cart.Lines.Count == 0)
+        var cart = ViewData.TryGetValue(CartKey, out var loaded)
+            ? loaded as CartDto
+            : await orderService.GetCartAsync(UserClaimsPrincipal.GetUserId());
+        if (cart is null || cart.Lines.Count == 0)
             return Content("");
-        var seconds = Math.Max(0, (int)(expiry - clock.GetLocalNow().DateTime).TotalSeconds);
-        return View(new HoldBadgeVM(seconds, false));
+        return View(new HoldBadgeVM(cart.SecondsLeft(clock.GetLocalNow().DateTime), false));
     }
 }
