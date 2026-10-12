@@ -1,5 +1,6 @@
 using EventTixHub.Web.Models;
 using EventTixHub.Web.Services;
+using EventTixHub.Web.ViewComponents;
 using EventTixHub.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,9 @@ public class BookingController(TicketService ticketService, OrderService orderSe
         if (map is null)
             return NotFound();
         var now = clock.GetLocalNow().DateTime;
-        var hold = CartHoldVM.From(await orderService.GetCartAsync(User.GetUserId()), id, now);
+        var cart = await orderService.GetCartAsync(User.GetUserId());
+        ViewData[HoldBadgeViewComponent.CartKey] = cart;
+        var hold = CartHoldVM.From(cart, id, now);
         return View(new HallVM(map, Monitor: false, SalesClosed: map.StartsAt <= now, Hold: hold));
     }
 
