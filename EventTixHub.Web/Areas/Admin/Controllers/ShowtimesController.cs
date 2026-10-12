@@ -7,9 +7,9 @@ namespace EventTixHub.Web.Areas.Admin.Controllers;
 public class ShowtimesController(
     EventService eventService, VenueService venueService, TicketService ticketService, TimeProvider clock) : AdminController
 {
-    public async Task<IActionResult> Index(int? eventId, int? venueId, DateTime? from, DateTime? to, int page = 1)
+    public async Task<IActionResult> Index(int? eventId, int? venueId, DateTime? from, DateTime? to, bool past = false, int page = 1)
     {
-        var filter = new ShowtimeFilter(eventId, venueId, from, to);
+        var filter = new ShowtimeFilter(eventId, venueId, from, to, past);
         return View(new AdminShowtimesVM(await eventService.SearchShowtimesAsync(filter, page),
             await eventService.GetEventOptionsAsync(), await venueService.GetAllAsync(), filter));
     }

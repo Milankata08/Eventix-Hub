@@ -162,7 +162,11 @@ public class EventService(
             query = query.Where(s => s.StartsAt >= from.Date);
         if (filter.To is { } to)
             query = query.Where(s => s.StartsAt < to.Date.AddDays(1));
-        return await query.OrderBy(s => s.StartsAt).ToOccupancyRows(Now).ToPagedResultAsync(page, pageSize);
+        var now = Now;
+        query = filter.Past
+            ? query.Where(s => s.StartsAt <= now).OrderByDescending(s => s.StartsAt)
+            : query.Where(s => s.StartsAt > now).OrderBy(s => s.StartsAt);
+        return await query.ToOccupancyRows(now).ToPagedResultAsync(page, pageSize);
     }
 
     // Sold / held / free per showtime of one event.
