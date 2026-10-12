@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using EventTixHub.Web.Data;
 using EventTixHub.Web.Models;
 using Microsoft.EntityFrameworkCore;
@@ -27,25 +28,27 @@ public class EventService(
             query = query.Where(e => e.Type == type);
         if (!string.IsNullOrWhiteSpace(filter.Genre))
             query = query.Where(e => e.Genre == filter.Genre);
-        if (!string.IsNullOrWhiteSpace(filter.City) || filter.VenueId is not null || filter.Date is not null)
-        {
-            var city = filter.City;
-            var venueId = filter.VenueId;
-            var from = filter.Date?.Date;
-            var to = from?.AddDays(1);
-            query = query.Where(e => e.Showtimes.Any(s => s.StartsAt >= now
-                && (string.IsNullOrEmpty(city) || s.Venue.City == city)
-                && (venueId == null || s.VenueId == venueId)
-                && (from == null || (s.StartsAt >= from && s.StartsAt < to))));
-        }
+        var city = string.IsNullOrWhiteSpace(filter.City) ? null : filter.City;
+        var venueId = filter.VenueId;
+        var from = filter.Date?.Date;
+        var to = from?.AddDays(1);
+        // Upcoming showtimes that match the place and date filters. The card's date, venue and
+        // from-price come from these only, so a buyer filtering for Варна never sees a София price.
+        Expression<Func<Showtime, bool>> upcomingMatching = s => s.StartsAt >= now
+            && (city == null || s.Venue.City == city)
+            && (venueId == null || s.VenueId == venueId)
+            && (from == null || (s.StartsAt >= from && s.StartsAt < to));
+        if (city is not null || venueId is not null || from is not null)
+            query = query.Where(e => e.Showtimes.AsQueryable().Any(upcomingMatching));
 
         // Anonymous projection: EF cannot order by a member of a constructed record.
         var cards = query.Select(e => new
         {
             e.Id, e.Title, e.Type, e.Genre, e.PosterUrl,
             AverageRating = e.Reviews.Any() ? e.Reviews.Average(r => (double)r.Rating) : (double?)null,
-            NextShowtime = e.Showtimes.Where(s => s.StartsAt >= now).Min(s => (DateTime?)s.StartsAt),
-            Next = e.Showtimes.Where(s => s.StartsAt >= now).OrderBy(s => s.StartsAt)
+            NextShowtime = e.Showtimes.AsQueryable().Where(upcomingMatching).Min(s => (DateTime?)s.StartsAt),
+            MinPrice = e.Showtimes.AsQueryable().Where(upcomingMatching).Min(s => (decimal?)s.StandardPrice),
+            Next = e.Showtimes.AsQueryable().Where(upcomingMatching).OrderBy(s => s.StartsAt)
                 .Select(s => new { s.Venue.Name, s.Venue.City }).FirstOrDefault()
         });
 
@@ -59,7 +62,7 @@ public class EventService(
         var result = await cards.ToPagedResultAsync(page, pageSize);
         return new PagedResult<EventCardDto>(
             result.Items.Select(c => new EventCardDto(c.Id, c.Title, c.Type, c.Genre, c.PosterUrl,
-                c.AverageRating, c.NextShowtime, c.Next?.Name, c.Next?.City)).ToList(),
+                c.AverageRating, c.NextShowtime, c.Next?.Name, c.Next?.City, c.MinPrice)).ToList(),
             result.Page, result.PageSize, result.TotalCount);
     }
 
