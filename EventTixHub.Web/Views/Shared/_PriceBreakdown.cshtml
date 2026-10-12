@@ -7,7 +7,7 @@
         <span class="text-nowrap-money">@Format.Money(Model.Subtotal)</span>
     </div>
     <div class="summary-line px-0">
-        <span>Промо код @Model.PromoCode (−@Model.PromoPercent&nbsp;%)</span>
+        <span>Промо код @Format.Promo(Model.PromoCode, Model.PromoPercent)</span>
         <span class="text-nowrap-money">−@Format.Money(Model.PromoDiscount)</span>
     </div>
 }
