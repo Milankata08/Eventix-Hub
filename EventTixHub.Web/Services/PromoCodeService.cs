@@ -48,6 +48,9 @@ public class PromoCodeService(IRepository<PromoCode> promos, TimeProvider clock)
             ?? throw new BookingException("Промо кодът не е намерен.");
         if (promo.UsageLimit < current.TimesUsed)
             throw new BookingException($"Лимитът не може да е под вече използваните пъти ({current.TimesUsed}).");
+        // Paid tickets name their order's promo by code and percent, so those stay as they were sold (BR-15).
+        if (current.TimesUsed > 0 && (promo.Code != current.Code || promo.DiscountPercent != current.DiscountPercent))
+            throw new BookingException("Кодът и отстъпката на използван промо код не могат да се променят. Създайте нов код.");
         await EnsureCodeFreeAsync(promo);
 
         current.Code = promo.Code;
