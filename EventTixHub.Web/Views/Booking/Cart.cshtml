@@ -59,19 +59,19 @@ else
                                     <form asp-action="SetConcession" method="post" class="d-flex flex-wrap align-items-end gap-2 mt-1">
                                         <input type="hidden" name="ticketId" value="@l.TicketId" />
                                         <div>
-                                            <label class="form-label small mb-0" for="c-@l.TicketId">Намаление за ред @l.Row, място @l.Number</label>
-                                            <select id="c-@l.TicketId" name="concession" class="form-select form-select-sm">
+                                            <label class="form-label small mb-0" for="c-@l.TicketId">Намаление<span class="visually-hidden"> за ред @l.Row, място @l.Number</span></label>
+                                            <select id="c-@l.TicketId" name="concession" class="form-select form-select-sm" data-autosubmit>
                                                 @foreach (var c in Enum.GetValues<ConcessionType>())
                                                 {
                                                     <option value="@c" selected="@(c == l.Concession)">@Format.Concession(c)</option>
                                                 }
                                             </select>
                                         </div>
-                                        <button type="submit" class="btn btn-sm btn-outline-secondary">Приложи</button>
+                                        <noscript><button type="submit" class="btn btn-sm btn-outline-secondary">Приложи</button></noscript>
                                     </form>
                                 </div>
                                 <div class="cart-line-side">
-                                    <div class="text-nowrap-money fw-bold">@Format.Money(l.Price)</div>
+                                    <div class="text-nowrap-money fw-bold">@Format.Money(l.Fare)</div>
                                     <form asp-action="RemoveTicket" method="post">
                                         <input type="hidden" name="ticketId" value="@l.TicketId" />
                                         <button type="submit" class="btn btn-sm btn-link text-danger p-0">Премахни<span class="visually-hidden"> ред @l.Row, място @l.Number</span></button>
@@ -88,7 +88,7 @@ else
                 @if (cart.PromoCode is not null)
                 {
                     <form asp-action="RemovePromo" method="post" class="d-flex align-items-center gap-2">
-                        <span>Промо код <strong>@cart.PromoCode</strong> (−@cart.PromoPercent&nbsp;%)</span>
+                        <span>Промо код <strong>@cart.PromoCode</strong> (−@cart.PromoPercent&nbsp;%): <span class="text-nowrap-money">−@Format.Money(cart.PromoDiscount)</span></span>
                         <button type="submit" class="btn btn-sm btn-outline-secondary">Премахни</button>
                     </form>
                 }
@@ -113,11 +113,8 @@ else
 
         <aside class="col-lg-4 d-none d-lg-block">
             <div class="totals-panel">
-                @if (cart.PromoCode is not null)
-                {
-                    <div class="text-muted">Промо код @cart.PromoCode (−@cart.PromoPercent&nbsp;%)</div>
-                }
-                <div class="label-caps">Общо</div>
+                <partial name="_PriceBreakdown" model="cart" />
+                <div class="label-caps@(cart.PromoCode is null ? "" : " mt-2")">Общо</div>
                 <div class="figure text-nowrap-money mb-3">@Format.Money(cart.Total)</div>
                 <a class="btn btn-primary w-100" asp-action="Checkout">Към плащане</a>
             </div>
