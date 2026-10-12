@@ -20,6 +20,9 @@ public static class Format
     public static string Fare(SeatCategory category, ConcessionType c) =>
         BookingRules.ConcessionPercent(c) > 0 ? $"{category.DisplayName()} · {Concession(c)}" : category.DisplayName();
 
+    // Why a paid ticket costs less than its fare: "с промо код WELCOME10 (−10 %)"; null when the order had no promo.
+    public static string? PromoNote(string? code, int percent) => code is null ? null : $"с промо код {code} (−{percent} %)";
+
     public static string Rating(double value) => value.ToString("0.0", Bg);
 
     public static string PosterDay(DateTime d) => d.ToString("dd", Bg);
