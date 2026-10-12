@@ -14,6 +14,7 @@
             for (const el of els) {
                 el.closest('[data-hold-text]').textContent = 'Резервацията изтече';
             }
+            for (const el of document.querySelectorAll('[data-hold-line]')) el.hidden = true;
             clearInterval(timer);
             return;
         }

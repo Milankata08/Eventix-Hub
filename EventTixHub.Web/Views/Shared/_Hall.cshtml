@@ -62,6 +62,13 @@
     @if (!readOnly)
     {
         <aside class="hall-summary" aria-label="Избрани места">
+            @if (Model.SeatsInCart > 0)
+            {
+                <p class="summary-held" data-hold-line>
+                    Имате @Model.SeatsInCart @(Model.SeatsInCart == 1 ? "място" : "места") за @map.EventType.ShowtimeThis() @map.EventType.ShowtimeNoun() в количката. На схемата @(Model.SeatsInCart == 1 ? "то е" : "те са") „резервирано“.
+                    <a href="/Booking/Cart">Към количката</a>
+                </p>
+            }
             <form asp-controller="Booking" asp-action="Reserve" method="post">
                 <input type="hidden" name="showtimeId" value="@map.ShowtimeId" />
                 <div class="summary-panel" data-role="panel" id="summary-panel">

@@ -128,6 +128,25 @@ public class OrderServiceTests
     }
 
     [Fact]
+    public async Task GetCart_SeatsFor_CountsOnlyActiveHoldsOfThatShowtime()
+    {
+        Ticket Hold(int id, int showtimeId, int minutes) => new()
+        {
+            Id = id, ShowtimeId = showtimeId, SeatId = id, Status = TicketStatus.Reserved, ReservedUntil = Now.DateTime.AddMinutes(minutes),
+            Showtime = new Showtime { StartsAt = Now.DateTime.AddDays(1), Event = new Event { Title = "Дюн" }, Venue = new Venue() },
+            Seat = new Seat { Id = id, Row = 1, Number = id }
+        };
+        _cart.Tickets.Add(Hold(1, 1, 5));
+        _cart.Tickets.Add(Hold(2, 1, 5));
+        _cart.Tickets.Add(Hold(3, 2, 5));
+        _cart.Tickets.Add(Hold(4, 1, -1));
+
+        var cart = await Service().GetCartAsync(1);
+
+        Assert.Equal((2, 1, 0), (cart!.SeatsFor(1), cart.SeatsFor(2), cart.SeatsFor(3)));
+    }
+
+    [Fact]
     public async Task Checkout_RejectsCartWhoseHoldExpired()
     {
         _cart.Tickets.Add(new Ticket

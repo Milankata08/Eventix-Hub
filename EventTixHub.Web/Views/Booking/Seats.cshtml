@@ -11,7 +11,7 @@
     <p class="text-muted mb-0">Стандартно @Format.Money(map.StandardPrice) · VIP @Format.Money(map.VipPrice)</p>
 </div>
 
-<partial name="_Hall" model="new HallVM(map, false, Model.SalesClosed)" />
+<partial name="_Hall" model="new HallVM(map, false, Model.SalesClosed, Model.SeatsInCart)" />
 
 @section Scripts {
     <script src="~/js/seatmap.js" asp-append-version="true"></script>
