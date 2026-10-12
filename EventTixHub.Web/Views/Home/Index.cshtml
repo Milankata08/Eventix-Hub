@@ -107,8 +107,7 @@ else
                 @if (e.AverageRating is { } r)
                 {
                     <div class="poster-caption small">
-                        <span aria-hidden="true">★</span> @r.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("bg-BG"))
-                        <span class="visually-hidden">Оценка @r.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("bg-BG")) от 5</span>
+                        <span aria-hidden="true">★ @Format.Rating(r)</span><span class="visually-hidden">Оценка @Format.Rating(r) от 5</span>
                     </div>
                 }
                 else
