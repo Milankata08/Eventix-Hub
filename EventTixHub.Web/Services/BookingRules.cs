@@ -29,15 +29,16 @@ public static class BookingRules
         ConcessionType concession, int promoPercent)
     {
         var basePrice = category == SeatCategory.Vip ? vipPrice : standardPrice;
-        var concessionPercent = concession switch
-        {
-            ConcessionType.Student => StudentPercent,
-            ConcessionType.Pensioner => PensionerPercent,
-            _ => 0
-        };
-        var price = basePrice * (100 - concessionPercent) / 100m * (100 - promoPercent) / 100m;
+        var price = basePrice * (100 - ConcessionPercent(concession)) / 100m * (100 - promoPercent) / 100m;
         return Math.Round(price, 2, MidpointRounding.AwayFromZero);
     }
+
+    public static int ConcessionPercent(ConcessionType concession) => concession switch
+    {
+        ConcessionType.Student => StudentPercent,
+        ConcessionType.Pensioner => PensionerPercent,
+        _ => 0
+    };
 
     public static int SecondsLeft(DateTime until, DateTime now) => Math.Max(0, (int)(until - now).TotalSeconds);
 

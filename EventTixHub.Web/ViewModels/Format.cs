@@ -1,4 +1,6 @@
 using System.Globalization;
+using EventTixHub.Web.Models;
+using EventTixHub.Web.Services;
 
 namespace EventTixHub.Web.ViewModels;
 
@@ -9,6 +11,14 @@ public static class Format
 
     // Non-breaking space so "12,50 €" never wraps.
     public static string Money(decimal value) => value.ToString("0.00", Bg) + " €";
+
+    // "Студент −20 %" (non-breaking space before %); "Редовен" carries no discount.
+    public static string Concession(ConcessionType c) =>
+        BookingRules.ConcessionPercent(c) is var p and > 0 ? $"{c.DisplayName()} −{p} %" : c.DisplayName();
+
+    // What a seat line charges for: "VIP", or "Стандартно · Студент −20 %" when a discount applies.
+    public static string Fare(SeatCategory category, ConcessionType c) =>
+        BookingRules.ConcessionPercent(c) > 0 ? $"{category.DisplayName()} · {Concession(c)}" : category.DisplayName();
 
     public static string Rating(double value) => value.ToString("0.0", Bg);
 
