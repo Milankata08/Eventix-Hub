@@ -43,7 +43,7 @@ else
                 <div class="programme-date" aria-hidden="true"><span class="figure">@Format.PosterDay(s.StartsAt)</span><span class="label-caps">@Format.PosterMonth(s.StartsAt) · @Format.WeekdayShort(s.StartsAt)</span></div>
                 <div class="programme-when">
                     <span class="visually-hidden">@Format.LongDate(s.StartsAt), @Format.Weekday(s.StartsAt), </span><strong>@Format.Time(s.StartsAt)</strong>
-                    <div>@s.VenueName, @s.City</div>
+                    <div>@Format.Place(s.VenueName, s.City)</div>
                 </div>
                 <div class="programme-price text-nowrap-money">@Format.Money(s.StandardPrice) · VIP @Format.Money(s.VipPrice)</div>
                 <div class="programme-free">@s.FreeSeats свободни места</div>
@@ -70,6 +70,7 @@ else
         <div class="mb-3">
             <label for="Rating" class="form-label">Оценка</label>
             <select id="Rating" name="Rating" class="form-select w-auto" required>
+                <option value="">Изберете</option>
                 @for (var i = 5; i >= 1; i--)
                 {
                     <option value="@i">@i ★</option>
@@ -91,7 +92,7 @@ else if (Model.CurrentUserId is null)
 }
 else if (!Model.CanReview)
 {
-    <p class="text-muted">Можете да оцените събитие само веднъж и само ако сте били с платен билет на негова прожекция, която вече е започнала.</p>
+    <p class="text-muted">Можете да оцените събитие само веднъж и само ако сте имали платен билет за вече @ev.Type.StartedShowtime().</p>
 }
 
 @if (Model.Reviews.Items.Count == 0)

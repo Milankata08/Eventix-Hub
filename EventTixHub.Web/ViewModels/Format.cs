@@ -34,6 +34,12 @@ public static class Format
         return (char.ToLower(cities[0][0], Bg) is 'в' or 'ф' ? "във " : "в ") + list;
     }
 
+    // "Камерна, София", but "Морска зала Варна" when the venue name already names the city.
+    public static string Place(string? venue, string? city) =>
+        string.IsNullOrEmpty(city) || (venue?.Contains(city, StringComparison.OrdinalIgnoreCase) ?? false)
+            ? venue ?? ""
+            : string.IsNullOrEmpty(venue) ? city : venue + ", " + city;
+
     // Character count of the longest word; drives the poster title fit. At least 1.
     public static int LongestWord(string title) =>
         Math.Max(1, title.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).Select(w => w.Length).DefaultIfEmpty(1).Max());

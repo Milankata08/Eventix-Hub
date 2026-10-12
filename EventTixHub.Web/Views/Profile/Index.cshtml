@@ -44,7 +44,7 @@ else
                 <div class="profile-date" aria-hidden="true"><span class="figure">@Format.PosterDay(t.StartsAt)</span><span class="label-caps">@Format.PosterMonth(t.StartsAt) · @Format.WeekdayShort(t.StartsAt)</span></div>
                 <div>
                     <h3 class="h5 mb-1">@t.EventTitle <span class="badge type-badge">@t.EventType.DisplayName()</span></h3>
-                    <div class="text-muted"><span class="visually-hidden">@Format.LongDate(t.StartsAt), @Format.Weekday(t.StartsAt), </span>@Format.Time(t.StartsAt) · @t.VenueName, @t.City</div>
+                    <div class="text-muted"><span class="visually-hidden">@Format.LongDate(t.StartsAt), @Format.Weekday(t.StartsAt), </span>@Format.Time(t.StartsAt) · @Format.Place(t.VenueName, t.City)</div>
                     <div>Ред @t.Row · място @t.Number</div>
                     <div class="text-nowrap-money fw-semibold">@Format.Money(t.Price)</div>
                 </div>
