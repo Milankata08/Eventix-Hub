@@ -53,4 +53,22 @@ public class FormatTests
     [InlineData(EventType.Theatre, "това")]
     public void Showtime_demonstrative_follows_gender(EventType t, string expected) =>
         Assert.Equal(expected, t.ShowtimeThis());
+
+    [Theory]
+    [InlineData("Морска зала Варна", "Морска зала Варна", "Варна")]
+    [InlineData("Голяма зала Пловдив", "Голяма зала Пловдив", "Пловдив")]
+    [InlineData("Зала 1 – Арена Сердика, София", "Зала 1 – Арена Сердика", "София")]
+    [InlineData("Зала Варна", "Зала Варна", "варна")]
+    [InlineData("Камерна", "Камерна", null)]
+    [InlineData("София", null, "София")]
+    [InlineData("", null, null)]
+    public void Place_drops_city_already_in_venue_name(string expected, string? venue, string? city) =>
+        Assert.Equal(expected, Format.Place(venue, city));
+
+    [Theory]
+    [InlineData(EventType.Movie, "започнала прожекция")]
+    [InlineData(EventType.Concert, "започнал концерт")]
+    [InlineData(EventType.Theatre, "започнало представление")]
+    public void Started_showtime_agrees_in_gender(EventType t, string expected) =>
+        Assert.Equal(expected, t.StartedShowtime());
 }
