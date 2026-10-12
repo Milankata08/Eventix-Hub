@@ -52,7 +52,7 @@
 
 // Empty date filters: data-empty swaps the browser's locale mask for the Bulgarian placeholder (site.css, .date-field).
 for (const input of document.querySelectorAll('.date-field input')) {
-    const sync = () => input.toggleAttribute('data-empty', !input.value);
+    const sync = () => input.toggleAttribute('data-empty', !input.value && !input.validity.badInput); // a half-typed date stays visible
     input.addEventListener('input', sync);
     sync();
 }

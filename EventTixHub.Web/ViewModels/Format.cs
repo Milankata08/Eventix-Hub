@@ -16,6 +16,10 @@ public static class Format
     public static string Concession(ConcessionType c) =>
         BookingRules.ConcessionPercent(c) is var p and > 0 ? $"{c.DisplayName()} −{p} %" : c.DisplayName();
 
+    // What a seat line charges for: "VIP", or "Стандартно · Студент −20 %" when a discount applies.
+    public static string Fare(SeatCategory category, ConcessionType c) =>
+        BookingRules.ConcessionPercent(c) > 0 ? $"{category.DisplayName()} · {Concession(c)}" : category.DisplayName();
+
     public static string Rating(double value) => value.ToString("0.0", Bg);
 
     public static string PosterDay(DateTime d) => d.ToString("dd", Bg);
