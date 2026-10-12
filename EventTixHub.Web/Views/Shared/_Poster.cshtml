@@ -5,7 +5,7 @@
     var dateLine = p.Date is { } d
         ? $"{Format.LongDate(d)} · {Format.Weekday(d)} · {Format.Time(d)}"
         : "Без предстоящи дати";
-    var place = string.Join(", ", new[] { p.Venue, p.City }.Where(x => !string.IsNullOrEmpty(x)));
+    var place = Format.Place(p.Venue, p.City);
     var timePlace = p.Date is { } td ? string.Join(" · ", new[] { Format.Time(td), place }.Where(x => x.Length > 0)) : dateLine;
     var hasImage = !string.IsNullOrEmpty(p.PosterUrl);
     var cls = $"poster poster--{p.Size.ToString().ToLowerInvariant()} {p.Type.TypeClass()} poster-{p.Type}" + (hasImage ? " poster--image" : "");
