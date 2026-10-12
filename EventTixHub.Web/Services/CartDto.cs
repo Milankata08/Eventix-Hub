@@ -13,7 +13,4 @@ public record CartDto(
     decimal Total, DateTime? EarliestExpiry, IReadOnlyList<ExpiredSeatDto> Expired)
 {
     public int ExpiredCount => Expired.Count;
-
-    // Seats this cart holds for one showtime; the seat page names them so the buyer knows the "held" seats are theirs.
-    public int SeatsFor(int showtimeId) => Lines.Count(l => l.ShowtimeId == showtimeId);
 }

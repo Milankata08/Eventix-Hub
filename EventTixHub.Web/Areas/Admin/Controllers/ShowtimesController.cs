@@ -18,7 +18,7 @@ public class ShowtimesController(
     public async Task<IActionResult> Details(int id)
     {
         var map = await ticketService.GetSeatMapAsync(id);
-        return map is null ? NotFound() : View(new SeatsVM(map));
+        return map is null ? NotFound() : View(new HallVM(map, true, false, null));
     }
 
     [HttpGet]
