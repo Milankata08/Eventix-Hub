@@ -71,4 +71,11 @@ public class FormatTests
     [InlineData(EventType.Theatre, "започнало представление")]
     public void Started_showtime_agrees_in_gender(EventType t, string expected) =>
         Assert.Equal(expected, t.StartedShowtime());
+
+    [Theory]
+    [InlineData(ConcessionType.Regular, "Редовен")]
+    [InlineData(ConcessionType.Student, "Студент −20 %")]
+    [InlineData(ConcessionType.Pensioner, "Пенсионер −30 %")]
+    public void Concession_names_the_discount(ConcessionType c, string expected) =>
+        Assert.Equal(expected, Format.Concession(c));
 }

@@ -23,7 +23,7 @@
                     @foreach (var l in g)
                     {
                         <li class="summary-line">
-                            <span>Ред @l.Row · място @l.Number</span>
+                            <span>Ред @l.Row · място @l.Number · @l.Category.DisplayName()@(l.Concession == ConcessionType.Regular ? "" : " · " + Format.Concession(l.Concession))</span>
                             <span class="text-nowrap-money">@Format.Money(l.Price)</span>
                         </li>
                     }
