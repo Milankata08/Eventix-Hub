@@ -14,7 +14,8 @@ public class BookingController(TicketService ticketService, OrderService orderSe
         var map = await ticketService.GetSeatMapAsync(id);
         if (map is null)
             return NotFound();
-        return View(new SeatsVM(map, map.StartsAt <= clock.GetLocalNow().DateTime));
+        var cart = await orderService.GetCartAsync(User.GetUserId());
+        return View(new SeatsVM(map, map.StartsAt <= clock.GetLocalNow().DateTime, cart?.SeatsFor(id) ?? 0));
     }
 
     [HttpPost]
