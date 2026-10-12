@@ -296,6 +296,11 @@ h4, .h4, h5, .h5, h6, .h6 { font-weight: 700; }
   color: var(--ink);
 }
 .form-check-input { border-color: var(--field-border); background-color: var(--sheet); }
+/* Invalid field: danger border, kept on focus; the ink ring still marks focus. The error text below is the non-colour cue. */
+:is(.form-control, .form-select, .form-check-input):is(.input-validation-error, [aria-invalid="true"]),
+:is(.form-control, .form-select, .form-check-input):is(.input-validation-error, [aria-invalid="true"]):focus {
+  border-color: var(--danger);
+}
 .form-check-input:checked,
 .form-check-input[type=checkbox]:indeterminate {
   background-color: var(--ink);
