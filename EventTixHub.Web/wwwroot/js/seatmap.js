@@ -1,12 +1,15 @@
 // Seat map: builds the hall once from /api/showtimes/{id}/seats, then updates seats in place on every
 // 5 s poll and click, so keyboard focus is never lost. data-mode="select" lets the user pick free
-// seats; "monitor" is read-only (admin, or sales closed). One roving tab stop; arrows move between seats.
+// seats; "monitor" is the admin's read-only view; "closed" (sales over) keeps the seats as reachable
+// buttons that are all aria-disabled. One roving tab stop; arrows move between seats.
 (function () {
     const root = document.getElementById('seatmap');
     if (!root) return;
 
     const showtimeId = root.dataset.showtimeId;
     const monitor = root.dataset.mode === 'monitor';
+    const closed = root.dataset.mode === 'closed';
+    const readOnly = monitor || closed;
     const role = name => root.querySelector(`[data-role="${name}"]`);
     const grid = role('grid');
     const notice = role('notice');
@@ -116,6 +119,10 @@
                 `Ред ${seat.row}, място ${seat.number}, ${seat.category === 'Vip' ? 'VIP' : 'стандартно'}, ` +
                 `${money(prices[seat.category])}, ${state === 'Selected' ? 'избрано' : statusText[seat.status]}`);
             if (monitor) continue;
+            if (closed) {
+                el.setAttribute('aria-disabled', 'true');
+                continue;
+            }
             el.setAttribute('aria-pressed', state === 'Selected' ? 'true' : 'false');
             if (free) el.removeAttribute('aria-disabled'); else el.setAttribute('aria-disabled', 'true');
         }
@@ -149,7 +156,7 @@
     }
 
     function renderSummary() {
-        if (monitor) return;
+        if (readOnly) return;
         const chosen = seats.filter(s => selected.has(s.id));
         const sum = chosen.reduce((acc, s) => acc + prices[s.category], 0);
         total.textContent = money(sum);
@@ -211,7 +218,7 @@
     }
 
     function preselect() {
-        if (monitor) return;
+        if (readOnly) return;
         const wanted = (new URLSearchParams(location.search).get('seats') || '')
             .split(',').map(Number).filter(id => Number.isInteger(id) && id > 0 && seatById(id));
         if (wanted.length === 0) return;
@@ -278,11 +285,6 @@
     });
 
     if (!monitor) {
-        grid.addEventListener('click', e => {
-            const el = e.target.closest('[data-seat-id]');
-            if (el) choose(Number(el.dataset.seatId));
-        });
-
         grid.addEventListener('keydown', e => {
             const el = e.target.closest('[data-seat-id]');
             if (!el || e.altKey || e.ctrlKey || e.metaKey) return;
@@ -290,6 +292,13 @@
                 e.preventDefault();
                 moveFocus(Number(el.dataset.seatId), e.key);
             }
+        });
+    }
+
+    if (!readOnly) {
+        grid.addEventListener('click', e => {
+            const el = e.target.closest('[data-seat-id]');
+            if (el) choose(Number(el.dataset.seatId));
         });
 
         list.addEventListener('click', e => {
