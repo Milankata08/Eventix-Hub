@@ -127,23 +127,36 @@ public class OrderServiceTests
         Assert.Equal((5, 7, 5), (seat.Row, seat.Number, seat.SeatId));
     }
 
-    [Fact]
-    public async Task GetCart_SeatsFor_CountsOnlyActiveHoldsOfThatShowtime()
+    private Ticket LiveHold(int id) => new()
     {
-        Ticket Hold(int id, int showtimeId, int minutes) => new()
-        {
-            Id = id, ShowtimeId = showtimeId, SeatId = id, Status = TicketStatus.Reserved, ReservedUntil = Now.DateTime.AddMinutes(minutes),
-            Showtime = new Showtime { StartsAt = Now.DateTime.AddDays(1), Event = new Event { Title = "Дюн" }, Venue = new Venue() },
-            Seat = new Seat { Id = id, Row = 1, Number = id }
-        };
-        _cart.Tickets.Add(Hold(1, 1, 5));
-        _cart.Tickets.Add(Hold(2, 1, 5));
-        _cart.Tickets.Add(Hold(3, 2, 5));
-        _cart.Tickets.Add(Hold(4, 1, -1));
+        Id = id, ShowtimeId = 1, SeatId = id, Status = TicketStatus.Reserved, ReservedUntil = Now.DateTime.AddMinutes(5),
+        Showtime = new Showtime { StartsAt = Now.DateTime.AddDays(1), Event = new Event { Title = "Дюн" }, Venue = new Venue() },
+        Seat = new Seat { Id = id, Row = 1, Number = id }
+    };
 
-        var cart = await Service().GetCartAsync(1);
+    [Fact]
+    public async Task GetCart_TwiceInOneRequest_QueriesOnce()
+    {
+        _cart.Tickets.Add(LiveHold(1));
+        var service = Service();
 
-        Assert.Equal((2, 1, 0), (cart!.SeatsFor(1), cart.SeatsFor(2), cart.SeatsFor(3)));
+        await service.GetCartAsync(1);
+        await service.GetCartAsync(1);
+
+        _orders.Verify(r => r.Query(), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetCart_AfterAChangeInTheSameRequest_ShowsTheChange()
+    {
+        _cart.Tickets.Add(LiveHold(1));
+        var service = Service();
+
+        await service.GetCartAsync(1);
+        await service.SetConcessionAsync(1, 1, ConcessionType.Student);
+        var cart = await service.GetCartAsync(1);
+
+        Assert.Equal(ConcessionType.Student, Assert.Single(cart!.Lines).Concession);
     }
 
     [Fact]

@@ -62,13 +62,6 @@
     @if (!readOnly)
     {
         <aside class="hall-summary" aria-label="Избрани места">
-            @if (Model.SeatsInCart > 0)
-            {
-                <p class="summary-held" data-hold-line>
-                    Имате @Model.SeatsInCart @(Model.SeatsInCart == 1 ? "място" : "места") за @map.EventType.ShowtimeThis() @map.EventType.ShowtimeNoun() в количката. На схемата @(Model.SeatsInCart == 1 ? "то е" : "те са") „резервирано“.
-                    <a href="/Booking/Cart">Към количката</a>
-                </p>
-            }
             <form asp-controller="Booking" asp-action="Reserve" method="post">
                 <input type="hidden" name="showtimeId" value="@map.ShowtimeId" />
                 <div class="summary-panel" data-role="panel" id="summary-panel">
@@ -78,6 +71,22 @@
                     <p class="summary-total">Общо: <strong data-role="total">0,00&nbsp;€</strong></p>
                 </div>
                 <p class="small text-muted summary-promise">Ще пазим местата @BookingRules.HoldMinutes минути, докато платите. До @BookingRules.MaxTicketsPerOrder билета в поръчка.</p>
+                @if (Model.Hold is { } hold)
+                {
+                    var one = hold.Seats == 1;
+                    var seats = $"{hold.Seats} {(one ? "място" : "места")}";
+                    <p class="summary-held" data-hold-summary="@hold.SecondsLeft">
+                        @if (hold.ForThisShowtime)
+                        {
+                            <text>Имате @seats за @map.EventType.ShowtimeThis() @map.EventType.ShowtimeNoun() в количката. На схемата @(one ? "то е" : "те са") „резервирано“.</text>
+                        }
+                        else
+                        {
+                            <text>Имате @seats в количката.</text>
+                        }
+                        <a href="/Booking/Cart">Към количката</a>
+                    </p>
+                }
                 <div class="summary-bar">
                     <button type="button" class="btn btn-link summary-toggle d-lg-none" data-role="toggle" aria-expanded="false" aria-controls="summary-panel">
                         <span data-role="bar-text">0 места · 0,00 €</span>
