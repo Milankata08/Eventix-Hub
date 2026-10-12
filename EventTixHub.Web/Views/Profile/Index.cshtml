@@ -49,7 +49,7 @@ else
                     <div class="text-nowrap-money fw-semibold">@Format.Money(t.Price)</div>
                 </div>
                 <div class="profile-ticket-actions d-flex flex-wrap align-items-center gap-2">
-                    <a class="btn @(Model.Filter == TicketHistoryFilter.Upcoming ? "btn-primary" : "btn-outline-secondary")" href="/Tickets/Details/@t.TicketId">Покажи билета</a>
+                    <a class="btn @(Model.Filter == TicketHistoryFilter.Upcoming ? "btn-primary" : "btn-outline-secondary")" href="/Tickets/Details/@t.TicketId" aria-label="Покажи билета: ред @t.Row, място @t.Number, „@t.EventTitle“">Покажи билета</a>
                     <partial name="_CancelControl" model="t" />
                 </div>
             </li>

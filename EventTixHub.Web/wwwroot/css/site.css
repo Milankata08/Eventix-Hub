@@ -589,7 +589,6 @@ button.seat { cursor: pointer; }
   color: var(--on-type);
   border-radius: 0;
 }
-.poster--band { aspect-ratio: 16 / 10; }
 .poster--thumb { display: inline-block; width: 48px; }
 /* cqi resolves against an ancestor container, so padding lives on a child of the poster */
 .poster-in { flex: 1 0 auto; display: flex; flex-direction: column; padding: var(--pad); }
