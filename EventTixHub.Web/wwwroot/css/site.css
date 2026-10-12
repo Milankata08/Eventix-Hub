@@ -67,7 +67,7 @@
   --success: #1D7A3E;
   --seat-free: #FBFAF7;
   --seat-held: #8F8C84;
-  --seat-sold: #C8C6BF;
+  --seat-sold: #CDCBC4; /* worn-ink number 4.6:1 */
 
   --font-display: 'Sofia Sans Extra Condensed', 'Arial Narrow', sans-serif;
   --font-body: 'Sofia Sans', system-ui, 'Segoe UI', Arial, sans-serif;
@@ -528,6 +528,7 @@ button.seat { cursor: pointer; }
   background: repeating-linear-gradient(45deg, var(--seat-held) 0 3px, var(--seat-free) 3px 7px);
   color: var(--ink);
 }
+.seat-held > span { display: inline-block; padding: 3px 3px 2px; border-radius: 3px; background: var(--seat-free); } /* backplate: the number never sits on a hatch stripe */
 .seat-vip { background: color-mix(in srgb, var(--concert) 35%, var(--seat-free)); } /* admin venue plan */
 .seat-sold { background: var(--seat-sold); border-color: var(--seat-sold); color: var(--ink-muted); } /* no outline: free seats are drawn, sold ones are solid */
 .seat[aria-disabled="true"] { cursor: not-allowed; }

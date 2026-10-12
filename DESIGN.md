@@ -17,7 +17,7 @@ colors:
   danger: "#B42318"
   success: "#1D7A3E"
   seat-held: "#8F8C84"
-  seat-sold: "#C8C6BF"
+  seat-sold: "#CDCBC4"
   night: "#121211"
   night-sheet: "#1C1B19"
   night-ink: "#EEECE7"
@@ -416,8 +416,8 @@ The seat map is drawn as the hall.
 - **Seat states:**
   - **Free:** sheet fill (night-seat-free in dark), 1.5px worn-ink outline, ink number.
   - **Selected:** the event's ink fill with its paired number colour, a 3px ink border and `aria-pressed="true"`.
-  - **Held:** a diagonal hatch in seat-held.
-  - **Sold:** a solid seat-sold fill with no outline. The number is worn ink in light; in dark the sold fill is lifted to 2.5:1 against a free seat and the number is night ink (4.9:1).
+  - **Held:** a diagonal hatch in seat-held. The number sits on a small free-seat backplate, so it reads as ink on a free seat in both themes; the hatch shows around it.
+  - **Sold:** a solid seat-sold fill with no outline. The number is worn ink in light (4.6:1); in dark the sold fill is lifted to 2.5:1 against a free seat and the number is night ink (4.9:1).
   - Held and sold seats are `aria-disabled="true"`, not `disabled`, so they stay reachable and are announced.
   - Once sales close, every seat is `aria-disabled="true"`, and the legend and hall are greyed out under the alert.
 - **Behaviour:**
