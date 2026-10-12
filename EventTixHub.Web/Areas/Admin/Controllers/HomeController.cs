@@ -4,12 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EventTixHub.Web.Areas.Admin.Controllers;
 
-public class HomeController(ReportService reportService, EventService eventService, TimeProvider clock) : AdminController
+public class HomeController(ReportService reportService, EventService eventService) : AdminController
 {
     public async Task<IActionResult> Index()
     {
-        var today = clock.GetLocalNow().DateTime.Date;
-        var upcoming = await eventService.SearchShowtimesAsync(new ShowtimeFilter(From: today), 1);
+        var upcoming = await eventService.SearchShowtimesAsync(new ShowtimeFilter(), 1);
         return View(new AdminDashboardVM(await reportService.GetDashboardAsync(), upcoming.Items));
     }
 }
