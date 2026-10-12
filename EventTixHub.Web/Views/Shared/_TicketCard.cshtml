@@ -2,9 +2,16 @@
 @{
     var t = Model.Ticket;
 }
-<article class="ticket @t.EventType.TypeClass()" aria-label="Билет за @t.EventTitle">
+<article class="ticket @t.EventType.TypeClass()" aria-label="Билет за @t.EventTitle, ред @t.Row, място @t.Number">
     <div class="ticket-main">
-        <h2 class="h5 mb-1">@t.EventTitle</h2>
+        @if (ViewData["Nested"] is true)
+        {
+            <h3 class="h5 mb-1">@t.EventTitle</h3>
+        }
+        else
+        {
+            <h2 class="h5 mb-1">@t.EventTitle</h2>
+        }
         <div class="text-muted">@Format.LongDate(t.StartsAt), @Format.Weekday(t.StartsAt) · @Format.Time(t.StartsAt) · @t.VenueName</div>
         <div class="figure ticket-seat my-3">Ред @t.Row · Място @t.Number</div>
         <div>@t.Category.DisplayName()@(t.Concession == ConcessionType.Regular ? "" : " · " + t.Concession.DisplayName())</div>
