@@ -28,6 +28,7 @@
         <div class="alert alert-warning d-none" data-role="status" role="status">Схемата не можа да се зареди. Опитваме отново…</div>
         <div class="alert alert-warning d-none" data-role="notice" role="alert"></div>
 
+        <p class="text-muted small mb-1" data-role="scroll-hint" aria-hidden="true" hidden>Превъртете настрани, за да видите цялата зала.</p>
         <div class="hall-frame">
             <div class="hall-inner">
                 @if (map.EventType == EventTixHub.Web.Models.EventType.Movie)
@@ -46,7 +47,6 @@
                 </div>
             </div>
         </div>
-        <p class="text-muted small mt-1 mb-0" data-role="scroll-hint" aria-hidden="true" hidden>Превъртете настрани, за да видите цялата зала.</p>
 
         <p class="text-muted small my-3">
             Свободни: <span data-count="free">@map.FreeCount</span> ·
