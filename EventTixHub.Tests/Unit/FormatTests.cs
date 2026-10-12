@@ -78,4 +78,10 @@ public class FormatTests
     [InlineData(ConcessionType.Pensioner, "Пенсионер −30 %")]
     public void Concession_names_the_discount(ConcessionType c, string expected) =>
         Assert.Equal(expected, Format.Concession(c));
+
+    [Theory]
+    [InlineData(SeatCategory.Vip, ConcessionType.Regular, "VIP")]
+    [InlineData(SeatCategory.Standard, ConcessionType.Student, "Стандартно · Студент −20 %")]
+    public void Fare_adds_the_concession_only_when_discounted(SeatCategory s, ConcessionType c, string expected) =>
+        Assert.Equal(expected, Format.Fare(s, c));
 }
