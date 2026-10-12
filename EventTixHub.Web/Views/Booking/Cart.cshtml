@@ -71,7 +71,7 @@ else
                                     </form>
                                 </div>
                                 <div class="cart-line-side">
-                                    <div class="text-nowrap-money fw-bold">@Format.Money(l.Fare)</div>
+                                    <div class="text-nowrap-money fw-bold">@Format.Money(l.PriceBeforePromo)</div>
                                     <form asp-action="RemoveTicket" method="post">
                                         <input type="hidden" name="ticketId" value="@l.TicketId" />
                                         <button type="submit" class="btn btn-sm btn-link text-danger p-0">Премахни<span class="visually-hidden"> ред @l.Row, място @l.Number</span></button>
@@ -88,7 +88,7 @@ else
                 @if (cart.PromoCode is not null)
                 {
                     <form asp-action="RemovePromo" method="post" class="d-flex align-items-center gap-2">
-                        <span>Промо код <strong>@cart.PromoCode</strong> (−@cart.PromoPercent&nbsp;%): <span class="text-nowrap-money">−@Format.Money(cart.PromoDiscount)</span></span>
+                        <span>Промо код <strong>@cart.PromoCode</strong></span>
                         <button type="submit" class="btn btn-sm btn-outline-secondary">Премахни</button>
                     </form>
                 }
@@ -109,6 +109,7 @@ else
                     </form>
                 }
             </div>
+            <div class="d-lg-none mb-3"><partial name="_PriceBreakdown" model="cart" /></div>
         </div>
 
         <aside class="col-lg-4 d-none d-lg-block">

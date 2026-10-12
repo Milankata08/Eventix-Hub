@@ -29,7 +29,7 @@ public class HoldBadgeViewComponentTests
             SeatCategory.Standard, ConcessionType.Regular, 10m, 10m, Now.DateTime.AddMinutes(5));
         var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
         {
-            [HoldBadgeViewComponent.CartKey] = new CartDto(1, [line], null, 0, 10m, line.ReservedUntil, [])
+            [HoldBadgeViewComponent.CartKey] = new CartDto(1, [line], null, 0, 10m, 0m, 10m, line.ReservedUntil, [])
         };
         var user = new ClaimsPrincipal(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, "1")], "test"));
         var badge = new HoldBadgeViewComponent(service, new FakeClock(Now))

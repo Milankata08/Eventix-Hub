@@ -44,6 +44,10 @@ public static class BookingRules
 
     public static decimal OrderTotal(IEnumerable<decimal> ticketPrices) => ticketPrices.Sum();
 
+    // What the promo takes off the cart. Line prices are rounded one by one, so this is the difference of the
+    // totals, not the percentage of the subtotal; subtotal − discount always equals the total.
+    public static decimal PromoDiscount(decimal subtotalBeforePromo, decimal total) => subtotalBeforePromo - total;
+
     // status = null means no ticket exists for the seat.
     public static SeatStatus StatusOf(TicketStatus? status, DateTime? reservedUntil, DateTime now) => status switch
     {
