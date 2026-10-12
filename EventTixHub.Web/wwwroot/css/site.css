@@ -579,7 +579,21 @@ button.seat { cursor: pointer; }
 @media (min-width: 768px) { .poster-wall { --bs-gutter-x: 1rem; --bs-gutter-y: 1rem; } }
 .poster-wall > .col { display: flex; flex-direction: column; }
 .poster-wall .poster { flex-grow: 1; } /* a grown poster stretches its row mates */
-.poster-caption { margin-top: 0.25rem; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+/* One line under every poster: price leads in ink, rating follows muted. The fixed height holds when either is missing. */
+.poster-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: calc(0.875rem * 1.5);
+  margin-top: 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.poster-meta-price { font-weight: 700; color: var(--ink); }
+.poster-meta-rating { margin-left: auto; color: var(--ink-muted); }
 
 .poster {
   --pad: 6cqi;
