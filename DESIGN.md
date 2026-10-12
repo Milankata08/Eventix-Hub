@@ -419,6 +419,7 @@ The seat map is drawn as the hall.
   - **Held:** a diagonal hatch in seat-held.
   - **Sold:** a solid seat-sold fill with a muted number.
   - Held and sold seats are `aria-disabled="true"`, not `disabled`, so they stay reachable and are announced.
+  - Once sales close, every seat is `aria-disabled="true"`, and the legend and hall are greyed out under the alert.
 - **Behaviour:**
   - The grid renders once and is then updated in place, keyed by seat id.
   - It is a single tab stop with a roving `tabindex`:
