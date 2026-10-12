@@ -127,6 +127,39 @@ public class OrderServiceTests
         Assert.Equal((5, 7, 5), (seat.Row, seat.Number, seat.SeatId));
     }
 
+    private Ticket LiveHold(int id) => new()
+    {
+        Id = id, ShowtimeId = 1, SeatId = id, Status = TicketStatus.Reserved, ReservedUntil = Now.DateTime.AddMinutes(5),
+        Showtime = new Showtime { StartsAt = Now.DateTime.AddDays(1), Event = new Event { Title = "Дюн" }, Venue = new Venue() },
+        Seat = new Seat { Id = id, Row = 1, Number = id }
+    };
+
+    [Fact]
+    public async Task GetCart_SecondsLeft_CountsDownToTheEarliestHold()
+    {
+        var later = LiveHold(2);
+        later.ReservedUntil = Now.DateTime.AddMinutes(9);
+        _cart.Tickets.Add(LiveHold(1));
+        _cart.Tickets.Add(later);
+
+        var cart = await Service().GetCartAsync(1);
+
+        Assert.Equal((300, 0), (cart!.SecondsLeft(Now.DateTime), cart.SecondsLeft(Now.DateTime.AddMinutes(6))));
+    }
+
+    [Fact]
+    public async Task GetCart_AfterAChangeInTheSameRequest_ShowsTheChange()
+    {
+        _cart.Tickets.Add(LiveHold(1));
+        var service = Service();
+
+        await service.GetCartAsync(1);
+        await service.SetConcessionAsync(1, 1, ConcessionType.Student);
+        var cart = await service.GetCartAsync(1);
+
+        Assert.Equal(ConcessionType.Student, Assert.Single(cart!.Lines).Concession);
+    }
+
     [Fact]
     public async Task Checkout_RejectsCartWhoseHoldExpired()
     {

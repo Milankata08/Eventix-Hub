@@ -39,6 +39,8 @@ public static class BookingRules
         return Math.Round(price, 2, MidpointRounding.AwayFromZero);
     }
 
+    public static int SecondsLeft(DateTime until, DateTime now) => Math.Max(0, (int)(until - now).TotalSeconds);
+
     public static decimal OrderTotal(IEnumerable<decimal> ticketPrices) => ticketPrices.Sum();
 
     // status = null means no ticket exists for the seat.

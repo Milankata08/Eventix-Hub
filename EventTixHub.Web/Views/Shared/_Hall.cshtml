@@ -71,6 +71,16 @@
                     <p class="summary-total">Общо: <strong data-role="total">0,00&nbsp;€</strong></p>
                 </div>
                 <p class="small text-muted summary-promise">Ще пазим местата @BookingRules.HoldMinutes минути, докато платите. До @BookingRules.MaxTicketsPerOrder билета в поръчка.</p>
+                @if (Model.Hold is { } hold)
+                {
+                    // seatmap.js fills in the count and the words that agree with it, and shows the first line that
+                    // still has seats: this showtime's, then the whole cart's. The seat map needs JS anyway.
+                    <p class="summary-held" data-hold-summary hidden>
+                        <span data-hold-line="@string.Join(' ', hold.Here)" hidden>Имате <span data-hold-count></span> <span data-one="място" data-many="места"></span> за @map.EventType.ShowtimeThis() @map.EventType.ShowtimeNoun() в количката, <span data-one="отбелязано" data-many="отбелязани"></span> на схемата като „резервирано“.</span>
+                        <span data-hold-line="@string.Join(' ', hold.All)" hidden>Имате <span data-hold-count></span> <span data-one="място" data-many="места"></span> в количката.</span>
+                        <a href="/Booking/Cart">Към количката</a>
+                    </p>
+                }
                 <div class="summary-bar">
                     <button type="button" class="btn btn-link summary-toggle d-lg-none" data-role="toggle" aria-expanded="false" aria-controls="summary-panel">
                         <span data-role="bar-text">0 места · 0,00 €</span>
