@@ -1,5 +1,6 @@
 @model HallVM
 @using EventTixHub.Web.Services
+@using Microsoft.AspNetCore.Html
 @{
     var map = Model.Map;
     var readOnly = Model.Monitor || Model.SalesClosed;
@@ -73,16 +74,19 @@
                 <p class="small text-muted summary-promise">Ще пазим местата @BookingRules.HoldMinutes минути, докато платите. До @BookingRules.MaxTicketsPerOrder билета в поръчка.</p>
                 @if (Model.Hold is { } hold)
                 {
-                    var one = hold.Seats == 1;
-                    var seats = $"{hold.Seats} {(one ? "място" : "места")}";
-                    <p class="summary-held" data-hold-summary="@hold.SecondsLeft">
+                    // The words that change with the count carry both forms, so seatmap.js can lower the count as holds end.
+                    var one = hold.SecondsLeft.Count == 1;
+                    Func<string, string, IHtmlContent> word = (single, plural) =>
+                        new HtmlString($"<span data-one=\"{single}\" data-many=\"{plural}\">{(one ? single : plural)}</span>");
+                    <p class="summary-held" data-hold-summary="@string.Join(' ', hold.SecondsLeft)">
+                        Имате <span data-hold-count>@hold.SecondsLeft.Count</span> @word("място", "места")
                         @if (hold.ForThisShowtime)
                         {
-                            <text>Имате @seats за @map.EventType.ShowtimeThis() @map.EventType.ShowtimeNoun() в количката. На схемата @(one ? "то е" : "те са") „резервирано“.</text>
+                            <text>за @map.EventType.ShowtimeThis() @map.EventType.ShowtimeNoun() в количката, @word("отбелязано", "отбелязани") на схемата като „резервирано“.</text>
                         }
                         else
                         {
-                            <text>Имате @seats в количката.</text>
+                            <text>в количката.</text>
                         }
                         <a href="/Booking/Cart">Към количката</a>
                     </p>

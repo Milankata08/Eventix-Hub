@@ -323,6 +323,20 @@
     const bar = root.querySelector('.hall-summary');
     if (bar) new ResizeObserver(() => root.style.setProperty('--summary-h', bar.offsetHeight + 'px')).observe(bar);
 
+    // "Имате N места в количката": lower the count as each seat's hold ends; leave when none is left.
+    // Plain text writes, no live region, so screen readers are not interrupted.
+    const held = root.querySelector('[data-hold-summary]');
+    if (held) {
+        const seconds = held.dataset.holdSummary.split(' ').map(Number);
+        let left = seconds.length;
+        for (const s of seconds) setTimeout(() => {
+            left--;
+            held.hidden = left === 0;
+            held.querySelector('[data-hold-count]').textContent = left;
+            for (const w of held.querySelectorAll('[data-one]')) w.textContent = left === 1 ? w.dataset.one : w.dataset.many;
+        }, s * 1000);
+    }
+
     load();
     setInterval(load, 5000);
 })();
