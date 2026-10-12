@@ -220,6 +220,7 @@ h4, .h4, h5, .h5, h6, .h6 { font-weight: 700; }
 
 /* Buttons: primary is ink; every outline variant is the secondary look */
 .btn { min-height: 44px; font-weight: 600; }
+a.btn { display: inline-flex; align-items: center; justify-content: center; } /* a <button> centres its label in the min-height; a link needs flex for the same baseline */
 .btn-sm { min-height: 2rem; }
 
 .btn-primary {
@@ -296,6 +297,22 @@ h4, .h4, h5, .h5, h6, .h6 { font-weight: 700; }
   color: var(--ink);
 }
 .form-check-input { border-color: var(--field-border); background-color: var(--sheet); }
+/* Empty date filter: Chromium draws the browser locale's mask ("dd/mm/yyyy"), not Bulgarian. The wrapper's own
+   placeholder shows instead until the field has focus or a value (site.js sets data-empty). Firefox follows the
+   page language, so it keeps its own mask. */
+@supports selector(::-webkit-datetime-edit) {
+  .date-field { position: relative; }
+  .date-field input[data-empty]:not(:focus)::-webkit-datetime-edit { color: transparent; }
+  .date-field:has(input[data-empty]:not(:focus))::before {
+    content: attr(data-placeholder);
+    position: absolute;
+    inset: 0 auto 0 calc(0.75rem + var(--bs-border-width));
+    display: flex;
+    align-items: center;
+    color: var(--ink-muted);
+    pointer-events: none;
+  }
+}
 /* Invalid field: danger border, kept on focus; the ink ring still marks focus. The error text below is the non-colour cue. */
 :is(.form-control, .form-select, .form-check-input):is(.input-validation-error, [aria-invalid="true"]),
 :is(.form-control, .form-select, .form-check-input):is(.input-validation-error, [aria-invalid="true"]):focus {
@@ -759,6 +776,9 @@ button.seat { cursor: pointer; }
 }
 .totals-bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 1rem; margin: 0 -0.75rem; }
 .pay-bar { padding: 0.75rem 0; }
+@media (max-width: 991.98px) {
+  html:has(.pay-bar) { scroll-padding-bottom: 5.5rem; } /* a focused field scrolls clear of the sticky bar */
+}
 @media (min-width: 992px) {
   .pay-bar { position: static; border-top: 0; padding: 0; }
 }

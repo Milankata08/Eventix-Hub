@@ -63,7 +63,7 @@ else
                                             <select id="c-@l.TicketId" name="concession" class="form-select form-select-sm">
                                                 @foreach (var c in Enum.GetValues<ConcessionType>())
                                                 {
-                                                    <option value="@c" selected="@(c == l.Concession)">@c.DisplayName()@(c == ConcessionType.Student ? " −20%" : c == ConcessionType.Pensioner ? " −30%" : "")</option>
+                                                    <option value="@c" selected="@(c == l.Concession)">@Format.Concession(c)</option>
                                                 }
                                             </select>
                                         </div>
@@ -88,7 +88,7 @@ else
                 @if (cart.PromoCode is not null)
                 {
                     <form asp-action="RemovePromo" method="post" class="d-flex align-items-center gap-2">
-                        <span>Промо код <strong>@cart.PromoCode</strong> (−@cart.PromoPercent%)</span>
+                        <span>Промо код <strong>@cart.PromoCode</strong> (−@cart.PromoPercent&nbsp;%)</span>
                         <button type="submit" class="btn btn-sm btn-outline-secondary">Премахни</button>
                     </form>
                 }
@@ -115,7 +115,7 @@ else
             <div class="totals-panel">
                 @if (cart.PromoCode is not null)
                 {
-                    <div class="text-muted">Промо код @cart.PromoCode (−@cart.PromoPercent %)</div>
+                    <div class="text-muted">Промо код @cart.PromoCode (−@cart.PromoPercent&nbsp;%)</div>
                 }
                 <div class="label-caps">Общо</div>
                 <div class="figure text-nowrap-money mb-3">@Format.Money(cart.Total)</div>
