@@ -92,6 +92,25 @@ public class CatalogServicesTests : IDisposable
     }
 
     [Fact]
+    public async Task SearchShowtimes_DefaultsToNotYetStarted_PastListsTheRestNewestFirst()
+    {
+        var now = _clock.Now.DateTime;
+        using (var db = _db.NewContext())
+        {
+            db.AddRange(
+                new Showtime { EventId = _concertId, VenueId = _venueId, StartsAt = now.AddHours(-1), StandardPrice = 10m, VipPrice = 20m },
+                new Showtime { EventId = _concertId, VenueId = _venueId, StartsAt = now.AddDays(-3), StandardPrice = 10m, VipPrice = 20m });
+            db.SaveChanges();
+        }
+
+        var upcoming = await Events().SearchShowtimesAsync(new ShowtimeFilter(), 1);
+        var past = await Events().SearchShowtimesAsync(new ShowtimeFilter(Past: true), 1);
+
+        Assert.Equal([_showtimeId], upcoming.Items.Select(i => i.Id));
+        Assert.Equal([now.AddHours(-1), now.AddDays(-3)], past.Items.Select(i => i.StartsAt));
+    }
+
+    [Fact]
     public async Task DeleteEvent_WithTickets_IsRefused_ButEventWithoutIsDeleted()
     {
         await Assert.ThrowsAsync<BookingException>(() => Events().DeleteEventAsync(_movieId));

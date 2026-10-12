@@ -115,10 +115,10 @@ public class ShowtimeFormVM : IValidatableObject
     public DateTime? StartsAt { get; set; }
 
     [Required(ErrorMessage = "Стандартната цена е задължителна."), Range(typeof(decimal), "0.01", "1000", ErrorMessage = "Цената трябва да е между {1} и {2} €."), Display(Name = "Стандартна цена (€)")]
-    public decimal StandardPrice { get; set; }
+    public decimal? StandardPrice { get; set; }
 
     [Required(ErrorMessage = "VIP цената е задължителна."), Range(typeof(decimal), "0.01", "1000", ErrorMessage = "Цената трябва да е между {1} и {2} €."), Display(Name = "VIP цена (€)")]
-    public decimal VipPrice { get; set; }
+    public decimal? VipPrice { get; set; }
 
     [BindNever, ValidateNever]
     public IReadOnlyList<EventOption> Events { get; set; } = [];
@@ -135,7 +135,7 @@ public class ShowtimeFormVM : IValidatableObject
     public Showtime ToEntity() => new()
     {
         Id = Id, EventId = EventId, VenueId = VenueId, StartsAt = StartsAt!.Value,
-        StandardPrice = StandardPrice, VipPrice = VipPrice
+        StandardPrice = StandardPrice!.Value, VipPrice = VipPrice!.Value
     };
 
     public IEnumerable<ValidationResult> Validate(ValidationContext context)
