@@ -73,4 +73,19 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="~/lib/jquery-validation/dist/additional-methods.min.js"></script>
+    <script>
+        // No validation on blur: an error line appearing as the pointer leaves a field moves "Плати" and the
+        // next field from under the click. Errors show on submit; after that, each input event updates the field's
+        // error (input, not keyup, so autofill and pasting count too). Ready handler, so it runs after
+        // jquery.validate.unobtrusive has built the form's validator. A failed submit always focuses the first error:
+        // without a last-active field, focusInvalid falls back to errorList[0].
+        $(() => {
+            const form = $('form[action$="/Checkout"]'), validator = form.validate();
+            validator.settings.onfocusout = validator.settings.onkeyup = false;
+            validator.findLastActive = () => null;
+            form.on('input', 'input', e => {
+                if (e.target.name in validator.submitted || e.target.name in validator.invalid) validator.element(e.target);
+            });
+        });
+    </script>
 }
