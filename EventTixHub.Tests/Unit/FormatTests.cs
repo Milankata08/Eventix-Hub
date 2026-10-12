@@ -84,4 +84,11 @@ public class FormatTests
     [InlineData(SeatCategory.Standard, ConcessionType.Student, "Стандартно · Студент −20 %")]
     public void Fare_adds_the_concession_only_when_discounted(SeatCategory s, ConcessionType c, string expected) =>
         Assert.Equal(expected, Format.Fare(s, c));
+
+    [Fact]
+    public void PromoNote_names_the_code_and_percent_or_nothing()
+    {
+        Assert.Equal("с промо код WELCOME10 (−10 %)", Format.PromoNote("WELCOME10", 10));
+        Assert.Null(Format.PromoNote(null, 0));
+    }
 }

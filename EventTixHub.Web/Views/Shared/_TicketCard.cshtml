@@ -16,6 +16,10 @@
         <div class="figure ticket-seat my-3">Ред @t.Row · място @t.Number</div>
         <div>@Format.Fare(t.Category, t.Concession)</div>
         <div class="text-nowrap-money fw-semibold">@Format.Money(t.Price)</div>
+        @if (Format.PromoNote(t.PromoCode, t.PromoPercent) is { } promo)
+        {
+            <div class="small text-muted">@promo</div>
+        }
         @if (t.Status != TicketStatus.Paid)
         {
             <div class="label-caps mt-2">@t.Status.DisplayName()</div>
