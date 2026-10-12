@@ -125,8 +125,7 @@ public class TicketService(
         .Where(t => t.Order.UserId == userId && t.Status != TicketStatus.Reserved);
 
     // Checkout refuses an unusable promo (BR-08), so a paid order's PromoCode is the one already taken off Price.
-    // ponytail: code and percent are read live, so an admin edit of a used promo changes the label; snapshot them
-    // on Order at checkout if that matters.
+    // A used promo's code and percent cannot change (BR-15), so reading them live stays true to the sale.
     private static IQueryable<UserTicketDto> ToDto(IQueryable<Ticket> query) => query
         .Select(t => new UserTicketDto(t.Id, t.Showtime.Event.Type, t.Showtime.Event.Title, t.Showtime.Venue.Name,
             t.Showtime.Venue.City, t.Showtime.Venue.Address, t.Showtime.StartsAt,
