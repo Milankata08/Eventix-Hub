@@ -82,7 +82,9 @@
                 const el = document.createElement(monitor ? 'span' : 'button');
                 if (monitor) el.setAttribute('role', 'img'); else el.type = 'button';
                 el.dataset.seatId = seat.id;
-                el.appendChild(document.createElement('span')).textContent = seat.number; // span: backplate for held seats
+                const number = el.appendChild(document.createElement('span'));
+                number.className = 'seat-num'; // backplate for held seats
+                number.textContent = seat.number;
                 if (!monitor) el.tabIndex = -1;
                 seatEls.set(seat.id, el);
                 position.set(seat.id, { r: rows.length, i: ids.length });

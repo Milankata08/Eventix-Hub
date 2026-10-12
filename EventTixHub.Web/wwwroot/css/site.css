@@ -528,7 +528,7 @@ button.seat { cursor: pointer; }
   background: repeating-linear-gradient(45deg, var(--seat-held) 0 3px, var(--seat-free) 3px 7px);
   color: var(--ink);
 }
-.seat-held > span { display: inline-block; padding: 3px 3px 2px; border-radius: 3px; background: var(--seat-free); } /* backplate: the number never sits on a hatch stripe */
+.seat-held .seat-num { display: inline-block; padding: 3px 3px 2px; border-radius: 2px; background: var(--seat-free); } /* backplate: the number never sits on a hatch stripe */
 .seat-vip { background: color-mix(in srgb, var(--concert) 35%, var(--seat-free)); } /* admin venue plan */
 .seat-sold { background: var(--seat-sold); border-color: var(--seat-sold); color: var(--ink-muted); } /* no outline: free seats are drawn, sold ones are solid */
 .seat[aria-disabled="true"] { cursor: not-allowed; }
