@@ -5,7 +5,8 @@
     var pager = new PagerVM(Model.Showtimes.Page, Model.Showtimes.TotalPages, new Dictionary<string, string?>
     {
         ["eventId"] = f.EventId?.ToString(), ["venueId"] = f.VenueId?.ToString(),
-        ["from"] = f.From?.ToString("yyyy-MM-dd"), ["to"] = f.To?.ToString("yyyy-MM-dd")
+        ["from"] = f.From?.ToString("yyyy-MM-dd"), ["to"] = f.To?.ToString("yyyy-MM-dd"),
+        ["past"] = f.Past ? "true" : null
     });
 }
 
@@ -14,7 +15,20 @@
     <a class="btn btn-primary" asp-action="Create">Нова прожекция</a>
 </div>
 
+<nav class="chips mb-3" aria-label="Време">
+    @foreach (var (past, label) in new[] { (false, "Предстоящи"), (true, "Минали") })
+    {
+        var route = pager.LinkFor(1);
+        if (past) route["past"] = "true"; else route.Remove("past");
+        <a class="chip" asp-action="Index" asp-all-route-data="route" aria-current="@(f.Past == past ? "page" : null)">@label</a>
+    }
+</nav>
+
 <form method="get" class="admin-filter">
+    @if (f.Past)
+    {
+        <input type="hidden" name="past" value="true" />
+    }
     <div>
         <label class="form-label label-caps" for="eventId">Събитие</label>
         <select id="eventId" name="eventId" class="form-select" data-autosubmit>
@@ -44,7 +58,16 @@
 
 @if (Model.Showtimes.Items.Count == 0)
 {
-    <p class="text-muted">Няма намерени прожекции.</p>
+    @if (f.Past)
+    {
+        <p class="text-muted">Няма минали прожекции.</p>
+    }
+    else
+    {
+        var pastRoute = pager.LinkFor(1);
+        pastRoute["past"] = "true";
+        <p class="text-muted">Няма предстоящи прожекции. <a asp-action="Index" asp-all-route-data="pastRoute">Вижте миналите</a>.</p>
+    }
 }
 else
 {

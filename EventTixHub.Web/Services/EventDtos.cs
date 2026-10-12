@@ -26,7 +26,8 @@ public record ShowtimeCardDto(
 public record EventDetailsDto(
     Event Event, double? AverageRating, int ReviewCount, IReadOnlyList<ShowtimeCardDto> Showtimes);
 
-public record ShowtimeFilter(int? EventId = null, int? VenueId = null, DateTime? From = null, DateTime? To = null);
+// Not yet started by default; Past lists the started ones, newest first.
+public record ShowtimeFilter(int? EventId = null, int? VenueId = null, DateTime? From = null, DateTime? To = null, bool Past = false);
 
 public record ReviewDto(int Id, int UserId, string Author, int Rating, string? Comment, DateTime CreatedAt);
 
