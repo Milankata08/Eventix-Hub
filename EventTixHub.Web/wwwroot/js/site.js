@@ -50,6 +50,13 @@
     });
 })();
 
+// Empty date filters: data-empty swaps the browser's locale mask for the Bulgarian placeholder (site.css, .date-field).
+for (const input of document.querySelectorAll('.date-field input')) {
+    const sync = () => input.toggleAttribute('data-empty', !input.value && !input.validity.badInput); // a half-typed date stays visible
+    input.addEventListener('input', sync);
+    sync();
+}
+
 // Field errors. A page that comes back with server-side errors (FieldErrorTagHelper sets aria-invalid) focuses the
 // first one, as a failed client submit does; a form-level error (e.g. wrong password) only shows in the summary, so
 // then the summary takes focus and is read out. jquery.validate sets aria-invalid only on per-field checks, not on submit,

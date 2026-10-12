@@ -29,7 +29,8 @@
         <nav class="navbar navbar-expand-sm site-nav bg-body mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">EventTix Hub</a>
-                <div class="nav-slot ms-auto me-2" id="nav-hold-slot">@await Component.InvokeAsync("HoldBadge")</div>
+                @* Cart and checkout show the large hold badge; a second one here would be read out twice. *@
+                <div class="nav-slot ms-auto me-2" id="nav-hold-slot">@if (Current("", "Booking", "Cart", "Checkout") is null) { @await Component.InvokeAsync("HoldBadge") }</div>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#site-menu" aria-controls="site-menu"
                         aria-expanded="false" aria-label="Превключи навигацията">
                     <span class="navbar-toggler-icon"></span>
