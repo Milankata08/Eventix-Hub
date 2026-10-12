@@ -73,6 +73,40 @@ public class CatalogServicesTests : IDisposable
     }
 
     [Fact]
+    public async Task Search_FromPriceIsLowestStandardPriceOfUpcomingShowtimes()
+    {
+        using (var db = _db.NewContext())
+        {
+            // A cheaper showtime that already started must not count; a dearer upcoming one must not win.
+            db.AddRange(
+                new Showtime { EventId = _movieId, VenueId = _venueId, StartsAt = _clock.Now.DateTime.AddHours(-1), StandardPrice = 5m, VipPrice = 8m },
+                new Showtime { EventId = _movieId, VenueId = _venueId, StartsAt = _clock.Now.DateTime.AddDays(3), StandardPrice = 12.5m, VipPrice = 18m });
+            db.SaveChanges();
+        }
+
+        var items = (await Events().SearchAsync(new EventFilter(), 1)).Items;
+
+        Assert.Equal(10m, items.Single(i => i.Id == _movieId).MinPrice);
+        Assert.Null(items.Single(i => i.Id == _concertId).MinPrice);
+    }
+
+    [Fact]
+    public async Task Search_FromPriceCountsOnlyShowtimesMatchingTheFilter()
+    {
+        using (var db = _db.NewContext())
+        {
+            var varna = new Venue { Name = "Морска зала", City = "Варна", Address = "ул. Тест 2", Rows = 1, SeatsPerRow = 1 };
+            db.Add(new Showtime { EventId = _movieId, Venue = varna, StartsAt = _clock.Now.DateTime.AddDays(3), StandardPrice = 20m, VipPrice = 30m });
+            db.SaveChanges();
+        }
+
+        var inVarna = (await Events().SearchAsync(new EventFilter(City: "Варна"), 1)).Items.Single();
+
+        // The 10,00 € showtime is in София, so a Варна buyer must not see it.
+        Assert.Equal((20m, "Варна"), (inVarna.MinPrice, inVarna.NextCity));
+    }
+
+    [Fact]
     public async Task Details_ShowsUpcomingShowtimeWithFreeSeatCount()
     {
         var details = await Events().GetDetailsAsync(_movieId);
