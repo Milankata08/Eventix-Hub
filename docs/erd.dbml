@@ -1,0 +1,107 @@
+// EventTix Hub — ERD. Paste into https://dbdiagram.io to view or edit.
+
+Table Users {
+  Id int [pk, increment]
+  FirstName nvarchar(50) [not null]
+  LastName nvarchar(50) [not null]
+  Email nvarchar(256)
+  UserName nvarchar(256)
+  PasswordHash nvarchar
+  PhoneNumber nvarchar
+  LockoutEnd datetimeoffset
+  Note: 'AspNetUsers (ASP.NET Core Identity)'
+}
+
+Table Roles {
+  Id int [pk, increment]
+  Name nvarchar(256) [note: 'Administrator, Customer']
+  Note: 'AspNetRoles'
+}
+
+Table UserRoles {
+  UserId int [pk, ref: > Users.Id]
+  RoleId int [pk, ref: > Roles.Id]
+  Note: 'AspNetUserRoles - N:M User <-> Role'
+}
+
+Table Events {
+  Id int [pk, increment]
+  Title nvarchar(150) [not null]
+  Description nvarchar(2000)
+  Type int [note: 'Movie, Concert, Theatre']
+  Genre nvarchar(50) [not null]
+  DurationMinutes int
+  PosterUrl nvarchar(500)
+}
+
+Table Venues {
+  Id int [pk, increment]
+  Name nvarchar(100) [not null]
+  City nvarchar(50) [not null]
+  Address nvarchar(200) [not null]
+  Rows int
+  SeatsPerRow int
+}
+
+Table Seats {
+  Id int [pk, increment]
+  VenueId int [ref: > Venues.Id]
+  Row int
+  Number int
+  Category int [note: 'Standard, Vip']
+  indexes { (VenueId, Row, Number) [unique] }
+}
+
+Table Showtimes {
+  Id int [pk, increment]
+  EventId int [ref: > Events.Id]
+  VenueId int [ref: > Venues.Id]
+  StartsAt datetime2
+  StandardPrice decimal(10,2)
+  VipPrice decimal(10,2)
+}
+
+Table PromoCodes {
+  Id int [pk, increment]
+  Code nvarchar(20) [unique, not null]
+  DiscountPercent int
+  UsageLimit int
+  TimesUsed int
+  ValidFrom datetime2
+  ValidUntil datetime2
+  IsActive bit
+}
+
+Table Orders {
+  Id int [pk, increment]
+  UserId int [ref: > Users.Id]
+  PromoCodeId int [null, ref: > PromoCodes.Id]
+  Status int [note: 'Pending, Paid, Cancelled; one Pending per user']
+  CreatedAt datetime2
+  PaidAt datetime2
+  TotalAmount decimal(10,2)
+}
+
+Table Tickets {
+  Id int [pk, increment]
+  OrderId int [ref: > Orders.Id]
+  ShowtimeId int [ref: > Showtimes.Id]
+  SeatId int [ref: > Seats.Id]
+  Status int [note: 'Reserved, Paid, Cancelled']
+  Concession int [note: 'Regular, Student, Pensioner']
+  Price decimal(10,2)
+  ReservedUntil datetime2
+  Code nvarchar(20) [note: 'unique when not null']
+  CancelledAt datetime2
+  indexes { (ShowtimeId, SeatId) [unique, note: 'where Status <> Cancelled'] }
+}
+
+Table Reviews {
+  Id int [pk, increment]
+  UserId int [ref: > Users.Id]
+  EventId int [ref: > Events.Id]
+  Rating int [note: '1-5']
+  Comment nvarchar(1000)
+  CreatedAt datetime2
+  indexes { (UserId, EventId) [unique] }
+}
