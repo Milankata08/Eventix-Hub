@@ -67,7 +67,7 @@
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <span class="navbar-text me-2">@User.Identity.Name</span>
+                                <span class="navbar-text me-2 text-break">@User.Identity.Name</span>
                             </li>
                             <li class="nav-item">
                                 <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">

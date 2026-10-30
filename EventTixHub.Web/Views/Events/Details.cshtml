@@ -25,7 +25,7 @@
         {
             <p class="mb-3"><span aria-hidden="true">★ </span><strong>@Format.Rating(avg) от 5</strong> <span class="text-muted">· @Format.Count(Model.Details.ReviewCount, "оценка", "оценки")</span></p>
         }
-        <p class="details-desc">@ev.Description</p>
+        <p class="details-desc text-break">@ev.Description</p>
     </div>
 </div>
 
@@ -115,7 +115,7 @@ else
             </div>
             @if (!string.IsNullOrEmpty(r.Comment))
             {
-                <p class="mb-1">@r.Comment</p>
+                <p class="mb-1 text-break">@r.Comment</p>
             }
             @if (r.UserId == Model.CurrentUserId || Model.IsAdmin)
             {
