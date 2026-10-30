@@ -5,18 +5,36 @@
     var to = Math.Min(Model.TotalPages, Model.Page + 2);
     <nav aria-label="Страници">
         <ul class="pagination justify-content-center">
-            <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
-                <a class="page-link" asp-all-route-data="Model.LinkFor(Model.Page - 1)">‹ Предишна</a>
-            </li>
+            @if (Model.Page <= 1)
+            {
+                <li class="page-item disabled">
+                    <span class="page-link" aria-disabled="true"><span aria-hidden="true">‹</span> Предишна</span>
+                </li>
+            }
+            else
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-all-route-data="Model.LinkFor(Model.Page - 1)"><span aria-hidden="true">‹</span> Предишна</a>
+                </li>
+            }
             @for (var p = from; p <= to; p++)
             {
                 <li class="page-item @(p == Model.Page ? "active" : "")">
-                    <a class="page-link" asp-all-route-data="Model.LinkFor(p)">@p</a>
+                    <a class="page-link" asp-all-route-data="Model.LinkFor(p)" aria-current="@(p == Model.Page ? "page" : null)">@p</a>
                 </li>
             }
-            <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
-                <a class="page-link" asp-all-route-data="Model.LinkFor(Model.Page + 1)">Следваща ›</a>
-            </li>
+            @if (Model.Page >= Model.TotalPages)
+            {
+                <li class="page-item disabled">
+                    <span class="page-link" aria-disabled="true">Следваща <span aria-hidden="true">›</span></span>
+                </li>
+            }
+            else
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-all-route-data="Model.LinkFor(Model.Page + 1)">Следваща <span aria-hidden="true">›</span></a>
+                </li>
+            }
         </ul>
     </nav>
 }
