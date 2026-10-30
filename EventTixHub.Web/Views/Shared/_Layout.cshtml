@@ -4,9 +4,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - EventTix Hub</title>
+    <meta name="theme-color" content="#F3F2EE" />
     <script>
-        document.documentElement.dataset.bsTheme = localStorage.getItem('theme')
-            ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        // Browser bar colour = --paper of the active theme (site.css); follows every theme change, toggle included.
+        (() => {
+            const html = document.documentElement;
+            const bar = document.querySelector('meta[name="theme-color"]');
+            const sync = () => bar.content = html.dataset.bsTheme === 'dark' ? '#121211' : '#F3F2EE';
+            new MutationObserver(sync).observe(html, { attributes: true, attributeFilter: ['data-bs-theme'] });
+            html.dataset.bsTheme = localStorage.getItem('theme')
+                ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            sync();
+        })();
     </script>
     <script type="importmap"></script>
     <link rel="preload" as="font" type="font/woff2" href="~/fonts/sofia-sans-cyrillic.woff2" crossorigin />
