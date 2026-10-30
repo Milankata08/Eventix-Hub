@@ -40,15 +40,15 @@ else
         @foreach (var p in Model.Promos.Items)
         {
             <tr>
-                <td>@p.Code</td>
+                <td translate="no">@p.Code</td>
                 <td class="num">@Format.Percent(p.DiscountPercent)</td>
                 <td class="num">@p.TimesUsed / @p.UsageLimit</td>
                 <td>@Format.Date(p.ValidFrom) – @Format.Date(p.ValidUntil)</td>
                 <td class="label-caps">@Model.StateOf(p).DisplayName()</td>
                 <td>
                     <div class="row-actions">
-                        <a asp-action="Edit" asp-route-id="@p.Id">Редакция<span class="visually-hidden"> на „@p.Code“</span></a>
-                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@p.Id">Изтрий<span class="visually-hidden"> „@p.Code“</span></a>
+                        <a asp-action="Edit" asp-route-id="@p.Id">Редакция<span class="visually-hidden"> на „<span translate="no">@p.Code</span>“</span></a>
+                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@p.Id">Изтрий<span class="visually-hidden"> „<span translate="no">@p.Code</span>“</span></a>
                     </div>
                 </td>
             </tr>

@@ -9,7 +9,7 @@
         @if (User.Identity?.IsAuthenticated == true)
         {
             <div class="sheet-panel">
-                <p>Вече сте влезли като <strong>@User.Identity.Name</strong>.</p>
+                <p>Вече сте влезли като <strong translate="no">@User.Identity.Name</strong>.</p>
                 <a class="btn btn-primary" asp-controller="Profile" asp-action="Index">Към профила</a>
                 <a class="btn btn-link" asp-controller="Home" asp-action="Index">Към афиша</a>
             </div>

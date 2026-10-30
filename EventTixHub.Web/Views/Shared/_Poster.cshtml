@@ -8,6 +8,7 @@
     var place = Format.Place(p.Venue, p.City);
     var timePlace = p.Date is { } td ? string.Join(" · ", new[] { Format.Time(td), place }.Where(x => x.Length > 0)) : dateLine;
     var hasImage = !string.IsNullOrEmpty(p.PosterUrl);
+    var hero = p.Size == PosterSize.Hero;
     var cls = $"poster poster--{p.Size.ToString().ToLowerInvariant()} {p.Type.TypeClass()} poster-{p.Type}" + (hasImage ? " poster--image" : "");
 }
 @{
@@ -25,7 +26,8 @@ else
 <article class="@cls" style="--longest: @Format.LongestWord(p.Title)">
     @if (hasImage)
     {
-        <img src="@p.PosterUrl" alt="" class="poster-img" loading="lazy" />
+        @* The hero sits above the fold: fetch it first. Wall cards stay lazy. *@
+        <img src="@p.PosterUrl" alt="" class="poster-img" loading="@(hero ? null : "lazy")" fetchpriority="@(hero ? "high" : null)" />
         <div class="poster-band">
             <div class="label-caps">@typeWord</div>
             <h2 class="poster-title">@Title()</h2>

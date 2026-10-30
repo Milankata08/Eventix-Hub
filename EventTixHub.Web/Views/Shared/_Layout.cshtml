@@ -37,7 +37,7 @@
     <header>
         <nav class="navbar navbar-expand-sm site-nav bg-body mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">EventTix Hub</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" translate="no">EventTix Hub</a>
                 @* Cart and checkout show the large hold badge; a second one here would be read out twice. *@
                 <div class="nav-slot ms-auto me-2" id="nav-hold-slot">@if (Current("", "Booking", "Cart", "Checkout") is null) { @await Component.InvokeAsync("HoldBadge") }</div>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#site-menu" aria-controls="site-menu"
@@ -76,7 +76,7 @@
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <span class="navbar-text me-2 text-break">@User.Identity.Name</span>
+                                <span class="navbar-text me-2 text-break" translate="no">@User.Identity.Name</span>
                             </li>
                             <li class="nav-item">
                                 <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
@@ -107,7 +107,7 @@
 
     <footer class="site-footer">
         <div class="container">
-            <p class="mb-1">EventTix Hub · билети за кино, концерти и театър · София · Пловдив · Варна</p>
+            <p class="mb-1"><span translate="no">EventTix Hub</span> · билети за кино, концерти и театър · София · Пловдив · Варна</p>
             <p class="mb-0">Учебен проект · плащането е симулирано</p>
         </div>
     </footer>

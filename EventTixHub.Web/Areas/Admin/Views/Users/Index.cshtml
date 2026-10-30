@@ -42,7 +42,7 @@ else
             var self = u.Id == Model.CurrentUserId;
             <tr>
                 <td>@u.FullName</td>
-                <td>@u.Email</td>
+                <td translate="no">@u.Email</td>
                 <td>
                     <form asp-action="SetRole" asp-route-id="@u.Id" method="post" class="d-flex gap-2">
                         <select name="role" class="form-select form-select-sm w-auto" aria-label="Роля на @u.FullName" disabled="@self">

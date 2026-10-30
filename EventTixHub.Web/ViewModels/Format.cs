@@ -1,4 +1,6 @@
 using System.Globalization;
+using System.Net;
+using Microsoft.AspNetCore.Html;
 using EventTixHub.Web.Models;
 using EventTixHub.Web.Services;
 
@@ -21,10 +23,13 @@ public static class Format
         BookingRules.ConcessionPercent(c) > 0 ? $"{category.DisplayName()} · {Concession(c)}" : category.DisplayName();
 
     // "WELCOME10 (−10 %)": the cart's promo row and a paid ticket's promo note share this wording.
-    public static string Promo(string code, int percent) => $"{code} (−{Percent(percent)})";
+    // translate="no" so browser auto-translate leaves the code as typed.
+    public static IHtmlContent Promo(string code, int percent) =>
+        new HtmlString($"<span translate=\"no\">{WebUtility.HtmlEncode(code)} (−{Percent(percent)})</span>");
 
     // Why a paid ticket costs less than its fare: "с промо код WELCOME10 (−10 %)"; null when the order had no promo.
-    public static string? PromoNote(string? code, int percent) => code is null ? null : $"с промо код {Promo(code, percent)}";
+    public static IHtmlContent? PromoNote(string? code, int percent) =>
+        code is null ? null : new HtmlString($"с промо код {Promo(code, percent)}");
 
     public static string Rating(double value) => value.ToString("0.0", Bg);
 

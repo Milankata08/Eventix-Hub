@@ -28,11 +28,11 @@
     <div class="ticket-stub">
         @if (Model.QrDataUri is not null)
         {
-            <img class="ticket-qr" src="@Model.QrDataUri" alt="QR код @t.Code" width="200" height="200" />
+            <img class="ticket-qr" translate="no" src="@Model.QrDataUri" alt="QR код @t.Code" width="200" height="200" />
         }
         @if (t.Code is not null)
         {
-            <div class="ticket-code">@t.Code</div>
+            <div class="ticket-code" translate="no">@t.Code</div>
         }
     </div>
 </article>

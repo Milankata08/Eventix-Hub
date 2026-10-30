@@ -107,7 +107,11 @@ public class FormatTests
     [Fact]
     public void PromoNote_names_the_code_and_percent_or_nothing()
     {
-        Assert.Equal("с промо код WELCOME10 (−10 %)", Format.PromoNote("WELCOME10", 10));
+        Assert.Equal("с промо код <span translate=\"no\">WELCOME10 (−10 %)</span>", Format.PromoNote("WELCOME10", 10)?.ToString());
         Assert.Null(Format.PromoNote(null, 0));
     }
+
+    [Fact]
+    public void Promo_keeps_the_code_out_of_auto_translate_and_encodes_it() =>
+        Assert.Equal("<span translate=\"no\">A&amp;B (−5 %)</span>", Format.Promo("A&B", 5).ToString());
 }

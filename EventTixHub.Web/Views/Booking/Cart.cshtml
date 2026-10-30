@@ -88,7 +88,7 @@ else
                 @if (cart.PromoCode is not null)
                 {
                     <form asp-action="RemovePromo" method="post" class="d-flex align-items-center gap-2">
-                        <span>Промо код <strong>@cart.PromoCode</strong></span>
+                        <span>Промо код <strong translate="no">@cart.PromoCode</strong></span>
                         <button type="submit" class="btn btn-sm btn-outline-secondary">Премахни</button>
                     </form>
                 }
