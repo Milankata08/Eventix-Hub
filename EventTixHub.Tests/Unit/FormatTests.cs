@@ -39,6 +39,14 @@ public class FormatTests
     }
 
     [Theory]
+    [InlineData(0, "0 оценки")]
+    [InlineData(1, "1 оценка")]
+    [InlineData(2, "2 оценки")]
+    [InlineData(11, "11 оценки")]
+    public void Count_uses_singular_only_for_one(int n, string expected) =>
+        Assert.Equal(expected, Format.Count(n, "оценка", "оценки"));
+
+    [Theory]
     [InlineData("в Пловдив и София", "Пловдив", "София")]
     [InlineData("във Варна, Пловдив и София", "Варна", "Пловдив", "София")]
     [InlineData("в София", "София")]

@@ -60,6 +60,9 @@ public static class Format
 
     public static string OrderNo(int id) => "№ " + id;
 
+    // "1 оценка", "0 оценки", "2 оценки": Bulgarian uses the singular only for exactly one.
+    public static string Count(int n, string one, string many) => $"{n} {(n == 1 ? one : many)}";
+
     // "във Варна, Пловдив и София": "във" before a city starting with в or ф, else "в". Empty for no cities.
     public static string CityPhrase(IReadOnlyList<string> cities)
     {

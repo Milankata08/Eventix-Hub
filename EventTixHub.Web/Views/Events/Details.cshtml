@@ -23,7 +23,7 @@
         </p>
         @if (Model.Details.AverageRating is { } avg)
         {
-            <p class="mb-3"><span aria-hidden="true">★ </span><strong>@Format.Rating(avg) от 5</strong> <span class="text-muted">· @Model.Details.ReviewCount оценки</span></p>
+            <p class="mb-3"><span aria-hidden="true">★ </span><strong>@Format.Rating(avg) от 5</strong> <span class="text-muted">· @Format.Count(Model.Details.ReviewCount, "оценка", "оценки")</span></p>
         }
         <p class="details-desc">@ev.Description</p>
     </div>
@@ -46,7 +46,7 @@ else
                     <div>@Format.Place(s.VenueName, s.City)</div>
                 </div>
                 <div class="programme-price text-nowrap-money">@Format.Money(s.StandardPrice) · VIP @Format.Money(s.VipPrice)</div>
-                <div class="programme-free">@s.FreeSeats свободни места</div>
+                <div class="programme-free">@Format.Count(s.FreeSeats, "свободно място", "свободни места")</div>
                 <div class="programme-action">
                     @if (s.FreeSeats > 0)
                     {
