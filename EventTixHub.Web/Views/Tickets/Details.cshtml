@@ -3,6 +3,7 @@
     ViewData["Title"] = "Билет";
 }
 
+<h1 class="visually-hidden">Билет за @Model.Ticket.EventTitle, ред @Model.Ticket.Row, място @Model.Ticket.Number</h1>
 <partial name="_TicketCard" model="Model" />
 
 <div class="d-print-none d-flex flex-wrap align-items-center gap-2">
