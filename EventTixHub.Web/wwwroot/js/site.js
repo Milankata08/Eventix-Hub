@@ -51,6 +51,35 @@
     });
 })();
 
+// Pending submit: a button-submitted form locks its button until the next page, so a double click sends one request.
+// Cancelled confirms and failed client validation stop the event before it reaches document; auto-submits have no
+// submitter. aria-disabled, not disabled: a disabled submitter drops out of the form data. bfcache restore unlocks.
+(function () {
+    document.addEventListener('submit', e => {
+        const button = e.submitter;
+        if (!button || e.defaultPrevented) return;
+        if (e.target.dataset.submitting) { e.preventDefault(); return; }
+        e.target.dataset.submitting = '1';
+        button.dataset.locked = '1';
+        button.classList.add('disabled');
+        button.setAttribute('aria-disabled', 'true');
+        if (button.dataset.pendingText) {
+            button.dataset.idleText = button.textContent;
+            button.textContent = button.dataset.pendingText;
+        }
+    });
+    addEventListener('pageshow', e => {
+        if (!e.persisted) return;
+        for (const form of document.querySelectorAll('form[data-submitting]')) delete form.dataset.submitting;
+        for (const button of document.querySelectorAll('[data-locked]')) {
+            delete button.dataset.locked;
+            button.classList.remove('disabled');
+            button.removeAttribute('aria-disabled');
+            if (button.dataset.idleText) button.textContent = button.dataset.idleText;
+        }
+    });
+})();
+
 // Empty date filters: data-empty swaps the browser's locale mask for the Bulgarian placeholder (site.css, .date-field).
 for (const input of document.querySelectorAll('.date-field input')) {
     const sync = () => input.toggleAttribute('data-empty', !input.value && !input.validity.badInput); // a half-typed date stays visible
