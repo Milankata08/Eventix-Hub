@@ -154,6 +154,7 @@ h2, .h2, h3, .h3 {
   line-height: 1.25;
 }
 h4, .h4, h5, .h5, h6, .h6 { font-weight: 700; }
+h1, .h1, h2, .h2, h3, .h3, .display, .headline { text-wrap: balance; } /* a long title never leaves one word alone on its last line */
 
 .display {
   font-family: var(--font-display);
@@ -206,7 +207,7 @@ h4, .h4, h5, .h5, h6, .h6 { font-weight: 700; }
 }
 
 /* Motion: state changes ease out over 150 ms; a press sinks on pointer-down, before the click lands */
-.btn, .chip, .seat {
+.btn, .chip, .seat, .hold-badge {
   transition: color 150ms ease-out, background-color 150ms ease-out, border-color 150ms ease-out, transform 100ms ease-out;
 }
 .btn:active, .chip:active, button.seat:not([aria-disabled="true"]):active { transform: scale(0.96); }
@@ -265,8 +266,8 @@ a.btn { display: inline-flex; align-items: center; justify-content: center; } /*
   --bs-btn-bg: var(--danger);
   --bs-btn-border-color: var(--danger);
   --bs-btn-hover-color: var(--sheet);
-  --bs-btn-hover-bg: var(--danger);
-  --bs-btn-hover-border-color: var(--danger);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--danger) 80%, var(--ink));
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--danger) 80%, var(--ink));
   --bs-btn-active-color: var(--sheet);
   --bs-btn-active-bg: var(--danger);
   --bs-btn-active-border-color: var(--danger);
@@ -456,6 +457,12 @@ main#content:focus { outline: none !important; } /* programmatic focus only (ski
   color: var(--ink);
   text-decoration: none;
 }
+.site-nav .nav-link:hover,
+.site-nav .btn-link:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
 .site-nav .nav-link.active {
   text-decoration: underline;
   text-decoration-thickness: 3px;
@@ -608,6 +615,8 @@ button.seat { cursor: pointer; }
   text-decoration: none;
 }
 .chip[aria-current] { background: var(--ink); color: var(--paper); }
+.chip:hover { background: color-mix(in srgb, var(--ink) 12%, transparent); color: var(--ink); }
+.chip[aria-current]:hover { background: var(--ink-muted); border-color: var(--ink-muted); color: var(--paper); }
 .empty-state { padding: 2rem 0; max-width: 32rem; }
 
 /* Generated афиш posters. Title fills the width (The Fit Rule): size comes from the longest word. */
@@ -649,6 +658,7 @@ button.seat { cursor: pointer; }
 .poster-in { flex: 1 0 auto; display: flex; flex-direction: column; padding: var(--pad); }
 .poster:has(a:focus-visible) { outline: 3px solid var(--ink); outline-offset: 2px; }
 .poster a:focus-visible { outline: none !important; }
+.poster:has(a:hover) { outline: 3px solid var(--ink); outline-offset: 2px; } /* same ring as focus: the whole poster is the link */
 .poster a { color: inherit; text-decoration: none; }
 .poster .label-caps { font-size: max(0.8125rem, 4.2cqi); text-transform: none; letter-spacing: 0.02em; }
 .poster-day .label-caps { text-transform: uppercase; letter-spacing: 0.05em; }
@@ -754,6 +764,8 @@ button.seat { cursor: pointer; }
 .hold-perf { align-self: stretch; border-left: 2px dashed var(--ink); }
 .hold-badge.is-urgent { background: var(--danger); border-color: var(--danger); color: var(--sheet); font-weight: 800; }
 .hold-badge.is-urgent .hold-perf { border-color: var(--sheet); }
+a.hold-badge:hover { background: var(--ink); border-color: var(--ink); color: var(--sheet); }
+a.hold-badge:hover .hold-perf { border-color: var(--sheet); }
 .hold-badge--large { display: flex; margin-bottom: 1.5rem; padding: 0.75rem 1rem; font-size: 1.125rem; }
 .hold-badge--large [data-hold-seconds] { font-weight: 800; }
 @media (max-width: 575.98px) {
