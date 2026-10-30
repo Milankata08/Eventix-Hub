@@ -23,7 +23,7 @@ public class AfishaVM
         ["Genre"] = Filter.Genre,
         ["City"] = Filter.City,
         ["VenueId"] = Filter.VenueId?.ToString(),
-        ["Date"] = Filter.Date?.ToString("yyyy-MM-dd"),
+        ["Date"] = Format.DateInput(Filter.Date),
         ["Sort"] = Filter.Sort.ToString()
     };
 }

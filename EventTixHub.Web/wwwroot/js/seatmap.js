@@ -36,7 +36,7 @@
     let prices = { Standard: Number(root.dataset.standardPrice), Vip: Number(root.dataset.vipPrice) };
 
     const moneyFormat = new Intl.NumberFormat('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const money = n => moneyFormat.format(n) + ' €';
+    const money = n => moneyFormat.format(n) + ' €';
     const statusText = { Free: 'свободно', Held: 'резервирано', Sold: 'продадено' };
     const where = s => `ред ${s.row}, място ${s.number}`;
     const seatById = id => seats.find(s => s.id === id);

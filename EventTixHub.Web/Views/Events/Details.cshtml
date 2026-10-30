@@ -19,7 +19,7 @@
         <h1 class="display">@ev.Title</h1>
         <p class="mt-3 mb-2">
             <span class="badge type-badge @ev.Type.TypeClass()">@ev.Type.DisplayName()</span>
-            <span class="text-muted">· @ev.Genre · @ev.DurationMinutes мин.</span>
+            <span class="text-muted">· @ev.Genre · @Format.Minutes(ev.DurationMinutes)</span>
         </p>
         @if (Model.Details.AverageRating is { } avg)
         {
@@ -111,7 +111,7 @@ else
                     <span class="review-stars" aria-hidden="true">@r.Rating/5 @string.Concat(Enumerable.Repeat("★", r.Rating))</span>
                     <span class="visually-hidden">Оценка @r.Rating от 5</span>
                 </div>
-                <div class="text-muted small">@r.CreatedAt.ToString("dd.MM.yyyy")</div>
+                <div class="text-muted small">@Format.Date(r.CreatedAt)</div>
             </div>
             @if (!string.IsNullOrEmpty(r.Comment))
             {

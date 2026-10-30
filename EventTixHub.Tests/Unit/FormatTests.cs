@@ -25,6 +25,17 @@ public class FormatTests
         Assert.Equal("9 октомври", Format.LongDate(D));
         Assert.Equal("петък", Format.Weekday(D));
         Assert.Equal("20:00", Format.Time(D));
+        Assert.Equal("09.10.2026", Format.Date(D));
+        Assert.Equal("09.10.2026 20:00", Format.DateAndTime(D));
+        Assert.Equal("09:00", Format.Hour(9));
+    }
+
+    [Fact]
+    public void Units_stay_with_their_numbers()
+    {
+        Assert.Equal("35\u00A0%", Format.Percent(35));
+        Assert.Equal("120\u00A0мин.", Format.Minutes(120));
+        Assert.Equal("№\u00A042", Format.OrderNo(42));
     }
 
     [Theory]

@@ -31,9 +31,9 @@ else
                         <a class="board-title" asp-controller="Showtimes" asp-action="Details" asp-route-id="@s.Id">@s.EventTitle</a>
                         <span class="badge type-badge @s.Type.TypeClass()">@s.Type.DisplayName()</span>
                     </div>
-                    <div class="text-muted">@s.VenueName · @s.StartsAt.ToString("HH:mm")</div>
+                    <div class="text-muted">@s.VenueName · @Format.Time(s.StartsAt)</div>
                     <div class="mt-2">@await Html.PartialAsync("_Bar", (percent, "Заетост"))</div>
-                    <div class="bar-note">@percent % · @s.Taken от @s.Capacity@if (s.IsCritical) { <text> · </text><span class="label-caps">критична</span> }</div>
+                    <div class="bar-note">@Format.Percent(percent) · @s.Taken от @s.Capacity@if (s.IsCritical) { <text> · </text><span class="label-caps">критична</span> }</div>
                 </div>
             </li>
         }

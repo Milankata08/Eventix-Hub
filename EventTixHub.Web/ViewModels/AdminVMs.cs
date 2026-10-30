@@ -26,7 +26,7 @@ public class EventFormVM
     [Required(ErrorMessage = "Жанрът е задължителен."), StringLength(50, ErrorMessage = "Жанрът може да е до {1} символа."), Display(Name = "Жанр")]
     public string Genre { get; set; } = "";
 
-    [Required(ErrorMessage = "Продължителността е задължителна."), Range(1, 600, ErrorMessage = "Продължителността трябва да е между {1} и {2} минути."), Display(Name = "Продължителност (мин)")]
+    [Required(ErrorMessage = "Продължителността е задължителна."), Range(1, 600, ErrorMessage = "Продължителността трябва да е между {1} и {2} минути."), Display(Name = "Продължителност (мин)")]
     public int DurationMinutes { get; set; } = 90;
 
     /// <summary>Current poster URL, display only: set by the server, never bound from the form.</summary>
@@ -114,10 +114,10 @@ public class ShowtimeFormVM : IValidatableObject
     [Required(ErrorMessage = "Началото е задължително."), Display(Name = "Начало")]
     public DateTime? StartsAt { get; set; }
 
-    [Required(ErrorMessage = "Стандартната цена е задължителна."), Range(typeof(decimal), "0.01", "1000", ErrorMessage = "Цената трябва да е между {1} и {2} €."), Display(Name = "Стандартна цена (€)")]
+    [Required(ErrorMessage = "Стандартната цена е задължителна."), Range(typeof(decimal), "0.01", "1000", ErrorMessage = "Цената трябва да е между {1} и {2} €."), Display(Name = "Стандартна цена (€)")]
     public decimal? StandardPrice { get; set; }
 
-    [Required(ErrorMessage = "VIP цената е задължителна."), Range(typeof(decimal), "0.01", "1000", ErrorMessage = "Цената трябва да е между {1} и {2} €."), Display(Name = "VIP цена (€)")]
+    [Required(ErrorMessage = "VIP цената е задължителна."), Range(typeof(decimal), "0.01", "1000", ErrorMessage = "Цената трябва да е между {1} и {2} €."), Display(Name = "VIP цена (€)")]
     public decimal? VipPrice { get; set; }
 
     [BindNever, ValidateNever]
@@ -157,7 +157,7 @@ public class PromoCodeFormVM : IValidatableObject
      RegularExpression("^[A-Za-z0-9]+$", ErrorMessage = "Кодът може да съдържа само букви и цифри."), Display(Name = "Код")]
     public string Code { get; set; } = "";
 
-    [Required(ErrorMessage = "Отстъпката е задължителна."), Range(1, 100, ErrorMessage = "Отстъпката трябва да е между {1} и {2} %."), Display(Name = "Отстъпка (%)")]
+    [Required(ErrorMessage = "Отстъпката е задължителна."), Range(1, 100, ErrorMessage = "Отстъпката трябва да е между {1} и {2} %."), Display(Name = "Отстъпка (%)")]
     public int DiscountPercent { get; set; } = 10;
 
     [Required(ErrorMessage = "Лимитът е задължителен."), Range(1, int.MaxValue, ErrorMessage = "Лимитът трябва да е поне {1}."), Display(Name = "Лимит на използване")]

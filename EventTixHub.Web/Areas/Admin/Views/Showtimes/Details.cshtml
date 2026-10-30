@@ -5,7 +5,7 @@
 }
 
 <h1 class="headline">@map.EventTitle</h1>
-<div class="text-muted mb-3">@map.VenueName · @map.StartsAt.ToString("dd.MM.yyyy HH:mm")
+<div class="text-muted mb-3">@map.VenueName · @Format.DateAndTime(map.StartsAt)
     · Стандартно @Format.Money(map.StandardPrice) · VIP @Format.Money(map.VipPrice)</div>
 
 <partial name="_Hall" model="Model" />

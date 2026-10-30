@@ -76,7 +76,7 @@
             <div>
                 <label for="f-date" class="form-label">Дата</label>
                 <div class="date-field" data-placeholder="Всички дати">
-                    <input type="date" name="Date" id="f-date" value="@f.Date?.ToString("yyyy-MM-dd")" class="form-control" data-autosubmit="blur" />
+                    <input type="date" name="Date" id="f-date" value="@Format.DateInput(f.Date)" class="form-control" data-autosubmit="blur" />
                 </div>
             </div>
             <div>

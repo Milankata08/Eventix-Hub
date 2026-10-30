@@ -4,8 +4,8 @@
     var groups = Model.Tickets.GroupBy(c => (c.Ticket.EventTitle, c.Ticket.StartsAt, c.Ticket.VenueName));
 }
 
-<p class="label-caps text-muted mb-3">Платено · поръчка №@Model.OrderId · @Format.Money(Model.Total)</p>
-<h1 class="visually-hidden">Потвърждение на поръчка №@Model.OrderId</h1>
+<p class="label-caps text-muted mb-3">Платено · поръчка @Format.OrderNo(Model.OrderId) · @Format.Money(Model.Total)</p>
+<h1 class="visually-hidden">Потвърждение на поръчка @Format.OrderNo(Model.OrderId)</h1>
 
 @foreach (var g in groups)
 {

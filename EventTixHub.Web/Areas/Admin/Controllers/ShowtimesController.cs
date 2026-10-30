@@ -77,7 +77,7 @@ public class ShowtimesController(
         var showtime = await eventService.GetShowtimeAsync(id);
         return showtime is null ? NotFound()
             : View("Delete", new DeleteVM(id, "Изтриване на прожекция",
-                $"{showtime.Event.Title} · {showtime.Venue.Name} · {showtime.StartsAt:dd.MM.yyyy HH:mm}"));
+                $"{showtime.Event.Title} · {showtime.Venue.Name} · {Format.DateAndTime(showtime.StartsAt)}"));
     }
 
     [HttpPost, ActionName("Delete")]

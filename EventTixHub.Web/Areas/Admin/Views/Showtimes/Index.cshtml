@@ -5,7 +5,7 @@
     var pager = new PagerVM(Model.Showtimes.Page, Model.Showtimes.TotalPages, new Dictionary<string, string?>
     {
         ["eventId"] = f.EventId?.ToString(), ["venueId"] = f.VenueId?.ToString(),
-        ["from"] = f.From?.ToString("yyyy-MM-dd"), ["to"] = f.To?.ToString("yyyy-MM-dd"),
+        ["from"] = Format.DateInput(f.From), ["to"] = Format.DateInput(f.To),
         ["past"] = f.Past ? "true" : null
     });
 }
@@ -49,8 +49,8 @@
             }
         </select>
     </div>
-    <div><label class="form-label label-caps" for="from">От дата</label><input id="from" type="date" name="from" value="@f.From?.ToString("yyyy-MM-dd")" class="form-control" data-autosubmit="blur" /></div>
-    <div><label class="form-label label-caps" for="to">До дата</label><input id="to" type="date" name="to" value="@f.To?.ToString("yyyy-MM-dd")" class="form-control" data-autosubmit="blur" /></div>
+    <div><label class="form-label label-caps" for="from">От дата</label><input id="from" type="date" name="from" value="@Format.DateInput(f.From)" class="form-control" data-autosubmit="blur" /></div>
+    <div><label class="form-label label-caps" for="to">До дата</label><input id="to" type="date" name="to" value="@Format.DateInput(f.To)" class="form-control" data-autosubmit="blur" /></div>
     <div class="admin-filter-actions">
         <button type="submit" class="btn btn-secondary">Филтрирай</button>
     </div>
@@ -78,13 +78,13 @@ else
         @foreach (var s in Model.Showtimes.Items)
         {
             <tr>
-                <td>@s.EventTitle <span class="badge type-badge @s.Type.TypeClass()">@s.Type.DisplayName()</span></td><td>@s.VenueName</td><td>@s.StartsAt.ToString("dd.MM.yyyy HH:mm")</td>
+                <td>@s.EventTitle <span class="badge type-badge @s.Type.TypeClass()">@s.Type.DisplayName()</span></td><td>@s.VenueName</td><td>@Format.DateAndTime(s.StartsAt)</td>
                 <td class="num">@s.Sold</td><td class="num">@s.Held</td><td class="num">@s.Free</td>
                 <td>
                     <div class="row-actions">
-                        <a asp-action="Details" asp-route-id="@s.Id">Места<span class="visually-hidden"> за „@s.EventTitle“, @s.StartsAt.ToString("dd.MM.yyyy HH:mm")</span></a>
-                        <a asp-action="Edit" asp-route-id="@s.Id">Редакция<span class="visually-hidden"> на „@s.EventTitle“, @s.StartsAt.ToString("dd.MM.yyyy HH:mm")</span></a>
-                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@s.Id">Изтрий<span class="visually-hidden"> „@s.EventTitle“, @s.StartsAt.ToString("dd.MM.yyyy HH:mm")</span></a>
+                        <a asp-action="Details" asp-route-id="@s.Id">Места<span class="visually-hidden"> за „@s.EventTitle“, @Format.DateAndTime(s.StartsAt)</span></a>
+                        <a asp-action="Edit" asp-route-id="@s.Id">Редакция<span class="visually-hidden"> на „@s.EventTitle“, @Format.DateAndTime(s.StartsAt)</span></a>
+                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@s.Id">Изтрий<span class="visually-hidden"> „@s.EventTitle“, @Format.DateAndTime(s.StartsAt)</span></a>
                     </div>
                 </td>
             </tr>

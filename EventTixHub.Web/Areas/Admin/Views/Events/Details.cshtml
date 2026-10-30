@@ -5,7 +5,7 @@
 }
 
 <h1 class="headline">@e.Title</h1>
-<p class="text-muted"><span class="badge type-badge @e.Type.TypeClass()">@e.Type.DisplayName()</span> · @e.Genre · @e.DurationMinutes мин</p>
+<p class="text-muted"><span class="badge type-badge @e.Type.TypeClass()">@e.Type.DisplayName()</span> · @e.Genre · @Format.Minutes(e.DurationMinutes)</p>
 @if (!string.IsNullOrWhiteSpace(e.Description))
 {
     <p>@e.Description</p>
@@ -29,7 +29,7 @@ else
         @foreach (var s in Model.Showtimes)
         {
             <tr>
-                <td><a asp-controller="Showtimes" asp-action="Details" asp-route-id="@s.Id">@s.StartsAt.ToString("dd.MM.yyyy HH:mm")</a></td>
+                <td><a asp-controller="Showtimes" asp-action="Details" asp-route-id="@s.Id">@Format.DateAndTime(s.StartsAt)</a></td>
                 <td>@s.VenueName</td><td class="num">@s.Sold</td><td class="num">@s.Held</td><td class="num">@s.Free</td>
             </tr>
         }

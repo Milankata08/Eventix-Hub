@@ -41,9 +41,9 @@ else
         {
             <tr>
                 <td>@p.Code</td>
-                <td class="num">@p.DiscountPercent %</td>
+                <td class="num">@Format.Percent(p.DiscountPercent)</td>
                 <td class="num">@p.TimesUsed / @p.UsageLimit</td>
-                <td>@p.ValidFrom.ToString("dd.MM.yyyy") – @p.ValidUntil.ToString("dd.MM.yyyy")</td>
+                <td>@Format.Date(p.ValidFrom) – @Format.Date(p.ValidUntil)</td>
                 <td class="label-caps">@Model.StateOf(p).DisplayName()</td>
                 <td>
                     <div class="row-actions">
