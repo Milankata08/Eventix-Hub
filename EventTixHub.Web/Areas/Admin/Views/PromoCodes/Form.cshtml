@@ -8,12 +8,12 @@
 <div class="row">
     <div class="col-lg-6">
         <h1 class="headline mb-3">@ViewData["Title"]</h1>
-        <form method="post" class="sheet-panel">
+        <form method="post" class="sheet-panel" autocomplete="off">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="TimesUsed" />
             <div class="mb-3">
                 <label asp-for="Code" class="form-label"></label>
-                <input asp-for="Code" class="form-control" readonly="@used" aria-describedby="@(used ? "locked-hint" : null)" />
+                <input asp-for="Code" class="form-control text-uppercase" autocomplete="off" spellcheck="false" autocapitalize="characters" readonly="@used" aria-describedby="@(used ? "locked-hint" : null)" />
                 <span asp-validation-for="Code" class="text-danger"></span>
                 @if (used)
                 {

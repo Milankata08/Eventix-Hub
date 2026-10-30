@@ -97,7 +97,7 @@ else
                     <form asp-action="ApplyPromo" method="post" style="max-width: 22rem">
                         <label class="form-label" for="promo-code">Промо код</label>
                         <div class="d-flex gap-2">
-                            <input id="promo-code" name="code" class="form-control" maxlength="20" value="@promoCode"
+                            <input id="promo-code" name="code" class="form-control text-uppercase" maxlength="20" autocomplete="off" spellcheck="false" autocapitalize="characters" value="@promoCode"
                                    aria-invalid="@(promoError is null ? "false" : "true")"
                                    aria-describedby="@(promoError is null ? null : "promo-error")" />
                             <button type="submit" class="btn btn-outline-primary">Приложи</button>

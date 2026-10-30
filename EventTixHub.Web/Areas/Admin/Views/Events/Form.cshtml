@@ -6,11 +6,11 @@
 <div class="row">
     <div class="col-lg-7">
         <h1 class="headline mb-3">@ViewData["Title"]</h1>
-        <form method="post" class="sheet-panel" enctype="multipart/form-data">
+        <form method="post" class="sheet-panel" autocomplete="off" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="mb-3">
                 <label asp-for="Title" class="form-label"></label>
-                <input asp-for="Title" class="form-control" />
+                <input asp-for="Title" class="form-control" autocomplete="off" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
             <div class="mb-3">
@@ -25,7 +25,7 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label asp-for="Genre" class="form-label"></label>
-                    <input asp-for="Genre" class="form-control" />
+                    <input asp-for="Genre" class="form-control" autocomplete="off" />
                     <span asp-validation-for="Genre" class="text-danger"></span>
                 </div>
                 <div class="col-md-4 mb-3">

@@ -13,7 +13,7 @@
 </div>
 
 <form method="get" class="admin-filter">
-    <div><label class="form-label label-caps" for="search">Търсене</label><input id="search" name="search" value="@Model.Search" class="form-control" data-autosubmit="blur" placeholder="По код" /></div>
+    <div><label class="form-label label-caps" for="search">Търсене</label><input type="search" id="search" name="search" value="@Model.Search" class="form-control" data-autosubmit="blur" autocomplete="off" spellcheck="false" placeholder="напр. SUMMER10…" /></div>
     <div>
         <label class="form-label label-caps" for="active">Състояние</label>
         <select id="active" name="active" class="form-select" data-autosubmit>
