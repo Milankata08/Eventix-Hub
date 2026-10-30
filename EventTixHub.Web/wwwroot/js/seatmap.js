@@ -321,9 +321,10 @@
 
     window.addEventListener('resize', updateHint);
 
-    // The bottom bar's height changes with the open panel and wrapping; keep the page padding equal to it.
+    // The bottom bar's height changes with the open panel and wrapping; keep the page padding and the
+    // focus scroll padding equal to it. Set on <html> so its scroll-padding can read it.
     const bar = root.querySelector('.hall-summary');
-    if (bar) new ResizeObserver(() => root.style.setProperty('--summary-h', bar.offsetHeight + 'px')).observe(bar);
+    if (bar) new ResizeObserver(() => document.documentElement.style.setProperty('--summary-h', bar.offsetHeight + 'px')).observe(bar);
 
     // "Имате N места в количката": each line counts its seats down as their holds end; the first line with seats
     // left is shown (this showtime's, then the whole cart's), and none once all have ended. Plain text writes,

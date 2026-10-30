@@ -566,6 +566,7 @@ button.seat { cursor: pointer; }
 /* Below lg the summary is a fixed bottom bar; its seat list expands above it. */
 @media (max-width: 991.98px) {
   .hall-summary { position: fixed; left: 0; right: 0; bottom: 0; z-index: 1030; background: var(--sheet); border-top: 3px solid var(--ink); }
+  html:has(.hall-summary) { scroll-padding-bottom: calc(var(--summary-h, 6rem) + 1rem); } /* a focused seat and its outline scroll clear of the bar */
   .summary-promise { margin: 0; padding: 0.5rem 1rem 0; }
   /* Kept outside the collapsible panel on purpose: the bottom sheet grows by a line or two, but a buyer who
      returns to the hall always sees that the "резервирано" seats are theirs. */
@@ -777,7 +778,7 @@ button.seat { cursor: pointer; }
 .totals-bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 1rem; margin: 0 -0.75rem; }
 .pay-bar { padding: 0.75rem 0; }
 @media (max-width: 991.98px) {
-  html:has(.pay-bar) { scroll-padding-bottom: 5.5rem; } /* a focused field scrolls clear of the sticky bar */
+  html:has(.pay-bar, .totals-bar) { scroll-padding-bottom: 5.5rem; } /* a focused field scrolls clear of the sticky bar */
 }
 @media (min-width: 992px) {
   .pay-bar { position: static; border-top: 0; padding: 0; }
